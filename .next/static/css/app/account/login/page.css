@@ -41,7 +41,7 @@
   }
   
   .login_button__v2Cia {
-    background-color: #0e365e;
+    background-color: var(--primary-bg-color);
     color: white;
     border: none;
     padding: 12px;
@@ -52,7 +52,7 @@
   }
   
   .login_button__v2Cia:hover {
-    background-color: #003366;
+    background-color:var(--primary-bg-color-hover);
   }
   .login_button__v2Cia:disabled {
     cursor: not-allowed;
@@ -65,7 +65,7 @@
   }
   
   .login_link__mSceC {
-    color: #003366;
+    color: var(--primary-bg-color);
     text-decoration: none;
   }
   

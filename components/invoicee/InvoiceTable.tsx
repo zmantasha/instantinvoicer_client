@@ -6,7 +6,7 @@ import { FcPaid } from "react-icons/fc";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { formatCurrency } from "../../lib/utils/format-currency";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { BadgeInfo, ChevronDown, Delete, Edit } from "lucide-react";
 
 interface InvoiceItem {
   _id: string;
@@ -150,15 +150,15 @@ export default function InvoiceTable({
                   {showDropdown === item._id && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
                       <div className={styles.dropdownContent} onClick={() => handleEditInvoice(item._id)}>
-                        <MdEdit size={20} />
+                      <Edit className="w-4 h-4 mr-2"  />
                         Edit
                       </div>
                       <div className={styles.dropdownContent} onClick={() => handleStatusChange(item._id, item.status)}>
-                        <FcPaid size={20} />
+                      <BadgeInfo className="w-4 h-4 mr-2 text-green-700"    />
                         {item.status === "Paid" ? "Mark as Not Paid" : "Mark as Paid"}
                       </div>
                       <div onClick={() => setDeleteItemId(item._id)} className={styles.dropdownContent}>
-                        <MdDelete color="#e65050" size={20} />
+                      <Delete className="w-4 h-4 mr-2 text-red-500"  />
                         Delete
                       </div>
                     </div>

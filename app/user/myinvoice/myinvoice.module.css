@@ -26,7 +26,7 @@
 .invoiceTitle{
     font-size: 25px;
     font-weight: 700;
-    color: #003366;
+    color: var(--primary-bg-color);
 }
 .noInvoiceFound{
     color: #656a6a;
@@ -105,7 +105,7 @@
 }
 
 .dropdownbutton:hover {
-  color: #003366;
+  color:  var(--primary-bg-color-hover);;
 }
 
 /* Dropdown menu */
@@ -132,7 +132,7 @@
 
 .dropdownMenu div:hover {
   background-color: #f4f4f4;
-  color: #003366;
+  color:  #29642b;
   border-radius: 4px;
 }
 
@@ -147,7 +147,7 @@
 }
 
 .viewButton:hover {
-  color: #003366;
+  color:  var(--primary-bg-color-hover);;
 }
 .dropdownContent{
   display:  flex;

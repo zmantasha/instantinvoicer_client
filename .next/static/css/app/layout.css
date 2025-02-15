@@ -1003,6 +1003,12 @@ video {
 .w-px {
   width: 1px;
 }
+.w-\[100\%\] {
+  width: 100%;
+}
+.w-\[80\%\] {
+  width: 80%;
+}
 .min-w-0 {
   min-width: 0px;
 }
@@ -1334,9 +1340,9 @@ video {
 .border-t-transparent {
   border-top-color: transparent;
 }
-.bg-\[\#003366\] {
+.bg-\[\#0c69cc\] {
   --tw-bg-opacity: 1;
-  background-color: rgb(0 51 102 / var(--tw-bg-opacity));
+  background-color: rgb(12 105 204 / var(--tw-bg-opacity));
 }
 .bg-\[--color-bg\] {
   background-color: var(--color-bg);
@@ -1868,6 +1874,8 @@ video {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --primary-bg-color:#0c69cc;
+  --primary-bg-color-hover:#0f7fe6;
 }
 *{
   padding: 0;
@@ -2029,6 +2037,11 @@ video {
 .hover\:bg-white:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-\[\#0f7fe6\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(15 127 230 / var(--tw-bg-opacity));
 }
 
 .hover\:text-accent-foreground:hover {
@@ -2863,6 +2876,10 @@ video {
 
 @media (min-width: 1024px) {
 
+  .lg\:max-w-\[500px\] {
+    max-width: 500px;
+  }
+
   .lg\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3105,7 +3122,7 @@ video {
   /* background-color: #333; */
   padding: 0.5rem 0;
   position: relative;
-  background-color: #0e365e; /* Change to your preferred background color */
+  background-color: var(--primary-bg-color);/* Change to your preferred background color */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -3209,7 +3226,7 @@ video {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #003366;
+  background-color:var(--primary-bg-color);
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   border-radius: 6px;
   z-index: 1000;
@@ -3270,19 +3287,19 @@ video {
 
 .navbar_dropdownItem__RvNs6:hover {
   color: #ffffff;
-  background-color: #003380;
+  background-color:  var(--primary-bg-color-hover);
   text-shadow: 0 0 12px rgba(76, 175, 80, 0.8);
 }
 
 .navbar_dropdownItem__RvNs6:last-child {
   border-bottom: none;
-  color: #e53935;
+  color: #ffffff;
   font-weight: 600;
 }
 
 .navbar_dropdownItem__RvNs6:last-child:hover {
-  color: #ff5252;
-  text-shadow: 0 0 8px rgba(229, 57, 53, 0.7);
+  color: #ffffff;
+  
 }
 .navbar_buttonStyles__VhH8X{
   background: linear-gradient(90deg,#297e2c, #4CAF50, #4eb84e);
@@ -3311,7 +3328,7 @@ video {
     top: 100%;
     left: 0;
     right: 0;
-    background-color: #003366;
+    background-color:var(--primary-bg-color);
     flex-direction: column;
     align-items: stretch;
     padding: 1rem;

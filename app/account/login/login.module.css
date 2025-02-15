@@ -38,7 +38,7 @@
   }
   
   .button {
-    background-color: #0e365e;
+    background-color: var(--primary-bg-color);
     color: white;
     border: none;
     padding: 12px;
@@ -49,7 +49,7 @@
   }
   
   .button:hover {
-    background-color: #003366;
+    background-color:var(--primary-bg-color-hover);
   }
   .button:disabled {
     cursor: not-allowed;
@@ -62,7 +62,7 @@
   }
   
   .link {
-    color: #003366;
+    color: var(--primary-bg-color);
     text-decoration: none;
   }
   

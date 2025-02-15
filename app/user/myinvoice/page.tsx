@@ -73,7 +73,7 @@ export default function MyInvoice() {
         <div className={styles.invoiceCard}>
           <div className={styles.invoiceHeader}>
             <h2 className={styles.invoiceTitle}>My Invoices</h2>
-             <Button variant="outline"  className="text-white bg-[#003366] hover:bg-[#003380] hover:text-white"  onClick={handleNewInvoice}>
+             <Button variant="outline"  className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white"  onClick={handleNewInvoice}>
             New Invoice 
             </Button>
           </div>

@@ -1,6 +1,7 @@
 {
+  "/account/login/page": "app/account/login/page.js",
   "/user/myinvoice/page": "app/user/myinvoice/page.js",
-  "/user/d/[id]/page": "app/user/d/[id]/page.js",
-  "/page": "app/page.js",
-  "/account/login/page": "app/account/login/page.js"
+  "/user/invoicetamplate/page": "app/user/invoicetamplate/page.js",
+  "/user/myaccount/page": "app/user/myaccount/page.js",
+  "/user/d/[id]/page": "app/user/d/[id]/page.js"
 }

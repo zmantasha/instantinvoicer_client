@@ -29,7 +29,7 @@
 .myinvoice_invoiceTitle__hPLNU{
     font-size: 25px;
     font-weight: 700;
-    color: #003366;
+    color: var(--primary-bg-color);
 }
 .myinvoice_noInvoiceFound__O8hed{
     color: #656a6a;
@@ -108,7 +108,7 @@
 }
 
 .myinvoice_dropdownbutton__FbTse:hover {
-  color: #003366;
+  color:  var(--primary-bg-color-hover);;
 }
 
 /* Dropdown menu */
@@ -135,7 +135,7 @@
 
 .myinvoice_dropdownMenu__VjFMV div:hover {
   background-color: #f4f4f4;
-  color: #003366;
+  color:  #29642b;
   border-radius: 4px;
 }
 
@@ -150,7 +150,7 @@
 }
 
 .myinvoice_viewButton__v5R00:hover {
-  color: #003366;
+  color:  var(--primary-bg-color-hover);;
 }
 .myinvoice_dropdownContent__Zo3zG{
   display:  flex;

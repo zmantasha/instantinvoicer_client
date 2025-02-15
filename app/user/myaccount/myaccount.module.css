@@ -27,7 +27,7 @@
 .profileTitle {
     font-size: 32px;
     font-weight: 700;
-    color:#003366;
+    color:var(--primary-bg-color);
     margin-bottom: 15px;
     text-align: center;
 }
@@ -47,7 +47,7 @@
 
 .profileEmail {
     font-weight: 600;
-    color: #003366; /* Vibrant green with depth */
+    color: var(--primary-bg-color); /* Vibrant green with depth */
 /*     text-shadow: 0 0 5px rgba(76, 175, 80, 0.7); */
 }
 
@@ -81,7 +81,7 @@
 }
 
 .saveButton {
-    background-color:#0e365e;
+    background-color:var(--primary-bg-color);
     color: #fff;
     border: none;
     margin-top: 20px;
@@ -93,7 +93,7 @@
 }
 
 .saveButton:hover {
-    background-color:#003380;
+    background-color:var(--primary-bg-color-hover);;
     transition: 1s ease-in-out;
 }
 .saveButton:disabled {

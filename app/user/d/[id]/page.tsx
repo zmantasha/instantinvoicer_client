@@ -22,7 +22,7 @@ export default function ViewPage() {
   
   const router=useRouter()
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
  const [deleteItemId, setDeleteItemId] =useState(false);
   const [shareUrl, setShareUrl] = useState("");
     const dropdownRef = useRef<HTMLDivElement | null>(null); 
@@ -249,7 +249,7 @@ export default function ViewPage() {
                       <div ref={dropdownRef} className={styles.dropdownMenu}> 
                         <div className={styles.dropdownContent} onClick={handleEditInvoice}>
                           <Edit className="w-4 h-4 mr-2"  />
-                          edit</div>
+                          Edit</div>
                         <div className={styles.dropdownContent} onClick={() => handleStatusChange(invoiceItem._id, invoiceItem.status)}>
                         <BadgeInfo className="w-4 h-4 mr-2 text-green-700"    />
                         {invoiceItem.status==="Paid" ?"Mark as not Paid":"Mark as Paid"}</div>
