@@ -1,0 +1,186 @@
+.viewPage {
+    background-color: #f4f7fc;
+    min-height: 100vh;
+}
+
+.viewContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    background-color: #f4f7fc;
+    padding: 20px;
+}
+
+.viewCard {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1334px;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.viewHeader {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    gap: 6px;
+}
+
+.headerTop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 25px;
+}
+
+.headerTop h1 {
+    font-size: 23px;
+    font-weight: 600;
+    color: black;
+}
+
+.middle p {
+   
+    display: flex;
+    font-size: 15px;
+    font-weight: 500;
+    color: #828585;
+    gap: 10px;
+    padding:0px 0px 15px 30px;
+}
+
+.middle span {
+    display: flex;
+    align-items: center;
+    color: #828585;
+}
+
+.headerButtons {
+    width: 100%;
+    margin-bottom: 30px;
+    margin-left: 30px;
+}
+
+/* Main section */
+.mainSection {
+    padding: 30px;
+}
+
+.moreOptionDropdown {
+    display: flex;
+    gap: 10px;
+    width: 35%;
+    position: relative;
+}
+
+/* Dropdown menu */
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 180px;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+}
+
+.dropdownMenu div {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.dropdownMenu div:hover {
+    background-color: #f4f4f4;
+    color: #29642b;
+    border-radius: 4px;
+}
+
+.dropdownContent {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Responsive styles */
+@media (max-width: 998px) {
+    .viewCard {
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .headerTop {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .headerTop h1 {
+        font-size: 20px;
+    }
+
+    .headerTop p {
+        font-size: 14px;
+    }
+
+    .moreOptionDropdown {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 768px) {
+    .viewHeader {
+        padding: 20px;
+    }
+
+    .mainSection {
+        padding: 20px;
+    }
+
+    .headerTop {
+        gap: 15px;
+    }
+
+    .headerTop h1 {
+        font-size: 18px;
+    }
+
+    .headerTop p {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .viewContainer {
+        padding: 10px;
+    }
+
+    .viewCard {
+        padding: 10px;
+    }
+
+    .headerTop h1 {
+        font-size: 16px;
+    }
+
+    .headerTop p {
+        font-size: 12px;
+    }
+
+    .dropdownMenu {
+        width: 150px;
+    }
+
+    .dropdownMenu div {
+        font-size: 12px;
+        padding: 10px 14px;
+    }
+}

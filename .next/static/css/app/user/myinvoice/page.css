@@ -1,0 +1,258 @@
+/*!***********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[7].use[3]!./app/user/myinvoice/myinvoice.module.css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************/
+.myinvoice_myInvoicePage__4UbXf{
+    min-height: 100vh;
+    background-color: #ffffff; 
+}
+.myinvoice_myInvoiceContainer__ylAs2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    padding: 20px;
+}
+.myinvoice_invoiceCard__00yV6{
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    width: 100%;
+    max-width: 1334px;
+    /* padding: 30px; */
+    box-sizing: border-box;
+}
+.myinvoice_invoiceHeader__z_5tC{
+   display:flex;
+   justify-content: space-between;
+   padding: 30px;
+}
+.myinvoice_invoiceTitle__hPLNU{
+    font-size: 25px;
+    font-weight: 700;
+    color: #003366;
+}
+.myinvoice_noInvoiceFound__O8hed{
+    color: #656a6a;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 10px;
+}
+.myinvoice_invoiceContainer__9_kok {
+  padding: 20px 0px;
+
+}
+
+ /* table styles */
+.myinvoice_tableContainer___ojyo {
+  margin-top: 20px;
+  /* overflow-x: auto; */
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.myinvoice_invoiceTable__aL4B0 {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.myinvoice_invoiceTable__aL4B0 th,
+.myinvoice_invoiceTable__aL4B0 td {
+  padding: 8px 16px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.myinvoice_invoiceTable__aL4B0 th {
+  background-color: #f2f2f2;
+  color: #545353;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.myinvoice_invoiceTable__aL4B0 tbody {
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.myinvoice_invoiceTable__aL4B0 tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.myinvoice_invoiceTable__aL4B0 tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.myinvoice_invoiceTable__aL4B0 td {
+  white-space: normal;
+}
+
+/* Dropdown styles */
+.myinvoice_invoicedropdown__p3AAN {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dadada;
+  width: 100px;
+  border-radius: 6px;
+  position: relative;
+  overflow: visible;
+}
+.myinvoice_dropdownbutton__FbTse {
+  padding: 6px 12px;
+}
+
+.myinvoice_dropdownbutton__FbTse::after {
+  content: '\25BC'; /* Down arrow */
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.myinvoice_dropdownbutton__FbTse:hover {
+  color: #003366;
+}
+
+/* Dropdown menu */
+.myinvoice_dropdownMenu__VjFMV {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 180px;
+  padding: 8px 0;
+  transition: all 0.3s ease;
+}
+
+.myinvoice_dropdownMenu__VjFMV div {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.myinvoice_dropdownMenu__VjFMV div:hover {
+  background-color: #f4f4f4;
+  color: #003366;
+  border-radius: 4px;
+}
+
+/* Button Styles */
+.myinvoice_viewButton__v5R00 {
+  color: black;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-right: 1px solid #dadada;
+  padding: 6px 12px;
+}
+
+.myinvoice_viewButton__v5R00:hover {
+  color: #003366;
+}
+.myinvoice_dropdownContent__Zo3zG{
+  display:  flex;
+  gap: 20px;
+  align-items: center;
+}
+.myinvoice_popupOverlay__l_2JM {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.myinvoice_popup__REsSx {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 350px;
+}
+
+.myinvoice_popupButtons__IE8ws {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.myinvoice_confirmButton__lGvxT,
+.myinvoice_cancelButton__kCxL_ {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.myinvoice_confirmButton__lGvxT {
+  background-color: #e65050;
+  color: white;
+  border-radius: 10px;
+}
+
+.myinvoice_cancelButton__kCxL_ {
+  background-color: gray;
+  color: white;
+  border-radius: 10px;
+}
+
+@media (max-width: 998px) {
+    /* Hide the columns that you don't want to show */
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(1), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(1),
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(3), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(3),
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(4), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(4),
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(5), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(5) {
+      display: none; /* Hide these columns */
+    }
+  
+    /* Ensure that only the "Reference" and "Total" columns are shown */
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(2), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(2),
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(6), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(6),
+    .myinvoice_invoiceTable__aL4B0 th:nth-child(7), 
+    .myinvoice_invoiceTable__aL4B0 td:nth-child(7) {
+      display: table-cell; /* Show the Reference and Total columns */
+    }
+
+    .myinvoice_invoiceCard__00yV6{
+      max-width: 100%;
+  }
+}
+@media (max-width: 600px){
+  /* Hide the columns that you don't want to show */
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(1), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(1),
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(3), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(3),
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(4), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(4),
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(5), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(5),
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(6), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(6){
+    display: none; /* Hide these columns */
+  }
+
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(2), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(2),
+  .myinvoice_invoiceTable__aL4B0 th:nth-child(7), 
+  .myinvoice_invoiceTable__aL4B0 td:nth-child(7) {
+    display: table-cell; /* Show the Reference and Total columns */
+  }
+  .myinvoice_invoiceCard__00yV6{
+    max-width: 100%;
+}
+}
+

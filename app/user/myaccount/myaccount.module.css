@@ -1,0 +1,177 @@
+
+
+/* CSS - myaccount.module.css */
+
+.myaccountPage{
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+.myProfileContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    padding: 20px;
+}
+
+.profileCard {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    width: 100%;
+    max-width: 1334px;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.profileTitle {
+    font-size: 32px;
+    font-weight: 700;
+    color:#003366;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.profileContent {
+    color: #7f8c8d;
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.profileDetails p {
+    font-size: 18px;
+    color: black;
+    margin: 10px 0;
+}
+
+.profileEmail {
+    font-weight: 600;
+    color: #003366; /* Vibrant green with depth */
+/*     text-shadow: 0 0 5px rgba(76, 175, 80, 0.7); */
+}
+
+.changeProfile {
+    margin-top: 30px;
+}
+
+.changeTitle {
+    font-size: 24px;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+}
+
+.inputGroup input {
+    padding: 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.saveButton {
+    background-color:#0e365e;
+    color: #fff;
+    border: none;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.saveButton:hover {
+    background-color:#003380;
+    transition: 1s ease-in-out;
+}
+.saveButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+.dangerCard{
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    /* padding: 30px; */
+    margin-top: 50px;
+    box-sizing: border-box;   
+}
+.dangerTitle{
+    background-color: #e65050;
+    border-radius: 12px 12px 0px 0px;
+    padding: 10px 15px;
+    color:white;
+}
+.dangerbuttondiv{
+    padding: 20px 30px;
+}
+.dangerButton{
+    padding: 10px 10px;
+    background-color: #e65050;
+    color: white;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .popup {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 350px;
+  }
+  
+  .popupButtons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  
+  .confirmButton,
+  .cancelButton {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .confirmButton {
+    background-color: #e65050;
+    color: white;
+    border-radius: 10px;
+  }
+  
+  .cancelButton {
+    background-color: gray;
+    color: white;
+    border-radius: 10px;
+  }
+ @media (max-width: 768px) {
+    .profileDetails p{
+        overflow-x: scroll;
+        scrollbar-width: none;
+    }
+  }

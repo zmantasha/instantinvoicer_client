@@ -1,0 +1,238 @@
+.viewPage {
+    background-color: #f4f7fc;
+    min-height: 100vh;
+}
+
+.viewContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    background-color: #f4f7fc;
+    padding: 20px;
+}
+
+.viewCard {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1334px;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.viewHeader {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    gap: 6px;
+}
+
+.headerTop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 25px;
+}
+
+.headerTop h1 {
+    font-size: 23px;
+    font-weight: 600;
+    color: black;
+}
+
+.headerTop p {
+    display: flex;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #828585;
+}
+
+.headerTop span {
+    display: flex;
+    align-items: center;
+}
+
+.headerButtons {
+    width: 100%;
+}
+
+/* Main section */
+.mainSection {
+    padding: 30px;
+}
+
+.moreOptionDropdown {
+    display: flex;
+    gap: 10px;
+    width: 35%;
+    position: relative;
+}
+
+/* Dropdown menu */
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 180px;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+}
+
+.dropdownMenu div {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.dropdownMenu div:hover {
+    background-color: #f4f4f4;
+    color: #29642b;
+    border-radius: 4px;
+}
+
+.dropdownContent {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+  }
+  
+  .popup {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 350px;
+  }
+  
+  .popupButtons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  
+  .confirmButton,
+  .cancelButton {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .confirmButton {
+    background-color: #e65050;
+    color: white;
+    border-radius: 10px;
+  }
+  
+  .cancelButton {
+    background-color: gray;
+    color: white;
+    border-radius: 10px;
+  }
+
+
+/* Responsive styles */
+@media (max-width: 998px) {
+    .viewCard {
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .headerTop {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .headerTop h1 {
+        font-size: 20px;
+    }
+
+    .headerTop p {
+        font-size: 14px;
+    }
+
+   .moreOptionDropdown {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .viewHeader {
+        padding: 20px;
+    }
+
+    .mainSection {
+        padding: 20px;
+    }
+
+    .headerTop {
+        gap: 15px;
+    }
+
+    .headerTop h1 {
+        font-size: 18px;
+    }
+
+    .headerTop p {
+        font-size: 13px;
+    }
+     .moreOptionDropdown {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .viewContainer {
+        padding: 10px;
+    }
+
+    .viewCard {
+        padding: 10px;
+    }
+
+    .headerTop h1 {
+        font-size: 16px;
+    }
+
+    .headerTop p {
+        font-size: 12px;
+    }
+
+    .dropdownMenu {
+        width: 150px;
+    }
+
+    .dropdownMenu div {
+        font-size: 12px;
+        padding: 10px 14px;
+    }
+     .moreOptionDropdown {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}

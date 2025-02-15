@@ -1,0 +1,81 @@
+.settingPage{
+    min-height: 100vh;
+    background-color: #f4f7fc;  
+}
+.settingContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    padding: 20px;
+}
+.settingCard{
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 80%;
+    padding: 30px;
+    box-sizing: border-box;
+}
+.settingTitle{
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(90deg,#29642b, #1f6a30, #4CAF50, #6fd96f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.settingContent{
+    color: #7f8c8d;
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+.settingDetails{
+    font-weight: 600;
+    font-size: 25px;
+    color: black;
+    margin: 20px 0;
+}
+.InvoiceNumber{
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-weight: 400;
+    font-size: 16px;
+    color: #7f8c8d;
+}
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+.inputGroup label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+}
+.inputGroup input {
+    padding: 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.saveButton {
+    background-color:#4CAF50;
+    color: #fff;
+    border: none;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.saveButton:hover {
+    background-color: #317e33;
+}
