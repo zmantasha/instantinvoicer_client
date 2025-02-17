@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams  } from "next/navigation";
 import styles from "./view.module.css";
 import { FaFacebook, FaInstagram, FaShareSquare, FaTwitter, FaWhatsapp } from "react-icons/fa";
 import axios from "axios";
@@ -21,6 +21,7 @@ export default function ViewPage() {
   const [copied, setCopied] = useState(false);
   
   const router=useRouter()
+  const searchParams = useSearchParams();
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
  const [deleteItemId, setDeleteItemId] =useState(false);
@@ -44,13 +45,18 @@ export default function ViewPage() {
       setModalOpen(true);
   }; 
 
- useEffect(()=>{
-     if(modalOpen===true){
-      const generatedUrl = `${window.location.protocol}//${window.location.host}/share/${id}`; // Replace with the actual field in your invoice data
-      setShareUrl(generatedUrl);
-     }
-  },[id])
+  useEffect(()=>{
+    if(modalOpen===true){
+     const generatedUrl = `${window.location.protocol}//${window.location.host}/share/${id}`; // Replace with the actual field in your invoice data
+     setShareUrl(generatedUrl);
+    }
+ },[id,modalOpen])
 
+ useEffect(() => {
+   if (searchParams.get('openModal') === 'true') {  // Check if the query param openModal is 'true'
+     setModalOpen(true);
+   }
+ }, [searchParams]);
 
   const handleShare = (platform: string) => {
     // Make sure the URL is properly encoded and includes the protocol
