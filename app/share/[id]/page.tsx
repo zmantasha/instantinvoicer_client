@@ -8,6 +8,7 @@ import InvoiceGenerator from "../../../components/invoice-tools/invoiceGenerator
 import PDFGenerator from "../../../components/invoice-tools/PDFGenerator";
 import { useUser } from "../../../hooks/UserContext";
 import { formatCurrency } from "../../../lib/utils/format-currency";
+import Spinner from "../../../components/Spinner";
 
 export default function SharePage() {
   const { user } = useUser();
@@ -48,7 +49,7 @@ export default function SharePage() {
 
   // If invoiceItem is null, show loading message
   if (!invoiceItem) {
-    return <div>Loading...</div>;
+    return <Spinner loading={true} color="teal" />;
   }
 
   return (

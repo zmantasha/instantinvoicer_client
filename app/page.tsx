@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import Spinner from "../components/Spinner";
 
 export default function Home() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function Home() {
     <main className="container mx-auto py-8 px-4">
       {/* You can add a loading spinner here if necessary */}
       {isAuthenticated === null ? (
-        <div>Loading...</div>  // Show loading text or a spinner
+        <Spinner loading={true} color="teal" />  // Show loading text or a spinner
       ) : null}
     </main>
   );

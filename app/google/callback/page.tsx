@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
+import Spinner from "../../../components/Spinner";
 
 export default function GoogleCallbackPage() {
   const searchParams = useSearchParams();
@@ -27,5 +28,5 @@ export default function GoogleCallbackPage() {
     }
   }, [searchParams, router]);
 
-  return <p>Processing Google login...</p>;
+  return <Spinner loading={true} color="teal" />;
 }

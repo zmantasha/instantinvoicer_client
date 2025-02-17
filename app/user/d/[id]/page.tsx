@@ -108,7 +108,7 @@ export default function ViewPage() {
   }, [showDropdown]);
 
   if (!invoiceItem) {
-    return  <Spinner loading={true} color="teal" />;; // Display a loading message while data is being fetched
+    return  <Spinner loading={true} color="teal" />; // Display a loading message while data is being fetched
   }
  
 
