@@ -12,7 +12,7 @@ const Spinner = ({ loading = true, color = "blue" }: { loading?: boolean, color?
     display: "flex",
     justifyContent: "center",  // Center horizontally
     alignItems: "center",      // Center vertically
-    height: "100vh",           // Full viewport height
+    height: "80vh",           // Full viewport height
   };
   return (
     <div style={spinnerWrapperStyles}>
