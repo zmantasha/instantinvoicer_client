@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import styles from "./myinvoice.module.css";
-import InvoiceTable from "../../../components/invoicee/InvoiceTable";
+import InvoiceTable from "../../../components/invoice-tools/InvoiceTable";
 import axios from "axios";
 import { useUser } from "../../../hooks/UserContext";
 import { useRouter } from "next/navigation";

@@ -6,12 +6,12 @@ import axios from "axios";
 import { useEffect, useRef, useState,useCallback } from "react";
 import { Button } from "../../../../components/ui/button";
 import { BadgeInfo, BookMarked, Calendar, ChevronDown, Delete, Dot, Edit, User } from "lucide-react";
-import InvoiceGenerator from "../../../../components/invoicee/invoiceGenerator";
+import InvoiceGenerator from "../../../../components/invoice-tools/invoiceGenerator";
 import { Modal } from "../../../../components/ui/modal";
 import { Input } from "../../../../components/ui/input";
 import { MdEmail } from "react-icons/md";
 import Cookies from "js-cookie";
-import PDFGenerator from "../../../../components/invoicee/PDFGenerator";
+import PDFGenerator from "../../../../components/invoice-tools/PDFGenerator";
 import { useUser } from "../../../../hooks/UserContext";
 // import SharePDFGenerator from "@/components/invoicee/SharePDFGenerator";
 export default function ViewPage() {

@@ -4,8 +4,8 @@ import styles from "./view.module.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { BadgeInfo, BookMarked, Calendar, ChevronDown, Delete, Dot, Edit, User } from "lucide-react";
-import InvoiceGenerator from "../../../components/invoicee/invoiceGenerator";
-import PDFGenerator from "../../../components/invoicee/PDFGenerator";
+import InvoiceGenerator from "../../../components/invoice-tools/invoiceGenerator";
+import PDFGenerator from "../../../components/invoice-tools/PDFGenerator";
 import { useUser } from "../../../hooks/UserContext";
 import { formatCurrency } from "../../../lib/utils/format-currency";
 
