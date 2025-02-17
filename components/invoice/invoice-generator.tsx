@@ -14,6 +14,7 @@ import styles from "../../app/account/login/login.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { InvoiceData } from "../../types/invoice";
+import Spinner from "../Spinner";
 
 export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) {
   const [isLoading, setIsLoading] = useState(!!invoiceId);
@@ -56,7 +57,7 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
   } = useInvoice(initialData);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <Spinner loading={true} color="teal" />;
   }
 
   return (

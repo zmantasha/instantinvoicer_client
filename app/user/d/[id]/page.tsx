@@ -163,7 +163,7 @@ export default function ViewPage() {
 
  // Handle deletion of an invoice
     const handleDelete = async (id: string) => {
-      console.log(id);
+      // console.log(id);
       try {
         const accessToken = Cookies.get("accessToken");
         // Delete the invoice on the backend
@@ -174,7 +174,7 @@ export default function ViewPage() {
           },
           withCredentials: true,
         });
-        console.log(response);
+        // console.log(response);
         if (response.status === 200) {
           setDeleteItemId(false)
           router.replace("/user/myinvoice");
