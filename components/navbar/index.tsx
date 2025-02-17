@@ -185,9 +185,9 @@ const NavBar: FC = () => {
             <div className={styles.mobileAuth}>
               {isLoggedin && (
                 <div className={styles.dropdownContainer}>
-                  <div  className={styles.linkProfile}>
+                  <div  className={styles.linkProfile} onClick={toggleDropdown}>
                     {user?.user ? `${user?.user?.firstName} ${user?.user?.lastName}` : <></>}
-                    <ChevronDown className="w-4 h-4 ml-2" onClick={toggleDropdown} />
+                    <ChevronDown className="w-4 h-4 ml-2"/>
                   </div>
                   {showDropdown && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
