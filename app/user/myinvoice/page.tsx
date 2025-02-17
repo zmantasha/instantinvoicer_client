@@ -7,6 +7,7 @@ import axios from "axios";
 import { useUser } from "../../../hooks/UserContext";
 import { useRouter } from "next/navigation";
 import { Button } from "../../../components/ui/button";
+import Spinner from "../../../components/Spinner";
 
 export default function MyInvoice() {
   const { user } = useUser();
@@ -64,7 +65,7 @@ export default function MyInvoice() {
 
   // Show loading spinner while data is fetching
   if (isLoading) {
-    return <div className={styles.loading}>Loading...</div>;
+    return <Spinner loading={isLoading} color="teal" />;
   }
 
   return (

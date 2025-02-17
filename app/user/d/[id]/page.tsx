@@ -13,6 +13,7 @@ import { MdEmail } from "react-icons/md";
 import Cookies from "js-cookie";
 import PDFGenerator from "../../../../components/invoice-tools/PDFGenerator";
 import { useUser } from "../../../../hooks/UserContext";
+import Spinner from "../../../../components/Spinner";
 // import SharePDFGenerator from "@/components/invoicee/SharePDFGenerator";
 export default function ViewPage() {
   const { user } = useUser();
@@ -107,8 +108,9 @@ export default function ViewPage() {
   }, [showDropdown]);
 
   if (!invoiceItem) {
-    return <div>Loading...</div>; // Display a loading message while data is being fetched
+    return  <Spinner loading={true} color="teal" />;; // Display a loading message while data is being fetched
   }
+ 
 
   const handleEditInvoice=()=>{
     
