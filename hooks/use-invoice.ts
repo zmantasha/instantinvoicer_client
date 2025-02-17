@@ -253,9 +253,9 @@ export function useInvoice(initialData?: InvoiceData) {
           if (!isEditing) {
             resetForm();
             await generateInvoiceNumber();
-           router.push(`/user/d/${response.data.invoice._id}`); // Redirect to /user/myinvoice when a new invoice is saved
+           router.push(`/user/d/${response.data.invoice._id}?openModal=true`); // Redirect to /user/myinvoice when a new invoice is saved
           } else {
-            router.push(`/user/d/${response.data._id}`); // Redirect to /user/d/[id] when an invoice is updated
+            router.push(`/user/d/${response.data._id}?openModal=true`); // Redirect to /user/d/[id] when an invoice is updated
           }
         }
       } catch (error) {
