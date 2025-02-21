@@ -1,6 +1,7 @@
+
 export interface InvoiceItem {
   id: string;
-  description: string;
+  data: Record<string, string>;
   quantity: number;
   rate: number;
   amount: number;
@@ -36,14 +37,16 @@ export interface InvoiceData {
     poNumber: string;
     currency: string;
   };
+  itemHeaders: string[];
   items: InvoiceItem[];
   totals: {
     subtotal: number;
     tax: number;
     taxRate: number;
+    // taxType: string;
     discount: number;
     shipping: number;
-   discountType: number;
+    discountType: number;
     shippingType: "percentage" | "fixed";
     amountPaid: number,
     total: number;
