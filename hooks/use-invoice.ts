@@ -293,9 +293,9 @@ export function useInvoice(initialData?: InvoiceData) {
           if (!isEditing) {
             resetForm();
             await generateInvoiceNumber();
-            router.push(`/user/d/${response.data.invoice._id}`);
+            router.push(`/user/d/${response.data.invoice._id}?openModal=true`);
           } else {
-            router.push(`/user/d/${response.data._id}`);
+            router.push(`/user/d/${response.data._id}?openModal=true`);
           }
         }
       } catch (error) {
