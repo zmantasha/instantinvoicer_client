@@ -52,6 +52,7 @@ interface InvoiceData {
   };
   notes?: string;
   terms?: string;
+  status?: string;
 }
 
 interface PDFGeneratorProps {
@@ -275,20 +276,20 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
         gridY + 30 // Minimum spacing from grid
       );
         // Extract dynamic headers from the first item's data keys
-const dynamicHeaders =
-invoiceData.items.length > 0 ? Object.keys(invoiceData.items[0].data) : [];
+      const dynamicHeaders =
+      invoiceData.items.length > 0 ? Object.keys(invoiceData.items[0].data) : [];
 
-// Define the table headers including static columns
-const tableHeaders = ["Sr.No", ...dynamicHeaders, "Quantity", "Rate", "Amount"];
+      // Define the table headers including static columns
+      const tableHeaders = ["Sr.No", ...dynamicHeaders, "Quantity", "Rate", "Amount"];
 
-// Prepare table data dynamically
-const tableData = invoiceData.items.map((item, index) => [
-(index + 1).toString(),
-...dynamicHeaders.map((key) => item.data[key] || ""), // Extract values dynamically
-item.quantity.toString(),
-formatDownloadCurrency(item.rate, invoiceData.invoiceDetails.currency),
-formatDownloadCurrency(item.amount, invoiceData.invoiceDetails.currency),
-]);
+      // Prepare table data dynamically
+      const tableData = invoiceData.items.map((item, index) => [
+      (index + 1).toString(),
+      ...dynamicHeaders.map((key) => item.data[key] || ""), // Extract values dynamically
+      item.quantity.toString(),
+      formatDownloadCurrency(item.rate, invoiceData.invoiceDetails.currency),
+      formatDownloadCurrency(item.amount, invoiceData.invoiceDetails.currency),
+      ]);
       
 
       (pdf as any).autoTable({
@@ -311,6 +312,45 @@ formatDownloadCurrency(item.amount, invoiceData.invoiceDetails.currency),
         alternateRowStyles: {
           fillColor: [250, 250, 250],
         },
+
+          // Inside the autoTable's didDrawPage function
+          didDrawPage: function (data: any) {
+            if (invoiceData.status === "Paid") {
+              const fontSize = 80; // Adjust for better fit
+              const watermarkText = "PAID";
+        
+              // Get table position
+                 const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const centerX = pageWidth / 1.8;
+                const centerY = pageHeight / 1.5;
+        
+              pdf.setFont("helvetica", "bold");
+        
+              // Simulating transparency with layered red text
+              const transparencyLevels = [
+                { color: [240, 240, 240] }, // Very Light Gray (Almost Invisible)
+                { color: [230, 240, 255] }, // Lightest Blue
+                { color: [210, 230, 250] }, // Lighter Blue
+                { color: [190, 220, 245] }, // Very Light Blue
+              ];
+        
+              transparencyLevels.forEach(({ color }) => {
+                pdf.setFontSize(fontSize); // Slightly smaller for each layer
+                pdf.setTextColor(color[0], color[1], color[2]); // Set RGB color
+                pdf.text(watermarkText, centerX, centerY, {
+                  angle: 45,
+                  align: "center",
+                  baseline: "middle",
+                });
+              });
+        
+              // Reset styles
+              pdf.setTextColor(0, 0, 0);
+              pdf.setFontSize(12);
+              pdf.setFont("helvetica", "normal");
+            }
+          },
       });
 
       // Totals and Notes Section
