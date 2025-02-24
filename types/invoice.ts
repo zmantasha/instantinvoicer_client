@@ -43,7 +43,7 @@ export interface InvoiceData {
     taxRate: number;
     discount: number;
     shipping: number;
-   discountType: number;
+     discountType: number;
     shippingType: "percentage" | "fixed";
     amountPaid: number,
     total: number;
