@@ -46,9 +46,13 @@ const initialInvoiceData: Omit<InvoiceData, '_id'> = {
     subtotal: 0,
     tax: 0,
     taxRate: 0,
+    taxType: "VAT",
     shipping: 0,
     discount: 0,
     discountType: 0,
+    igst: 0,
+    cgst: 0,
+    sgst: 0,
     shippingType: "percentage",
     total: 0,
     amountPaid: 0,
@@ -199,7 +203,7 @@ export function useInvoice(initialData?: InvoiceData) {
         const calculatedTotals = {
           ...values.totals,
           subtotal: calculateSubtotal(values.items),
-          tax: calculateTax(calculateSubtotal(values.items), values.totals.taxRate),
+          tax: calculateTax(calculateSubtotal(values.items), values.totals.taxRate,values.totals.taxType),
           discount: calculateDiscount(
             calculateSubtotal(values.items),
             values.totals.discountType
@@ -369,7 +373,7 @@ export function useInvoice(initialData?: InvoiceData) {
     
     // Recalculate totals
     const subtotal = calculateSubtotal(items);
-    const tax = calculateTax(subtotal, formik.values.totals.taxRate);
+    const tax = calculateTax(subtotal, formik.values.totals.taxRate,formik.values.totals.taxType);
     const discount = calculateDiscount(
       subtotal,
       formik.values.totals.discountType
@@ -395,7 +399,8 @@ export function useInvoice(initialData?: InvoiceData) {
   const updateTotals = (totals: typeof initialInvoiceData.totals) => {
     // Recalculate subtotal, tax, discount, and shipping based on the items
     const subtotal = calculateSubtotal(formik.values.items);
-    const tax = calculateTax(subtotal, totals.taxRate);
+    const tax = totals.taxType === "No GST" ? 0 : 
+    calculateTax(subtotal, totals.taxRate, totals.taxType);
     const discount = calculateDiscount(subtotal, totals.discountType);
     const shipping = calculateShipping(subtotal, totals.shipping, totals.shippingType);
     

@@ -41,7 +41,11 @@ export interface InvoiceData {
     subtotal: number;
     tax: number;
     taxRate: number;
+    taxType: string;
     discount: number;
+    igst:number;
+    cgst: number;
+    sgst:number;
     shipping: number;
      discountType: number;
     shippingType: "percentage" | "fixed";
