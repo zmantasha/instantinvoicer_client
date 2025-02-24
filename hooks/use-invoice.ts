@@ -47,7 +47,6 @@ const initialInvoiceData: Omit<InvoiceData, '_id'> = {
     subtotal: 0,
     tax: 0,
     taxRate: 0,
-    // taxType: "VAT",
     shipping: 0,
     discount: 0,
     discountType: 0,
@@ -244,7 +243,6 @@ export function useInvoice(initialData?: InvoiceData) {
           tax: calculateTax(
             calculateSubtotal(values.items),
             values.totals.taxRate,
-            // values.totals.taxType
           ),
           discount: calculateDiscount(
             calculateSubtotal(values.items),
@@ -295,20 +293,11 @@ export function useInvoice(initialData?: InvoiceData) {
           if (!isEditing) {
             resetForm();
             await generateInvoiceNumber();
-           router.push(`/user/d/${response.data.invoice._id}?openModal=true`); // Redirect to /user/myinvoice when a new invoice is saved
+            router.push(`/user/d/${response.data.invoice._id}`);
           } else {
-            router.push(`/user/d/${response.data._id}?openModal=true`); // Redirect to /user/d/[id] when an invoice is updated
+            router.push(`/user/d/${response.data._id}`);
           }
         }
-
-        //   if (!isEditing) {
-        //     resetForm();
-        //     await generateInvoiceNumber();
-        //     router.push(`/user/d/${response.data.invoice._id}`);
-        //   } else {
-        //     router.push(`/user/d/${response.data._id}`);
-        //   }
-        // }
       } catch (error) {
         console.error("Operation failed:", error);
         toast.error(
@@ -434,9 +423,13 @@ export function useInvoice(initialData?: InvoiceData) {
     });
   }, [formik.setFieldValue, formik.values.totals]);
 
-  const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
-    const subtotal = calculateSubtotal(formik.values.items);
-    const tax = calculateTax(subtotal, totals.taxRate);
+
+
+
+
+      const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
+        const subtotal = calculateSubtotal(formik.values.items);
+        const tax = calculateTax(subtotal, totals.taxRate);
     const discount = calculateDiscount(subtotal, totals.discountType);
     const shipping = calculateShipping(subtotal, totals.shipping, totals.shippingType);
     const total = calculateTotal(subtotal, tax, discount, shipping);

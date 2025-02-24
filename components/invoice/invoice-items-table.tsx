@@ -92,23 +92,6 @@ const removeHeader = (index: number) => {
     setFocusedHeaderIndex(index); // Set the focused header index
   };
 
-  // const handleHeaderBlur = () => {
-  //   setFocusedHeaderIndex(index); // Reset focus when blurred
-  // };
-
-  // const addItem = useCallback(() => {
-  //   const newItem: InvoiceItem = {
-  //     id: crypto.randomUUID(),
-  //     data: itemHeaders.reduce((acc, header) => {
-  //       acc[header] = "";
-  //       return acc;
-  //     }, {} as Record<string, string>),
-  //     quantity: 1,
-  //     rate: 0,
-  //     amount: 0,
-  //   };
-  //   onUpdateItems([...items, newItem]);
-  // }, [items, onUpdateItems, itemHeaders]);
 
   const addItem = useCallback(() => {
     const newItem: InvoiceItem = {
@@ -171,45 +154,77 @@ const removeHeader = (index: number) => {
     onUpdateItems(items.filter((item) => item.id !== id));
   }, [items, onUpdateItems]);
 
-  const handleCellPaste = (e: React.ClipboardEvent<HTMLInputElement>, id: string, field: keyof InvoiceItem) => {
-    e.stopPropagation();
-    const clipboardData = e.clipboardData.getData('text');
-    const pastedValues = clipboardData.split(/[\n\t]/).map(v => v.trim()).filter(v => v);
-    if (pastedValues.length === 0) return;
-    e.preventDefault();
-    const currentIndex = items.findIndex(item => item.id === id);
-    if (currentIndex === -1) return;
-    const updatedItems = [...items];
-    pastedValues.forEach((value, offset) => {
-      const targetIndex = currentIndex + offset;
-      if (targetIndex >= updatedItems.length) {
-        updatedItems.push({
-          id: crypto.randomUUID(),
-          data: itemHeaders.reduce((acc, header) => {
-            acc[header] = "";
-            return acc;
-          }, {} as Record<string, string>),
-          quantity: 1,
-          rate: 0,
-          amount: 0,
-        });
-      }
-      const item = updatedItems[targetIndex];
-      if (field === 'data') {
-        updatedItems[targetIndex] = { ...item, data: { ...item.data, [itemHeaders[0]]: value } };
-      } else if (field === 'quantity' || field === 'rate') {
-        const numericValue = parseFloat(value) || 0;
-        const updatedItem = { ...item, [field]: numericValue };
-        updatedItem.amount = calculateItemAmount(
-          field === 'quantity' ? numericValue : item.quantity,
-          field === 'rate' ? numericValue : item.rate
-        );
-        updatedItems[targetIndex] = updatedItem;
-      }
+// Update handleCellPaste function signature
+const handleCellPaste = (
+  e: React.ClipboardEvent<HTMLInputElement>, 
+  id: string, 
+  field: keyof InvoiceItem,
+  headerIndex?: number // Add header index parameter
+) => {
+  e.stopPropagation();
+  const clipboardData = e.clipboardData.getData('text');
+  if (!clipboardData) return;
+  e.preventDefault();
+
+  const currentIndex = items.findIndex(item => item.id === id);
+  if (currentIndex === -1) return;
+
+  const updatedItems = [...items];
+  const pastedData = clipboardData.split(/[\n\t]/).map(v => v.trim()).filter(v => v);
+
+  // Calculate how many rows we need to update/create
+  const rowsToUpdate = Math.min(pastedData.length, items.length - currentIndex);
+
+  // Update existing rows
+  for (let i = 0; i < rowsToUpdate; i++) {
+    const targetIndex = currentIndex + i;
+    const value = pastedData[i];
+    
+    if (field === 'data' && typeof headerIndex !== 'undefined') {
+      const currentHeader = itemHeaders[headerIndex];
+      updatedItems[targetIndex] = {
+        ...updatedItems[targetIndex],
+        data: {
+          ...updatedItems[targetIndex].data,
+          [currentHeader]: value
+        }
+      };
+    } else if (field === 'quantity' || field === 'rate') {
+      const numericValue = parseFloat(value) || 0;
+      updatedItems[targetIndex] = {
+        ...updatedItems[targetIndex],
+        [field]: numericValue,
+        amount: calculateItemAmount(
+          field === 'quantity' ? numericValue : updatedItems[targetIndex].quantity,
+          field === 'rate' ? numericValue : updatedItems[targetIndex].rate
+        )
+      };
+    }
+  }
+
+  // Create new rows only if we have more pasted data than existing rows
+  if (pastedData.length > rowsToUpdate) {
+    const newItems = pastedData.slice(rowsToUpdate).map(value => ({
+      id: crypto.randomUUID(),
+      data: itemHeaders.reduce((acc, header) => {
+        acc[header] = field === 'data' && header === itemHeaders[headerIndex!] ? value : '';
+        return acc;
+      }, {} as Record<string, string>),
+      quantity: field === 'quantity' ? parseFloat(value) || 1 : 1,
+      rate: field === 'rate' ? parseFloat(value) || 0 : 0,
+      amount: 0
+    }));
+
+    // Calculate amounts for new items
+    newItems.forEach(item => {
+      item.amount = calculateItemAmount(item.quantity, item.rate);
     });
-    onUpdateItems(updatedItems);
-  };
-  // console.log("focusedHeaderIndex:", focusedHeaderIndex);
+
+    updatedItems.push(...newItems);
+  }
+
+  onUpdateItems(updatedItems);
+};
 
 
   return (
@@ -300,17 +315,19 @@ const removeHeader = (index: number) => {
                 <TableRow key={item.id}>
                   {itemHeaders.map((header, headerIndex) => (
                     <TableCell key={headerIndex}>
-                      <Input
-                        value={item.data[header] || ""}
-                        onChange={(e) => updateItem(item.id, "data", { ...item.data, [header]: e.target.value })}
-                        placeholder={`Enter ${header}`}
-                        className="border-transparent hover:border-input focus:border-input bg-transparent"
-                      />
-                      <FormError 
-                        message={formErrors?.items?.[index]?.data?.[header]} 
-                        className={formTouched?.items?.[index]?.data?.[header] ? "block" : "hidden"} 
-                      />
-                    </TableCell>
+                    <Input
+                      value={item.data[header] || ""}
+                      onChange={(e) => updateItem(item.id, "data", { ...item.data, [header]: e.target.value })}
+                      placeholder={`Enter ${header}`}
+                      onPaste={(e) => handleCellPaste(e, item.id, "data", headerIndex)}
+                      className="border-transparent hover:border-input focus:border-input bg-transparent"
+                    />
+                    <FormError 
+                      message={formErrors?.items?.[index]?.data?.[header]} 
+                      className={formTouched?.items?.[index]?.data?.[header] ? "block" : "hidden"} 
+                    />
+                  </TableCell>
+                 
                   ))}
                   <TableCell>
                     <Input
