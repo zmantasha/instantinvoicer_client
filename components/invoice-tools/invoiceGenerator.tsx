@@ -1,7 +1,7 @@
 
 
 import { useMemo } from "react";
-import { formatCurrency} from "../../lib/utils/format-currency";
+import { formatCurrency, getCurrencyLabel, getCurrencySymbol} from "../../lib/utils/format-currency";
 import { toWords } from "number-to-words"; // Importing the number-to-words library
 
 interface InvoiceItem {
@@ -40,6 +40,8 @@ interface InvoiceItem {
   }
   
   export default function InvoiceGenerator({ invoiceItem }: { invoiceItem: InvoiceItem }) {
+    const currencies = getCurrencyLabel(invoiceItem.invoiceDetails.currency);
+    
     const amountInWords = useMemo(() => {
       if (invoiceItem.status === "Paid") {
         return toWords(invoiceItem.totals.amountPaid).replace(/\b\w/g, (char) =>
@@ -277,7 +279,7 @@ interface InvoiceItem {
                 {/* Show Amount in Words if Paid */}
                 {invoiceItem.status === "Paid" && (
                   <div className="text-black-600 text-sm font-bold italic text-right mt-1">
-                    <span>Amount in Words:</span> ({amountInWords} only)
+                    <span>Amount in Words:</span> ({amountInWords} {currencies} only)
                   </div>
                   ) }
 

@@ -6,7 +6,7 @@ import { FcPaid } from "react-icons/fc";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { formatCurrency } from "../../lib/utils/format-currency";
 import { useRouter } from "next/navigation";
-import { BadgeInfo, ChevronDown, Delete, Edit } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 interface InvoiceItem {
   _id: string;
@@ -31,12 +31,16 @@ interface InvoiceTableProps {
   invoiceItem: InvoiceItem[];
   handleNavigation: (path: string) => void;
   handleDelete: (id: string) => void;
+  currentPage:Number;
+  limit:Number;
 }
 
 export default function InvoiceTable({
   invoiceItem,
   handleNavigation,
   handleDelete,
+  currentPage,
+  limit
 }: InvoiceTableProps) {
   const headers = ["Customer", "Reference", "Date", "Due Date", "Status", "Total", "Action"];
   
@@ -49,6 +53,9 @@ export default function InvoiceTable({
   // Ref for dropdown
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
+  const startIndex = (Number(currentPage) - 1) * Number(limit);
+  const endIndex = startIndex + Number(limit);
+  const currentData = invoiceItem.slice(startIndex, endIndex);
   const toggleDropdown = (id: string) => {
     setShowDropdown((prevId) => (prevId === id ? null : id));
   };
@@ -133,32 +140,32 @@ export default function InvoiceTable({
           </tr>
         </thead>
         <tbody>
-          {invoices.map((item) => (
+          {currentData.map((item) => (
             <tr key={item._id}>
               <td>{item?.recipientDetails.billTo.name}</td>
               <td>{item.invoiceDetails.number}</td>
               <td>{new Date(item.invoiceDetails.date).toLocaleDateString()}</td>
               <td>{new Date(item.invoiceDetails.dueDate).toLocaleDateString()}</td>
               <td>{item.status || "Pending"}</td>
-              <td>{formatCurrency(item.totals.total, item.invoiceDetails.currency)}</td>
+              <td>{formatCurrency(item.totals.total , item.invoiceDetails.currency)}</td>
               <td>
                 <div className={styles.invoicedropdown}>
                   <button className={styles.viewButton} onClick={() => handleNavigation(`/user/d/${item._id}`)}>
-                    View
+                    View  
                   </button>
-                  <div onClick={() => toggleDropdown(item._id)}><ChevronDown className="w-4 h-4 ml-2" /></div>
+                  <div  onClick={() => toggleDropdown(item._id)}><ChevronDown className="w-4 h-4 ml-2" /></div>
                   {showDropdown === item._id && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
                       <div className={styles.dropdownContent} onClick={() => handleEditInvoice(item._id)}>
-                      <Edit className="w-4 h-4 mr-2"  />
+                        <MdEdit size={20} />
                         Edit
                       </div>
                       <div className={styles.dropdownContent} onClick={() => handleStatusChange(item._id, item.status)}>
-                      <BadgeInfo className="w-4 h-4 mr-2 text-green-700"    />
+                        <FcPaid size={20} />
                         {item.status === "Paid" ? "Mark as Not Paid" : "Mark as Paid"}
                       </div>
                       <div onClick={() => setDeleteItemId(item._id)} className={styles.dropdownContent}>
-                      <Delete className="w-4 h-4 mr-2 text-red-500"  />
+                        <MdDelete color="#e65050" size={20} />
                         Delete
                       </div>
                     </div>
@@ -189,3 +196,4 @@ export default function InvoiceTable({
     </div>
   );
 }
+

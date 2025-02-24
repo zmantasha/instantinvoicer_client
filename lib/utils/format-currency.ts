@@ -16,6 +16,18 @@ export function getCurrencySymbol(currencyCode: string): string {
   }
   return symbol;
 }
+// Function to get only the currency symbol
+export function getCurrencyLabel(currencyCode: string): string {
+  // Check if the currency symbol is already cached
+  let label= currencyCache[currencyCode];
+  if (!label) {
+    // If not cached, find the currency symbol and store it in the cache
+    const currency = currencies.find((c) => c.value === currencyCode);
+    label = currency?.label || "USD - US Dollar";
+    currencyCache[currencyCode] = label;
+  }
+  return label;
+}
 
 // Function to format currency with symbol and amount
 export function formatCurrency(amount: number | undefined, currencyCode: string): string {
