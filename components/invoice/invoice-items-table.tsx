@@ -1,3 +1,6 @@
+
+
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -30,8 +33,13 @@ interface InvoiceItemsTableProps {
 const InvoiceItemsTable = memo(({ items, currency, itemHeaders, onUpdateItems, onUpdateItemHeaders, formErrors, formTouched,formik }: InvoiceItemsTableProps) => {
   const [focusedCell, setFocusedCell] = useState<{ rowId: string; column: string } | null>(null);
   const [focusedHeaderIndex, setFocusedHeaderIndex] = useState<number | null>(null); // Track focused header
+  const [isRatePopupOpen, setIsRatePopupOpen] = useState(false);
+  const [rateToApply, setRateToApply] = useState<number | null>(null);
+  const [hasAskedAboutRate, setHasAskedAboutRate] = useState(false);
+  const [popupPosition, setPopupPosition] = useState<{ top: number; left: number } | null>(null);
   const lastInputRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   const addHeader = () => {
     const newHeader = `Header ${itemHeaders.length + 1}`;
     onUpdateItemHeaders([...itemHeaders, newHeader]);
@@ -92,6 +100,10 @@ const removeHeader = (index: number) => {
     setFocusedHeaderIndex(index); // Set the focused header index
   };
 
+  // const handleHeaderBlur = () => {
+  //   setFocusedHeaderIndex(index); // Reset focus when blurred
+  // };
+
 
   const addItem = useCallback(() => {
     const newItem: InvoiceItem = {
@@ -127,32 +139,96 @@ const removeHeader = (index: number) => {
     onUpdateItems([...items, ...newItems]);
   }, [items, onUpdateItems, itemHeaders]);
 
+
+
+
   const updateItem = useCallback((id: string, field: keyof InvoiceItem, value: any) => {
-    const updatedItems = items.map((item) => {
-      if (item.id === id) {
-        if (field === "data") {
-          return {
-            ...item,
-            data: value as Record<string, string>
-          };
+    if (field === "rate") {
+      const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
+      
+      // Update current item first
+      const updatedItems = items.map(item => {
+        if (item.id === id) {
+          const updatedItem = { ...item, rate: numericValue };
+          updatedItem.amount = calculateItemAmount(updatedItem.quantity, numericValue);
+          return updatedItem;
         }
-        const updatedItem = { ...item, [field]: value };
-        if (field === "quantity" || field === "rate") {
-          updatedItem.amount = calculateItemAmount(
-            field === "quantity" ? value as number : item.quantity,
-            field === "rate" ? value as number : item.rate
-          );
+        return item;
+      });
+      onUpdateItems(updatedItems);
+  
+      // Show popup only first time
+      if (!hasAskedAboutRate) {
+        const index = items.findIndex(item => item.id === id);
+        console.log("index",index);
+        const inputElement = inputRefs.current[index];
+        if (inputElement) {
+          const rect = inputElement.getBoundingClientRect();
+          // Calculate position with viewport boundaries check
+          const popupWidth = 300;
+          const rightSpace = window.innerWidth - rect.right;
+          const leftPosition = rightSpace > popupWidth ? rect.right : rect.left - popupWidth;
+          
+          setPopupPosition({
+            top: rect.top + 40, // Position below input
+            left: leftPosition,
+          });
         }
-        return updatedItem;
+        setRateToApply(numericValue);
+        setIsRatePopupOpen(true);
       }
-      return item;
-    });
-    onUpdateItems(updatedItems);
-  }, [items, onUpdateItems]);
+      return;
+    
+    } else {
+      // Handle other field updates
+      const updatedItems = items.map((item) => {
+        if (item.id === id) {
+          if (field === "data") {
+            return { ...item, data: value as Record<string, string> };
+          }
+          const updatedItem = { ...item, [field]: value };
+          if (field === "quantity") {
+            updatedItem.amount = calculateItemAmount(
+              value as number,
+              item.rate
+            );
+          }
+          return updatedItem;
+        }
+        return item;
+      });
+      onUpdateItems(updatedItems);
+    }
+  }, [items, onUpdateItems, hasAskedAboutRate]);
+  
+  const applyRateToAll = () => {
+    if (rateToApply !== null) {
+      const updatedItems = items.map(item => ({
+        ...item,
+        rate: rateToApply,
+        amount: calculateItemAmount(item.quantity, rateToApply),
+      }));
+      onUpdateItems(updatedItems);
+    }
+    setIsRatePopupOpen(false);
+    setHasAskedAboutRate(true);
+    setRateToApply(null);
+    setPopupPosition(null);
+  };
+
+  const handleRateDecline = () => {
+    setIsRatePopupOpen(false);
+    setHasAskedAboutRate(true);
+    setRateToApply(null);
+    setPopupPosition(null);
+  };
+
 
   const removeItem = useCallback((id: string) => {
     onUpdateItems(items.filter((item) => item.id !== id));
   }, [items, onUpdateItems]);
+
+
 
 // Update handleCellPaste function signature
 const handleCellPaste = (
@@ -228,7 +304,9 @@ const handleCellPaste = (
 
 
 
-const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+// When the user presses Enter in the rate input box, move the cursor to the next input field.
+
+ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
   if (e.key === "Enter" ||e.key==="ArrowDown") {
     e.preventDefault();
     const nextInput = inputRefs.current[index + 1];
@@ -245,10 +323,29 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
   }
 
 };
+
+// Add this useEffect to handle window resize and scrolling
+useEffect(() => {
+  if (!isRatePopupOpen) return;
+
+  const handleScrollResize = () => {
+    setIsRatePopupOpen(false);
+    setPopupPosition(null);
+  };
+
+  window.addEventListener('scroll', handleScrollResize, true);
+  window.addEventListener('resize', handleScrollResize);
+
+  return () => {
+    window.removeEventListener('scroll', handleScrollResize, true);
+    window.removeEventListener('resize', handleScrollResize);
+  };
+}, [isRatePopupOpen]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={addItem} className="text-green-600">
             <Plus className="w-4 h-4 mr-2" />
             Add Item
@@ -366,17 +463,26 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
                       <span className="text-muted-foreground">{getCurrencySymbol(currency)} </span>
                       <Input
                         type="number"
+                        ref={(el) => (inputRefs.current[index] = el)}
                         value={item.rate === 0 ? "" : item.rate}
                         placeholder="rate"
                         onChange={(e) => updateItem(item.id, "rate", e.target.value === "" ? "" : Number(e.target.value))}
-                        onFocus={() => setFocusedCell({ rowId: item.id, column: "rate" })}
+                         onFocus={(e) => {
+                          setFocusedCell({ rowId: item.id, column: "rate" });
+                                        // Calculate the input's position
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setPopupPosition({ top: rect.bottom, left: rect.left });
+                    }}
                         onPaste={(e) => handleCellPaste(e, item.id, "rate")}
                         onKeyDown={(e) => handleKeyDown(e, index)}
                         className="border-transparent hover:border-input focus:border-input bg-transparent w-24 text-left"
                       />
                     </div>
                     <FormError message={formErrors?.items?.[index]?.rate} className={formTouched?.items?.[index]?.rate ? "block" : "hidden"} />
+                   
+
                   </TableCell>
+
                   <TableCell className="text-right font-medium">
                     {formatCurrency(item.amount, currency)}
                   </TableCell>
@@ -390,13 +496,49 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </TableCell>
+
+                 
                 </TableRow>
               ))
             )}
           </TableBody>
+          
         </Table>
         </div>
       </div>
+       {/* Rate Popup */}
+      
+{isRatePopupOpen && popupPosition && (
+  <div
+    className="fixed z-50 bg-white p-4 rounded-lg rounded-sm rounded-md shadow-lg border border-gray-200"
+    style={{
+      top: `${Math.max(popupPosition.top, 20)}px`,
+      left: `${Math.max(popupPosition.left, 20)}px`,
+      maxWidth: 'calc(100vw - 40px)'
+    }}
+  >
+    <div className="flex flex-col gap-2">
+      <p className="text-sm">Apply this rate to all items?</p>
+      <div className="flex gap-2 justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRateDecline}
+        >
+          No
+        </Button>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={applyRateToAll}
+        >
+          Yes
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+     
     </div>
   );
 });
