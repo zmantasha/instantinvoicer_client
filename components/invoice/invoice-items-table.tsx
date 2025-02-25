@@ -31,7 +31,7 @@ const InvoiceItemsTable = memo(({ items, currency, itemHeaders, onUpdateItems, o
   const [focusedCell, setFocusedCell] = useState<{ rowId: string; column: string } | null>(null);
   const [focusedHeaderIndex, setFocusedHeaderIndex] = useState<number | null>(null); // Track focused header
   const lastInputRef = useRef<HTMLInputElement>(null);
-
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const addHeader = () => {
     const newHeader = `Header ${itemHeaders.length + 1}`;
     onUpdateItemHeaders([...itemHeaders, newHeader]);
@@ -227,6 +227,24 @@ const handleCellPaste = (
 };
 
 
+
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  if (e.key === "Enter" ||e.key==="ArrowDown") {
+    e.preventDefault();
+    const nextInput = inputRefs.current[index + 1];
+
+    if (nextInput) {
+      nextInput.focus();
+    }
+  }else if(e.key==="ArrowUp"){
+    e.preventDefault();  
+    const nextInput = inputRefs.current[index-1];
+    if (nextInput) {
+      nextInput.focus(); 
+  }
+  }
+
+};
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -264,11 +282,12 @@ const handleCellPaste = (
         </TooltipProvider>
       </div>
       <div className="border rounded-lg overflow-hidden">
-        <Table>
+      <div className="overflow-x-auto">
+        <Table className="min-w-[800px]">
           <TableHeader className="bg-muted/50">
             <TableRow>
               {itemHeaders.map((header, index) => (
-                <TableHead key={index}>
+                <TableHead key={index} className="min-w-[150px]">
                   <div className="flex items-center gap-1">
                     <Input
                       value={header}
@@ -276,7 +295,7 @@ const handleCellPaste = (
                       onFocus={() => handleHeaderFocus(index)} // Handle focus
                       // onBlur={handleHeaderBlur} // Handle blur
                       placeholder="Header name"
-                      className="border-transparent hover:border-input focus:border-input bg-transparent"
+                      className="border-transparent hover:border-input focus:border-input bg-transparent w-full min-w-[120px]"
                     />
                     {focusedHeaderIndex === index &&itemHeaders.length > 1&&(
                       <Button
@@ -293,9 +312,9 @@ const handleCellPaste = (
                 )}
                 </TableHead>
               ))}
-              <TableHead className="text-right">Quantity</TableHead>
-              <TableHead className="text-center">Rate</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="text-right min-w-[100px]">Quantity</TableHead>
+              <TableHead className="text-center min-w-[100px]">Rate</TableHead>
+              <TableHead className="text-right min-w-[100px]">Amount</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -352,6 +371,7 @@ const handleCellPaste = (
                         onChange={(e) => updateItem(item.id, "rate", e.target.value === "" ? "" : Number(e.target.value))}
                         onFocus={() => setFocusedCell({ rowId: item.id, column: "rate" })}
                         onPaste={(e) => handleCellPaste(e, item.id, "rate")}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
                         className="border-transparent hover:border-input focus:border-input bg-transparent w-24 text-left"
                       />
                     </div>
@@ -375,6 +395,7 @@ const handleCellPaste = (
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
     </div>
   );
