@@ -113,7 +113,12 @@ const NavBar: FC = () => {
     <nav className={styles.nav}>
       <div className={styles.navContent}>
         <div className={styles.leftContainer}>
-          <h3 className={styles.logo} onClick={() => handleNavigation("/user/myinvoice")}>instantinvoicer.com</h3>
+        <h3
+          className={styles.logo}
+          onClick={() => handleNavigation(isLoggedin ? "/user/myinvoice" : "/")}
+        >
+          instantinvoicer.com
+        </h3>
 
           <div
             className={`${styles.menuContainer} ${
@@ -206,7 +211,7 @@ const NavBar: FC = () => {
                         className={styles.dropdownItem}
                         onClick={() => handleNavigation("/user/myaccount")}
                       >
-                        My Account
+                        Account Settings
                       </div>
                       <div onClick={handleLogout} className={styles.dropdownItem}>
                         Sign Out

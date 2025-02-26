@@ -6,6 +6,7 @@ import NavBar from '../components/navbar/index';
 import { UserProvider } from "../hooks/UserContext";
 import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
+import Footer from '@/components/footer/footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({
 
   // Hide NavBar for all dynamic `share` routes like `/share/:id`
   const shouldShowNavBar = !pathname.startsWith("/share/");
+  const shouldShowFooter = !pathname.startsWith("/account/");
 
   return (
     <html lang="en">
@@ -26,6 +28,7 @@ export default function RootLayout({
           <ToastContainer />
           {shouldShowNavBar && <NavBar />}
           <main>{children}</main>
+          {shouldShowFooter &&<Footer/>}
         </UserProvider>
       </body>
     </html>

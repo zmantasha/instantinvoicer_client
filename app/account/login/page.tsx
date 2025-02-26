@@ -16,8 +16,6 @@ interface FormValues {
   password: string;
 }
 
-
-
 export default function LoginPage() {
     const router = useRouter()
     
@@ -39,7 +37,7 @@ export default function LoginPage() {
           
           // localStorage.setItem("accessToken",response.data.token)
           setCookie('accessToken', response.data.token);
-          router.replace("/user/myinvoice")
+          router.replace("/user/invoicetamplate")
         }
       } catch (error) {
        if (axios.isAxiosError(error)) {
