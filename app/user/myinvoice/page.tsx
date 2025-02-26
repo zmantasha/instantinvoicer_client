@@ -126,12 +126,14 @@ const renderPageNumbers = () => {
             )}
           
 
-                      {/* Pagination */}
-              <div className={styles.paginationBox}>
+          {/* Pagination */}
+            
+          <div className={styles.paginationBox}>
+              <div className={styles.LeftSide}>
                 <div className={styles.totalpage}>
                   Page {currentPage} of {totalPages}
                 </div>
-                <div className={styles.rightSide}>
+               
                   <div className={styles.selectionLimit}>
                     <select 
                       onChange={(e) => {
@@ -145,6 +147,8 @@ const renderPageNumbers = () => {
                       <option value={15}>15</option>
                     </select>
                   </div>
+                  </div>
+                  
                   <div className={styles.rightPage}>
                     <Button
                       className={styles.previous}
@@ -173,9 +177,9 @@ const renderPageNumbers = () => {
                     >
                       Next
                     </Button>
+                  
                   </div>
                 </div>
-              </div>
         </div>
       </div>
     </div>
