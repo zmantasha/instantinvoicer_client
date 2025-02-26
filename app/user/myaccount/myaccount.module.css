@@ -1,131 +1,161 @@
-
-
-/* CSS - myaccount.module.css */
-
-.myaccountPage{
-    background-color: #ffffff;
-    min-height: 100vh;
-}
-.myProfileContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 20vh;
-    padding: 20px;
-}
-
-.profileCard {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-    width: 100%;
-    max-width: 1334px;
-    padding: 30px;
-    box-sizing: border-box;
-}
-
-.profileTitle {
-    font-size: 32px;
-    font-weight: 700;
-    color:var(--primary-bg-color);
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.profileContent {
-    color: #7f8c8d;
-    text-align: center;
-    font-size: 16px;
-    margin-bottom: 25px;
-}
-
-.profileDetails p {
-    font-size: 18px;
-    color: black;
-    margin: 10px 0;
-}
-
-.profileEmail {
-    font-weight: 600;
-    color: var(--primary-bg-color); /* Vibrant green with depth */
-/*     text-shadow: 0 0 5px rgba(76, 175, 80, 0.7); */
-}
-
-.changeProfile {
-    margin-top: 30px;
-}
-
-.changeTitle {
-    font-size: 24px;
-    color: black;
-    margin-bottom: 20px;
-}
-
-.inputGroup {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-
-.inputGroup label {
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #34495e;
-}
-
-.inputGroup input {
-    padding: 12px;
-    border: 1px solid #bdc3c7;
-    border-radius: 6px;
-    font-size: 16px;
-}
-
-.saveButton {
-    background-color:var(--primary-bg-color);
-    color: #fff;
-    border: none;
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.saveButton:hover {
-    background-color:var(--primary-bg-color-hover);;
-    transition: 1s ease-in-out;
-}
-.saveButton:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+/* myaccount.module.css */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
   }
-.dangerCard{
-    background-color: #fff;
+  
+  .profileHeader {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .profileHeader h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profileSubtitle {
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .profileSection {
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+  }
+  
+  .avatarSection {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .avatarWrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+  }
+  
+  .avatar {
     width: 100%;
-    /* padding: 30px; */
-    margin-top: 50px;
-    box-sizing: border-box;   
-}
-.dangerTitle{
-    background-color: #e65050;
-    border-radius: 12px 12px 0px 0px;
-    padding: 10px 15px;
-    color:white;
-}
-.dangerbuttondiv{
-    padding: 20px 30px;
-}
-.dangerButton{
-    padding: 10px 10px;
-    background-color: #e65050;
-    color: white;
-    border-radius: 10px;
-    font-size: 14px;
-}
-.popupOverlay {
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .avatarUpload {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    border: 2px solid #eaeaea;
+    border-radius: 50%;
+    padding: 0.5rem;
+    display: flex;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .avatarUpload:hover {
+    background: #f5f5f5;
+    transform: scale(1.05);
+  }
+  
+  .avatarInfo h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    text-transform: capitalize;
+  }
+  
+  .userEmail {
+    color: #666;
+    font-size: 0.95rem;
+  }
+  
+  .formSection {
+    margin-bottom: 3rem;
+  }
+  
+  .formGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .inputGroup {
+    margin-bottom: 1.5rem;
+  }
+  
+  .inputIcon {
+    margin-right: 0.5rem;
+    color: #666;
+  }
+  
+  .fileUploadSection {
+    margin-bottom: 2rem;
+  }
+  
+  .fileUploadLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border: 2px dashed #eaeaea;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .fileUploadLabel:hover {
+    border-color: #0070f3;
+    background: #f8faff;
+  }
+  
+  .uploadIcon {
+    color: #0070f3;
+  }
+  
+  .hiddenInput {
+    display: none;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .dangerZone {
+    border: 1px solid #ffe3e3;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: #fffafa;
+  }
+  
+  .dangerZoneTitle {
+    color: #dc2626;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .dangerZoneContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .dangerZoneContent p {
+    color: #666;
+    margin: 0;
+  }
+  
+  .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -135,43 +165,57 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
   }
   
-  .popup {
+  .confirmationModal {
     background: white;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 2rem;
+    border-radius: 12px;
     text-align: center;
-    width: 350px;
+    max-width: 400px;
+    width: 90%;
   }
   
-  .popupButtons {
+  .modalIcon {
+    color: #dc2626;
+    margin-bottom: 1rem;
+  }
+  
+  .confirmationModal h3 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .confirmationModal p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+  
+  .modalActions {
     display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
+    gap: 1rem;
+    justify-content: center;
   }
   
-  .confirmButton,
-  .cancelButton {
-    padding: 10px;
-    border: none;
-    cursor: pointer;
+  .error {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
   }
   
-  .confirmButton {
-    background-color: #e65050;
-    color: white;
-    border-radius: 10px;
-  }
+  @media (max-width: 768px) {
+    .formGrid {
+      grid-template-columns: 1fr;
+    }
   
-  .cancelButton {
-    background-color: gray;
-    color: white;
-    border-radius: 10px;
-  }
- @media (max-width: 768px) {
-    .profileDetails p{
-        overflow-x: scroll;
-        scrollbar-width: none;
+    .avatarSection {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .dangerZoneContent {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
     }
   }
