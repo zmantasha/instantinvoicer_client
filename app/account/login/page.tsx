@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import {loginSchema} from "../../../validation/schemas"
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
 
 import { setCookie } from 'cookies-next';
 // Define the shape of form values

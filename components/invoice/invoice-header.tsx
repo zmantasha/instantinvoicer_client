@@ -5,10 +5,10 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Textarea } from "../../components/ui/textarea";
 import { FormError } from "../../components/ui/form-error";
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from "axios";
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
 interface InvoiceHeaderProps {
   senderDetails: {
     logo: string;
@@ -61,6 +61,52 @@ const InvoiceHeader= memo(({
   //     reader.readAsDataURL(file);
   //   }
   // };
+  const addressLength = 60; // Set max length
+
+  const [senderCharactersLeft, setSenderCharactersLeft] = useState(() => {
+    const initialAddress = formik.values.senderDetails.address || "";
+    return addressLength - initialAddress.length;
+  });
+  
+  const [billToCharactersLeft, setBillToCharactersLeft] = useState(() => {
+    const initialAddress = formik.values.recipientDetails.billTo.address || "";
+    return addressLength - initialAddress.length;
+  });
+  
+  const [shipToCharactersLeft, setShipToCharactersLeft] = useState(() => {
+    const initialAddress = formik.values.recipientDetails.shipTo.address || "";
+    return addressLength - initialAddress.length;
+  });
+  
+  // Function to handle sender address change
+  const handleSenderAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatedAddress = e.target.value;
+    setSenderCharactersLeft(addressLength - updatedAddress.length);
+    onUpdateSender({ ...senderDetails, address: updatedAddress });
+  };
+  
+  // Function to handle billing address change
+  const handleBillToAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatedAddress = e.target.value;
+    setBillToCharactersLeft(addressLength - updatedAddress.length);
+    onUpdateRecipient({
+      ...recipientDetails,
+      billTo: { ...recipientDetails.billTo, address: updatedAddress },
+    });
+  };
+  
+  // Function to handle shipping address change
+  const handleShipToAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatedAddress = e.target.value;
+    setShipToCharactersLeft(addressLength - updatedAddress.length);
+    onUpdateRecipient({
+      ...recipientDetails,
+      shipTo: { ...recipientDetails.shipTo, address: updatedAddress },
+    });
+  };
+  
+ 
+  // console.log(charactersLeft);
 
 const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0];
@@ -168,16 +214,19 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             />
           </div>
           <div>
+            {/* Sender Address */}
             <Label htmlFor="sender-address">Address</Label>
             <Textarea
+              maxLength={addressLength}
               id="sender-address"
               value={formik.values.senderDetails.address}
-              onChange={(e) =>
-                onUpdateSender({ ...senderDetails, address: e.target.value })
-              }
+              onChange={handleSenderAddressChange}
               placeholder="Your business address"
               rows={3}
             />
+            <p className="text-xs mt-1 text-gray-500">{senderCharactersLeft} characters left</p>
+
+
             <FormError 
               message={formErrors.senderDetails?.address}
               className={formTouched.senderDetails?.address ? "block" : "hidden"}
@@ -205,18 +254,16 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               message={formErrors.recipientDetails?.billTo?.name}
               className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
             />
-            <Textarea
+           <Textarea
+              maxLength={addressLength}
               value={formik.values.recipientDetails.billTo.address}
-              onChange={(e) =>
-                onUpdateRecipient({
-                  ...recipientDetails,
-                  billTo: { ...recipientDetails.billTo, address: e.target.value },
-                })
-              }
+              onChange={handleBillToAddressChange}
               placeholder="Billing address"
               className="mt-2"
               rows={3}
             />
+            <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft} characters left</p>
+
             <FormError 
               message={formErrors.recipientDetails?.billTo?.address}
               className={formTouched.recipientDetails?.billTo?.address ? "block" : "hidden"}
@@ -238,17 +285,14 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               placeholder="Shipping recipient"
             />
             <Textarea
+              maxLength={addressLength}
               value={formik.values.recipientDetails.shipTo.address}
-              onChange={(e) =>
-                onUpdateRecipient({
-                  ...recipientDetails,
-                  shipTo: { ...recipientDetails.shipTo, address: e.target.value },
-                })
-              }
+              onChange={handleShipToAddressChange}
               placeholder="Shipping address (optional)"
               className="mt-2"
               rows={3}
             />
+            <p className="text-xs mt-1 text-gray-500">{shipToCharactersLeft} characters left</p>
           </div>
         </div>
       </div>
@@ -304,7 +348,8 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               onChange={(e) =>
                 onUpdateInvoice({ ...invoiceDetails, dueDate: e.target.value })
               }
-              readOnly={!!formik.initialValues._id} // Make read-only if editing
+              // readOnly={!!formik.initialValues._id} // Make read-only if editing
+              min={formik.values.invoiceDetails.date}
             />
             <FormError 
               message={formErrors?.invoiceDetails?.dueDate}

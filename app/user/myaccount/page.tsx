@@ -7,7 +7,7 @@ import { useFormik } from "formik";
 import { updateSchema } from "../../../validation/schemas";
 import { useRouter } from "next/navigation";
 import { useUser } from "../../../hooks/UserContext";
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
 import { Label } from "../../../components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

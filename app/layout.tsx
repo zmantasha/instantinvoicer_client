@@ -7,6 +7,7 @@ import { UserProvider } from "../hooks/UserContext";
 import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
 import Footer from '@/components/footer/footer';
+import {Toaster} from "react-hot-toast"
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,7 +26,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <UserProvider>
-          <ToastContainer />
+        <Toaster/>
+          {/* <ToastContainer /> */}
           {shouldShowNavBar && <NavBar />}
           <main>{children}</main>
           {shouldShowFooter &&<Footer/>}

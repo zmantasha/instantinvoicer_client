@@ -9,7 +9,7 @@ import styles from "./navbar.module.css";
 import { useUser } from "../../hooks/UserContext";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu } from "lucide-react";
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
 import Image from "next/image";
 
 const NavBar: FC = () => {
@@ -45,7 +45,7 @@ const NavBar: FC = () => {
       const accessToken = Cookies.get("accessToken");
   
       if (!accessToken) {
-        toast.warn("You are not logged in.", { position: "bottom-right" });
+        toast.error("You are not logged in.", { position: "bottom-right" });
         router.replace("/account/login");
         return;
       }
