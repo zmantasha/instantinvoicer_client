@@ -31,10 +31,12 @@ export function getCurrencyLabel(currencyCode: string): string {
 
 // Function to format currency with symbol and amount
 export function formatCurrency(amount: number | undefined, currencyCode: string): string {
-  if (amount === undefined || isNaN(amount)) {
+  if (amount === undefined || isNaN(amount) ||amount===0) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currencyCode || "USD",
+      minimumFractionDigits: 2,  // Change from 2 to 3 or more
+      maximumFractionDigits: 2,
     }).format(0);
   }
 
@@ -44,8 +46,8 @@ export function formatCurrency(amount: number | undefined, currencyCode: string)
     style: "currency",
     currency: currencyCode || "USD",
     currencyDisplay: "symbol",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 3,  // Use more decimals for small numbers
+    maximumFractionDigits: 5,
   }).format(amount);
 
   // Add a space between the currency symbol and the amount

@@ -156,6 +156,7 @@ const removeHeader = (index: number) => {
   const updateItem = useCallback((id: string, field: keyof InvoiceItem, value: any) => {
     if (field === "rate") {
       const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
+      // const numericValue = value === "" ? "" : parseFloat(value) || 0;
       
       // Update current item first
       const updatedItems = items.map(item => {
@@ -169,7 +170,8 @@ const removeHeader = (index: number) => {
       onUpdateItems(updatedItems);
   
       // Show popup only first time
-      if (!hasAskedAboutRate) {
+      
+      if (!hasAskedAboutRate && items.length > 1) {
         const index = items.findIndex(item => item.id === id);
         console.log("index",index);
         const inputElement = inputRefs.current[index];
@@ -188,6 +190,7 @@ const removeHeader = (index: number) => {
         setRateToApply(numericValue);
         setIsRatePopupOpen(true);
       }
+      
       return;
     
     } else {
@@ -478,13 +481,15 @@ useEffect(() => {
                         ref={(el) => (inputRefs.current[index] = el)}
                         value={item.rate}
                         placeholder="rate"
-                        onChange={(e) => updateItem(item.id, "rate", e.target.value === "" ? 0 : Number(e.target.value))}
-                         onFocus={(e) => {
+                        step="any" // Allows decimal values
+                        inputMode="decimal" // Mobile-friendly
+                        onChange={(e) => updateItem(item.id, "rate", parseFloat(e.target.value))}
+                        onFocus={(e) => {
                           setFocusedCell({ rowId: item.id, column: "rate" });
-                                        // Calculate the input's position
                           const rect = e.currentTarget.getBoundingClientRect();
                           setPopupPosition({ top: rect.bottom, left: rect.left });
-                    }}
+                        }} 
+
                         onPaste={(e) => handleCellPaste(e, item.id, "rate")}
                         onKeyDown={(e) => handleKeyDown(e, index)}
                         className="border-transparent hover:border-input focus:border-input bg-transparent w-24 text-left"

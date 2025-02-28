@@ -41,7 +41,7 @@ const initialInvoiceData: Omit<InvoiceData, '_id'> = {
     poNumber: "",
     currency: "USD",
   },
-  itemHeaders: ["description"],
+  itemHeaders: ["Description"],
   items: [],
   totals: {
     subtotal: 0,
@@ -211,7 +211,7 @@ export function useInvoice(initialData?: InvoiceData) {
     enableReinitialize: true,
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
+    onSubmit: async (values, { setSubmitting }) => {
       try {
         const errors = await formik.validateForm(values);
         const emptyFieldMessages = getEmptyFields(errors);
@@ -295,7 +295,7 @@ export function useInvoice(initialData?: InvoiceData) {
           });
 
           if (!isEditing) {
-            resetForm();
+            // resetForm();
             await generateInvoiceNumber();
             router.push(`/user/d/${response.data.invoice._id}?openModal=true`);
           } else {
@@ -385,6 +385,9 @@ export function useInvoice(initialData?: InvoiceData) {
         }
   
         formik.setFieldValue("invoiceDetails.number", newInvoiceNumber);
+      formik.setFieldValue("senderDetails.name", user.user.firstName || invoices.senderDetails.firstName);
+      formik.setFieldValue("senderDetails.address", user.user.address || invoices.senderDetails.address);
+      formik.setFieldValue("senderDetails.logo", user.user.logo || invoices.senderDetails.logo);
       }
     } catch (error) {
       console.error("Error fetching invoices:", error);
