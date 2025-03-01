@@ -41,7 +41,7 @@ const initialInvoiceData: Omit<InvoiceData, '_id'> = {
     poNumber: "",
     currency: "USD",
   },
-  itemHeaders: ["description"],
+  itemHeaders: ["Description"],
   items: [],
   totals: {
     subtotal: 0,
@@ -141,7 +141,10 @@ export function useInvoice(initialData?: InvoiceData) {
         ...initialData.invoiceDetails,
         number: initialData.invoiceDetails.number,
         date: new Date(initialData.invoiceDetails.date).toISOString().split('T')[0],
-        dueDate: new Date(initialData.invoiceDetails.dueDate).toISOString().split('T')[0],
+        dueDate: initialData.invoiceDetails.dueDate
+        ? new Date(initialData.invoiceDetails.dueDate).toISOString().split('T')[0]
+        : "", 
+    
       },
       itemHeaders: headers,
       items: processedItems
@@ -208,7 +211,7 @@ export function useInvoice(initialData?: InvoiceData) {
     enableReinitialize: true,
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
+    onSubmit: async (values, { setSubmitting }) => {
       try {
         const errors = await formik.validateForm(values);
         const emptyFieldMessages = getEmptyFields(errors);
@@ -276,6 +279,7 @@ export function useInvoice(initialData?: InvoiceData) {
             invoiceDetails: {
               ...finalValues.invoiceDetails,
               number: initialData.invoiceDetails.number,
+              // number: initialData.invoiceDetails.number ?? generateInvoiceNumber(),
               date: initialData.invoiceDetails.date,
             },
           };
@@ -291,7 +295,7 @@ export function useInvoice(initialData?: InvoiceData) {
           });
 
           if (!isEditing) {
-            resetForm();
+            // resetForm();
             await generateInvoiceNumber();
             router.push(`/user/d/${response.data.invoice._id}?openModal=true`);
           } else {
@@ -313,42 +317,105 @@ export function useInvoice(initialData?: InvoiceData) {
     },
   });
 
-  useEffect(() => {
-    if (user?.user._id && !initialData) {
-      generateInvoiceNumber();
-    }
-  }, [user, initialData]);
+  // useEffect(() => {
+  //   if (user?.user._id && !initialData) {
+  //     generateInvoiceNumber();
+  //   }
+  // }, [user, initialData]);
+ 
+  
+
+  // const generateInvoiceNumber = useCallback(async () => {
+  //   if (!user?.user._id) return;
+
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
+  //     );
+  //     const invoices = response.data;
+      
+  //     let newInvoiceNumber = "INV-0001";
+      
+
+  //     if (invoices?.length > 0) {
+  //       const latestInvoice = invoices[invoices.length - 1];
+  //       if (latestInvoice.invoiceDetails?.number) {
+  //         const lastNumber = parseInt(
+  //           latestInvoice.invoiceDetails.number.replace("INV-", ""),
+  //           10
+  //         );
+  //         newInvoiceNumber = `INV-${String(lastNumber + 1).padStart(4, "0")}`;
+          
+  //       }
+  //     }
+  //     const invoicenumber= invoices.filter((item:any) => item.invoiceDetails.number == newInvoiceNumber)
+  //         console.log(invoicenumber);
+
+  //     formik.setFieldValue("invoiceDetails.number", newInvoiceNumber||invoices.invoiceDetails.number);
+  //     formik.setFieldValue("senderDetails.name", user.user.firstName || invoices.senderDetails.firstName);
+  //     formik.setFieldValue("senderDetails.address", user.user.address || invoices.senderDetails.address);
+  //     formik.setFieldValue("senderDetails.logo", user.user.logo || invoices.senderDetails.logo);
+  //   } catch (error) {
+  //     console.error("Error fetching invoices:", error);
+  //   }
+  // }, [user?.user._id, formik.setFieldValue]);
 
   const generateInvoiceNumber = useCallback(async () => {
     if (!user?.user._id) return;
-
+  
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
       );
       const invoices = response.data;
+  
       let newInvoiceNumber = "INV-0001";
-
-      if (invoices?.length > 0) {
-        const latestInvoice = invoices[invoices.length - 1];
-        if (latestInvoice.invoiceDetails?.number) {
-          const lastNumber = parseInt(
-            latestInvoice.invoiceDetails.number.replace("INV-", ""),
-            10
-          );
-          newInvoiceNumber = `INV-${String(lastNumber + 1).padStart(4, "0")}`;
+  
+      if (!initialData) { // ✅ Ensure it's only for new invoices
+        if (invoices?.length > 0) {
+          const latestInvoice = invoices[invoices.length - 1];
+  
+          if (latestInvoice.invoiceDetails?.number) {
+            const lastNumber = parseInt(
+              latestInvoice.invoiceDetails.number.replace("INV-", ""),
+              10
+            );
+            newInvoiceNumber = `INV-${String(lastNumber + 1).padStart(4, "0")}`;
+          }
         }
+  
+        formik.setFieldValue("invoiceDetails.number", newInvoiceNumber);
+      formik.setFieldValue("senderDetails.name", user.user.firstName || invoices.senderDetails.firstName);
+      formik.setFieldValue("senderDetails.address", user.user.address || invoices.senderDetails.address);
+      formik.setFieldValue("senderDetails.logo", user.user.logo || invoices.senderDetails.logo);
       }
-
-      formik.setFieldValue("invoiceDetails.number", newInvoiceNumber);
-      formik.setFieldValue("senderDetails.name", user.user.firstName || "");
-      formik.setFieldValue("senderDetails.address", user.user.address || "");
-      formik.setFieldValue("senderDetails.logo", user.user.logo || "");
     } catch (error) {
       console.error("Error fetching invoices:", error);
     }
-  }, [user?.user._id, formik.setFieldValue]);
-
+  }, [user?.user._id, initialData, formik]);
+  
+  
+  useEffect(() => {
+    const fetchInvoiceData = async () => {
+      if (!user?.user._id) return;
+  
+      if (initialData) {
+        // If editing, use the existing invoice number
+        formik.setFieldValue("invoiceDetails.number", initialData.invoiceDetails.number);
+        formik.setFieldValue("senderDetails.name", initialData.senderDetails.name);
+        formik.setFieldValue("senderDetails.address", initialData.senderDetails.address);
+        formik.setFieldValue("senderDetails.logo", initialData.senderDetails.logo);
+      } else {
+        // If creating a new invoice, generate a number
+        await generateInvoiceNumber();
+      }
+    };
+  
+    fetchInvoiceData();
+  }, [user?.user._id, initialData]); // ✅ Depend on user ID & initialData
+  
+  
+  
   const generatePDF = useCallback(async () => {
     try {
       const invoiceDataWithId = {

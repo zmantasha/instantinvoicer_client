@@ -7,7 +7,7 @@ import axios from 'axios';
 // import { useState } from 'react';
 
 import { useRouter } from 'next/navigation'
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
 interface FormValues{
   firstName:string,
   lastName:string,
@@ -65,7 +65,7 @@ export default function SignUpPage() {
             <input
               type="text"
               name="firstName"
-              placeholder="FirstName"
+              placeholder="First Name"
               className={styles.input}
               value={formik.values.firstName}
               onChange={formik.handleChange}
@@ -78,7 +78,7 @@ export default function SignUpPage() {
             <input
               type="text"
               name="lastName"
-              placeholder="LastName"
+              placeholder="Last Name"
               className={styles.input}
               value={formik.values.lastName}
               onChange={formik.handleChange}
@@ -115,7 +115,7 @@ export default function SignUpPage() {
             <input
              type="password"
              name="confirmPassword"
-             placeholder="confirmPassword"
+             placeholder="Confirm Password"
              className={styles.input}
              value={formik.values.confirmPassword}
              onChange={formik.handleChange}

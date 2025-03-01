@@ -1,4 +1,3 @@
-
 "use client";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -8,7 +7,11 @@ import { useFormik } from "formik";
 import { updateSchema } from "../../../validation/schemas";
 import { useRouter } from "next/navigation";
 import { useUser } from "../../../hooks/UserContext";
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
+import { Label } from "../../../components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { FiUpload, FiTrash2, FiUser, FiHome, FiCamera } from "react-icons/fi";
 
 interface FormValues {
   firstName: string;
@@ -43,28 +46,21 @@ export default function MyAccount() {
           withCredentials: true,
         };
 
-        // Update Profile
         await axios.put(
           `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${user?.user?._id}`,
           values,
           headers
         );
 
-        toast.success("Profile updated successfully!", {
-          position: "bottom-right",
-        });
-
+        toast.success("Profile updated successfully!");
         fetchUserProfile();
       } catch (error) {
         console.error(error);
-        toast.error("Failed to update profile. Please try again.", {
-          position: "bottom-right",
-        });
+        toast.error("Failed to update profile. Please try again.");
       }
     },
   });
 
-  // Handle automatic file upload for avatar and logo
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: "avatar" | "logo") => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -79,25 +75,20 @@ export default function MyAccount() {
       await axios.put(uploadUrl, formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
 
-      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`, {
-        position: "bottom-right",
-      });
-
-      fetchUserProfile(); // Refresh user data
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
+      fetchUserProfile();
     } catch (error) {
       console.error(error);
-      toast.error(`Failed to update ${type}. Please try again.`, {
-        position: "bottom-right",
-      });
+      toast.error(`Failed to update ${type}. Please try again.`);
     }
   };
 
-
-    const handleDelete = async () => {
+  const handleDelete = async () => {
     try {
       const accessToken = Cookies.get("accessToken");
       const deleteUrl = `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${user?.user?._id}`;
@@ -110,145 +101,148 @@ export default function MyAccount() {
 
       if (response.data?.status === "success") {
         Cookies.remove("accessToken");
-        // Cookies.remove("refreshToken");
-        // Cookies.remove("isLoggedin");
         router.push("/account/login");
       }
     } catch (error) {
       console.error("Failed to delete account:", error);
-      toast.error("Failed to delete account. Please try again.", {
-        position: "bottom-right",
-      });
+      toast.error("Failed to delete account. Please try again.");
     }
     setDeletePopupVisible(false);
   };
 
   return (
-    <div className={styles.myaccountPage}>
-      <div className={styles.myProfileContainer}>
-        <div className={styles.profileCard}>
-          <h2 className={styles.profileTitle}>My Profile</h2>
-          <p className={styles.profileContent}>
-            Manage your user account, including your contact and sign-in
-            information.
-          </p>
-          {user ? (
-            <>
-              <div className={styles.profileDetails}>
-                <p>Email: <span className={styles.profileEmail}>{user?.user?.email}</span></p>
-              </div>
-              <div className={styles.changeProfile}>
-                <h2 className={styles.changeTitle}>Change Profile</h2>
-                <form onSubmit={formik.handleSubmit}>
-                  <div className={styles.inputGroup}>
-                    <label>First Name:</label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      placeholder="Enter your first name"
-                      className={styles.input}
-                      value={formik.values.firstName}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.firstName && formik.errors.firstName && (
-                      <div className={styles.error}>{formik.errors.firstName}</div>
-                    )}
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>Last Name:</label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      placeholder="Enter your last name"
-                      className={styles.input}
-                      value={formik.values.lastName}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.lastName && formik.errors.lastName && (
-                      <div className={styles.error}>{formik.errors.lastName}</div>
-                    )}
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>Address:</label>
-                    <input
-                      type="text"
-                      name="address"
-                      placeholder="Enter your address"
-                      className={styles.input}
-                      value={formik.values.address}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.address && formik.errors.address && (
-                      <div className={styles.error}>{formik.errors.address}</div>
-                    )}
-                  </div>
+    <div className={styles.container}>
+      <div className={styles.profileHeader}>
+        <h1>Account Settings</h1>
+        <p className={styles.profileSubtitle}>Manage your profile and account preferences</p>
+      </div>
 
-                  {/* Avatar Upload */}
-                  <div className={styles.inputGroup}>
-                    <label>Avatar:</label>
-                    <input
-                      type="file"
-                      name="avatar"
-                      accept="image/*"
-                      className={styles.input}
-                      onChange={(e) => handleFileUpload(e, "avatar")}
-                    />
-                  </div>
-
-                  {/* Logo Upload */}
-                  <div className={styles.inputGroup}>
-                    <label>Logo:</label>
-                    <input
-                      type="file"
-                      name="logo"
-                      className={styles.input}
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, "logo")}
-                    />
-                  </div>
-
-                  <button type="submit" className={styles.saveButton} disabled={formik.isSubmitting}>
-                    {formik.isSubmitting ? "Saving..." : "Save"}
-                  </button>
-                </form>
-              </div>
-
-              <div className={styles.dangerCard}>
-                <p className={styles.dangerTitle}>Danger Zone</p>
-                <div className={styles.dangerbuttondiv}>
-                  <button
-                    className={styles.dangerButton}
-                    onClick={() => setDeletePopupVisible(true)}
-                  >
-                    Close Account
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className={styles.loadingText}>Loading profile...</p>
-          )}
+      <div className={styles.profileSection}>
+        <div className={styles.avatarSection}>
+          <div className={styles.avatarWrapper}>
+            <img 
+              src={user?.user?.avatar || "/default-avatar.png"} 
+              alt="Avatar" 
+              className={styles.avatar}
+            />
+            <label className={styles.avatarUpload}>
+              <FiCamera size={20} />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileUpload(e, "avatar")}
+                className={styles.hiddenInput}
+              />
+            </label>
+          </div>
+          <div className={styles.avatarInfo}>
+            <h2>{user?.user?.firstName} {user?.user?.lastName}</h2>
+            <p className={styles.userEmail}>{user?.user?.email}</p>
+          </div>
         </div>
 
-        {isDeletePopupVisible && (
-          <div className={styles.popupOverlay}>
-            <div className={styles.popup}>
-              <h3>Are you sure you want to delete your account?</h3>
-              <div className={styles.popupButtons}>
-                <button className={styles.confirmButton} onClick={() => {handleDelete()}}>
-                  Confirm
-                </button>
-                <button className={styles.cancelButton} onClick={() => setDeletePopupVisible(false)}>
-                  Cancel
-                </button>
-              </div>
+        <form onSubmit={formik.handleSubmit} className={styles.formSection}>
+          <div className={styles.formGrid}>
+            <div className={styles.inputGroup}>
+              <Label><FiUser className={styles.inputIcon} /> First Name</Label>
+              <Input
+                type="text"
+                name="firstName"
+                value={formik.values.firstName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                hasError={formik.touched.firstName && !!formik.errors.firstName}
+              />
+              {formik.touched.firstName && formik.errors.firstName && (
+                <span className={styles.error}>{formik.errors.firstName}</span>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <Label><FiUser className={styles.inputIcon} /> Last Name</Label>
+              <Input
+                type="text"
+                name="lastName"
+                value={formik.values.lastName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                hasError={formik.touched.lastName && !!formik.errors.lastName}
+              />
+              {formik.touched.lastName && formik.errors.lastName && (
+                <span className={styles.error}>{formik.errors.lastName}</span>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <Label><FiHome className={styles.inputIcon} /> Address</Label>
+              <Input
+                type="text"
+                name="address"
+                value={formik.values.address}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                hasError={formik.touched.address && !!formik.errors.address}
+              />
+              {formik.touched.address && formik.errors.address && (
+                <span className={styles.error}>{formik.errors.address}</span>
+              )}
             </div>
           </div>
-        )}
+
+          <div className={styles.fileUploadSection}>
+            <Label>Company Logo</Label>
+            <label className={styles.fileUploadLabel}>
+              <FiUpload className={styles.uploadIcon} />
+              <span>Click to upload logo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileUpload(e, "logo")}
+                className={styles.hiddenInput}
+              />
+            </label>
+          </div>
+
+          <div className={styles.buttonGroup}>
+            <Button type="submit" variant="default" isLoading={formik.isSubmitting}>
+              Save Changes
+            </Button>
+          </div>
+        </form>
+
+        <div className={styles.dangerZone}>
+          <h3 className={styles.dangerZoneTitle}>Danger Zone</h3>
+          <div className={styles.dangerZoneContent}>
+            <p>Permanently delete your account and all associated data.</p>
+            <Button 
+              variant="destructive" 
+              onClick={() => setDeletePopupVisible(true)}
+              
+            >
+              <FiTrash2 />
+              Delete Account
+            </Button>
+          </div>
+        </div>
       </div>
+
+      {isDeletePopupVisible && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.confirmationModal}>
+            <FiTrash2 size={32} className={styles.modalIcon} />
+            <h3>Delete Account</h3>
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            <div className={styles.modalActions}>
+              <Button variant="secondary" onClick={() => setDeletePopupVisible(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDelete}>
+                Confirm Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

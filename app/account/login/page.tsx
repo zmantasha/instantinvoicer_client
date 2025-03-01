@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import {loginSchema} from "../../../validation/schemas"
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
-import { toast } from "react-toastify";
+import {toast} from "react-hot-toast"
 
 import { setCookie } from 'cookies-next';
 // Define the shape of form values
@@ -15,8 +15,6 @@ interface FormValues {
   email: string;
   password: string;
 }
-
-
 
 export default function LoginPage() {
     const router = useRouter()
@@ -39,7 +37,7 @@ export default function LoginPage() {
           
           // localStorage.setItem("accessToken",response.data.token)
           setCookie('accessToken', response.data.token);
-          router.replace("/user/myinvoice")
+          router.replace("/user/invoicetamplate")
         }
       } catch (error) {
        if (axios.isAxiosError(error)) {

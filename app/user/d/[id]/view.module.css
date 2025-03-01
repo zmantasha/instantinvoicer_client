@@ -1,5 +1,5 @@
 .viewPage {
-    background-color: #f4f7fc;
+    background-color: #ffffff;
     min-height: 100vh;
 }
 
@@ -8,14 +8,14 @@
     justify-content: center;
     align-items: center;
     min-height: 20vh;
-    background-color: #f4f7fc;
+    /* background-color: #f4f7fc; */
     padding: 20px;
 }
 
 .viewCard {
-    background-color: #fff;
+    /* background-color: #fff; */
     border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); */
     width: 100%;
     max-width: 1334px;
     box-sizing: border-box;

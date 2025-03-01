@@ -1,5 +1,4 @@
 .myInvoicePage{
-    min-height: 100vh;
     background-color: #ffffff; 
 }
 .myInvoiceContainer{
@@ -10,9 +9,9 @@
     padding: 20px;
 }
 .invoiceCard{
-    background-color: #fff;
+    /* background-color: #fff; */
     border-radius: 12px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    /* box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px; */
     width: 100%;
     max-width: 1334px;
     /* padding: 30px; */
@@ -207,11 +206,13 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 20px;
+    padding: 30px;
   }
-  .rightSide{
+  .LeftSide{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 60%;
 }
 
 .rightPage{
@@ -224,6 +225,7 @@
     border-radius: 5px;
     font-size: 14px;
   }
+
   .selectionLimit{
     border: 2px solid black;
     border-radius: 5px;
@@ -237,7 +239,7 @@
     cursor: pointer;
     color: #1d72f0;
     border-radius: 5px;
-    background-color: #f1f4f8;
+    background-color: #eff1f4;
     transition: background-color 0.3s ease;
   }
   
@@ -322,5 +324,22 @@
   }
   .invoiceCard{
     max-width: 100%;
+}
+.paginationBox {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.LeftSide{
+  width: 90%;
+}
+
+.rightPage {
+  margin-top: 10px;
+}
+.pagenumber,
+.previous,
+.nextbutton {
+  font-size: 12px;
+  padding: 5px 10px;
 }
 }
