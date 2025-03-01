@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { InvoiceData } from "../types/invoice";
 import { generateInvoicePDF } from "../lib/utils/pdf-generator";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import {
   calculateSubtotal,
   calculateTax,
@@ -227,7 +227,6 @@ export function useInvoice(initialData?: InvoiceData) {
           emptyFieldMessages.forEach(message => {
             toast.error(message, {
               position: "bottom-right",
-              autoClose: 5000,
             });
           });
           return;
