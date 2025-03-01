@@ -7,7 +7,19 @@ export function calculateSubtotal(items: Array<{ amount: number }>): number {
   return items.reduce((sum, item) => sum + item.amount, 0);
 }
 
-export function calculateTax(subtotal: number, taxRate: number): number {
+export function calculateTax(
+  subtotal: number,
+  taxRate: number,
+  taxType: string
+): number {
+  if (taxType === "No GST" || taxRate === 0) return 0;
+  
+  if (taxType === "IGST") {
+    return (subtotal * taxRate) / 100;
+  }
+  if (taxType === "SGST" || taxType === "CGST") {
+    return (subtotal * taxRate) / 100 / 2;
+  }
   return (subtotal * taxRate) / 100;
 }
 

@@ -23,7 +23,7 @@ export function getCurrencyLabel(currencyCode: string): string {
   if (!label) {
     // If not cached, find the currency symbol and store it in the cache
     const currency = currencies.find((c) => c.value === currencyCode);
-    label = currency?.label || "USD - US Dollar";
+    label = currency?.label || "US Dollar";
     currencyCache[currencyCode] = label;
   }
   return label;

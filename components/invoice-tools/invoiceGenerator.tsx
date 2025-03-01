@@ -1,7 +1,5 @@
-
-
 import { useMemo } from "react";
-import { formatCurrency, getCurrencyLabel, getCurrencySymbol} from "../../lib/utils/format-currency";
+import { formatCurrency} from "../../lib/utils/format-currency";
 import { toWords } from "number-to-words"; // Importing the number-to-words library
 
 interface InvoiceItem {
@@ -31,6 +29,9 @@ interface InvoiceItem {
       discount: number;
       shipping: number;
       tax: number;
+      igst:number;
+      cgst: number;
+      sgst:number;
       total: number;
       amountPaid: number;
     };
@@ -40,8 +41,6 @@ interface InvoiceItem {
   }
   
   export default function InvoiceGenerator({ invoiceItem }: { invoiceItem: InvoiceItem }) {
-    const currencies = getCurrencyLabel(invoiceItem.invoiceDetails.currency);
-    
     const amountInWords = useMemo(() => {
       if (invoiceItem.status === "Paid") {
         return toWords(invoiceItem.totals.amountPaid).replace(/\b\w/g, (char) =>
@@ -227,7 +226,7 @@ interface InvoiceItem {
                   )}
                 </p>
               </div>
-              <div className="flex justify-between py-1">
+              { invoiceItem.totals.discount >0  &&    <div className="flex justify-between py-1">
                 <p className="text-gray-600">Discount</p>
                 <p>
                   {formatCurrency(
@@ -236,8 +235,41 @@ interface InvoiceItem {
                   )}
                 </p>
               </div>
-              <div className="flex justify-between py-1">
-                <p className="text-gray-600">Tax</p>
+               }
+
+              { invoiceItem.totals.igst >0  &&   <div className="flex justify-between py-1">
+                <p className="text-gray-600">IGST</p>
+                <p>
+                  {formatCurrency(
+                    invoiceItem.totals.igst,
+                    invoiceItem.invoiceDetails.currency
+                  )}
+                </p>
+              </div>
+              }
+              {invoiceItem.totals.cgst >0  &&   <div className="flex justify-between py-1">
+                <p className="text-gray-600">CGST</p>
+                <p>
+                  {formatCurrency(
+                    invoiceItem.totals.cgst,
+                    invoiceItem.invoiceDetails.currency
+                  )}
+                </p>
+              </div>
+              }
+              { invoiceItem.totals.sgst >0  &&   <div className="flex justify-between py-1">
+                <p className="text-gray-600">SGST</p>
+                <p>
+                  {formatCurrency(
+                    invoiceItem.totals.sgst,
+                    invoiceItem.invoiceDetails.currency
+                  )}
+                </p>
+              </div>
+              }
+
+        { invoiceItem.totals.tax >0  &&   <div className="flex justify-between py-1">
+                <p className="text-gray-600">Total Tax</p>
                 <p>
                   {formatCurrency(
                     invoiceItem.totals.tax,
@@ -245,6 +277,7 @@ interface InvoiceItem {
                   )}
                 </p>
               </div>
+           }
               <hr className="my-2" />
               <div className="flex justify-between font-bold py-2">
                 <p>Total</p>
@@ -279,7 +312,7 @@ interface InvoiceItem {
                 {/* Show Amount in Words if Paid */}
                 {invoiceItem.status === "Paid" && (
                   <div className="text-black-600 text-sm font-bold italic text-right mt-1">
-                    <span>Amount in Words:</span> ({amountInWords} {currencies} only)
+                    <span>Amount in Words:</span> ({amountInWords} only)
                   </div>
                   ) }
 

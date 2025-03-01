@@ -211,33 +211,34 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
     gridY + (detailsData.length > 0 ? detailsData.length * 10 + 5 : 5),
     gridY + 30 // Minimum spacing from grid
   );
+
   const dynamicHeaders =
-  invoice.items.length > 0 ? Object.keys(invoice.items[0].data) : [];
-  
-  // Define the table headers including static columns
-  const tableHeaders = ["Sr.No", ...dynamicHeaders, "Quantity", "Rate", "Amount"];
-  
-    const tableData = invoice.items.map((item, index) => [
-      (index + 1).toString(),
-      ...dynamicHeaders.map((key) => item.data[key] || ""),
-      item.quantity.toString(),
-      formatDownloadCurrency(item.rate, invoice.invoiceDetails.currency),
-      formatDownloadCurrency(item.amount, invoice.invoiceDetails.currency)
-    ]);
+invoice.items.length > 0 ? Object.keys(invoice.items[0].data) : [];
+
+// Define the table headers including static columns
+const tableHeaders = ["Sr.No", ...dynamicHeaders, "Quantity", "Rate", "Amount"];
+
+  const tableData = invoice.items.map((item, index) => [
+    (index + 1).toString(),
+    ...dynamicHeaders.map((key) => item.data[key] || ""),
+    item.quantity.toString(),
+    formatDownloadCurrency(item.rate, invoice.invoiceDetails.currency),
+    formatDownloadCurrency(item.amount, invoice.invoiceDetails.currency)
+  ]);
 
   (doc as any).autoTable({
     startY:tableStartY ,
-    head: [tableHeaders],
-    body: tableData,
-    theme: "grid",
-    headStyles: { fillColor: [12, 105, 204] },
-columnStyles: {
-  0: { cellWidth: 20 },
-  ...Object.fromEntries(dynamicHeaders.map((_, i) => [i + 1, { cellWidth: "auto" }])),
-  [dynamicHeaders.length + 1]: { cellWidth: 25, halign: "left" },
-  [dynamicHeaders.length + 2]: { cellWidth: 25, halign: "left" },
-  [dynamicHeaders.length + 3]: { cellWidth: 25, halign: "left" },
-},
+        head: [tableHeaders],
+        body: tableData,
+        theme: "grid",
+        headStyles: { fillColor: [12, 105, 204] },
+    columnStyles: {
+      0: { cellWidth: 20 },
+      ...Object.fromEntries(dynamicHeaders.map((_, i) => [i + 1, { cellWidth: "auto" }])),
+      [dynamicHeaders.length + 1]: { cellWidth: 25, halign: "left" },
+      [dynamicHeaders.length + 2]: { cellWidth: 25, halign: "left" },
+      [dynamicHeaders.length + 3]: { cellWidth: 25, halign: "left" },
+    },
     styles: {
       fontSize: 9,
       cellPadding: 2
@@ -275,12 +276,34 @@ columnStyles: {
 
     const totalsData = [
       { label: "Subtotal", value: formatDownloadCurrency(invoice.totals.subtotal, invoice.invoiceDetails.currency) },
-      { label: "Discount", value: formatDownloadCurrency(invoice.totals.discount, invoice.invoiceDetails.currency) },
-      { label: "Tax", value: formatDownloadCurrency(invoice.totals.tax, invoice.invoiceDetails.currency) },
+      ...(invoice.totals.discount>0 ? [
+         { label: "Discount", value: formatDownloadCurrency(invoice.totals.discount, invoice.invoiceDetails.currency)} ]: []),
+      ...(invoice.totals.igst>0 ? [
+        { 
+          label: "IGST", 
+          value: formatDownloadCurrency(invoice.totals.igst || 0,  invoice.invoiceDetails.currency)
+        }
+      ] : []),
+      ...(invoice.totals.cgst>0 ? [
+        { 
+          label: "CGST", 
+          value: formatDownloadCurrency(invoice.totals.cgst || 0,  invoice.invoiceDetails.currency)
+        }
+      ] : []),
+      ...(invoice.totals.sgst>0 ? [
+        { 
+          label: "SGST", 
+          value: formatDownloadCurrency(invoice.totals.sgst || 0,  invoice.invoiceDetails.currency)
+        }
+      ] : []),
+   
+      ...(invoice.totals.tax>0 ? 
+        [{ label: "Tax", value: formatDownloadCurrency(invoice.totals.tax, invoice.invoiceDetails.currency) }] : []),
       { label: "Total", value: formatDownloadCurrency(invoice.totals.total, invoice.invoiceDetails.currency), bold: true },
       { label: "Amount Paid", value: formatDownloadCurrency(invoice.totals.amountPaid, invoice.invoiceDetails.currency) },
-      { label: "Balance Due", value: formatDownloadCurrency(invoice.totals.balanceDue, invoice.invoiceDetails.currency), color: "#DC2626" }
+      { label: "Balance Due", value: formatDownloadCurrency(invoice.totals.balanceDue, invoice.invoiceDetails.currency), color: "#DC2626" },
     ];
+
 
     totalsData.forEach((total, index) => {
       doc.setFontSize(9);
@@ -335,11 +358,32 @@ columnStyles: {
 
     const totalsData = [
       { label: "Subtotal", value: formatDownloadCurrency(invoice.totals.subtotal, invoice.invoiceDetails.currency) },
-      { label: "Discount", value: formatDownloadCurrency(invoice.totals.discount, invoice.invoiceDetails.currency) },
-      { label: "Tax", value: formatDownloadCurrency(invoice.totals.tax, invoice.invoiceDetails.currency) },
+      ...(invoice.totals.discount>0 ? [
+         { label: "Discount", value: formatDownloadCurrency(invoice.totals.discount, invoice.invoiceDetails.currency)} ]: []),
+      ...(invoice.totals.igst>0 ? [
+        { 
+          label: "IGST", 
+          value: formatDownloadCurrency(invoice.totals.igst || 0,  invoice.invoiceDetails.currency)
+        }
+      ] : []),
+      ...(invoice.totals.cgst>0 ? [
+        { 
+          label: "CGST", 
+          value: formatDownloadCurrency(invoice.totals.cgst || 0,  invoice.invoiceDetails.currency)
+        }
+      ] : []),
+      ...(invoice.totals.sgst>0 ? [
+        { 
+          label: "SGST", 
+          value: formatDownloadCurrency(invoice.totals.sgst || 0,  invoice.invoiceDetails.currency)
+        }
+      ] : []),
+   
+      ...(invoice.totals.tax>0 ? 
+        [{ label: "Tax", value: formatDownloadCurrency(invoice.totals.tax, invoice.invoiceDetails.currency) }] : []),
       { label: "Total", value: formatDownloadCurrency(invoice.totals.total, invoice.invoiceDetails.currency), bold: true },
       { label: "Amount Paid", value: formatDownloadCurrency(invoice.totals.amountPaid, invoice.invoiceDetails.currency) },
-      { label: "Balance Due", value: formatDownloadCurrency(invoice.totals.balanceDue, invoice.invoiceDetails.currency), color: "#DC2626" }
+      { label: "Balance Due", value: formatDownloadCurrency(invoice.totals.balanceDue, invoice.invoiceDetails.currency), color: "#DC2626" },
     ];
 
     totalsData.forEach((total, index) => {
@@ -391,3 +435,4 @@ columnStyles: {
 
   return doc.output("blob");
 }
+

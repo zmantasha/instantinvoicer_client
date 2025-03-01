@@ -43,7 +43,10 @@ export interface InvoiceData {
     subtotal: number;
     tax: number;
     taxRate: number;
-    // taxType: string;
+    taxType: string;
+    igst:number;
+    cgst: number;
+    sgst:number;
     discount: number;
     shipping: number;
     discountType: number;

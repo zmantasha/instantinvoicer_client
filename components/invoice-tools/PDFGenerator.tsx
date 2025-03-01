@@ -37,13 +37,17 @@ interface InvoiceData {
       address: string;
     };
   };
-  itemHeaders: string[];
-  items: InvoiceItem[];
+   itemHeaders: string[];
+   items: InvoiceItem[];
   totals: {
     subtotal: number;
     tax: number;
     taxRate: number;
+    taxType: string;
     discount: number;
+    igst:number;
+    cgst: number;
+    sgst:number;
     shipping: number;
     discountType: "percentage" | "fixed";
     amountPaid: number;
@@ -64,9 +68,73 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
   const generatePDF = async () => {
     try {
       const pdf = new jsPDF();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const pageWidth = pdf.internal.pageSize.getWidth();
+      
       const margin = 18;
       let contentY = margin; // Track vertical position
+
+
+
+     
+      // Add watermark if status is Paid
+      // if (invoiceData.status === "Paid") {
+      //   const fontSize = 100;
+      //   const watermarkText = "PAID";
+      //   const textWidth = pdf.getTextWidth(watermarkText);
+      
+      //   // Calculate center position
+      //   const centerX = (pageWidth - textWidth) / 2;
+      //   const centerY = pageHeight / 2;
+      
+      //   // Use a light blue shade that simulates transparency
+      //   pdf.setFontSize(fontSize);
+      //   pdf.setFont("helvetica", "bold");
+      //   pdf.setTextColor(200, 220, 255); // Adjusted RGB values for a light effect
+      
+      //   // Add rotated watermark text
+      //   pdf.text(watermarkText, centerX, centerY, {
+      //     angle: 45,
+      //     align: "center",
+      //     baseline: "middle",
+      //   });
+      
+      //   // Reset text color to normal
+      //   pdf.setTextColor(0, 0, 0);
+      //   pdf.setFontSize(12);
+      //   pdf.setFont("helvetica", "normal");
+      // }
+      // Add watermark if status is Paid
+// if (invoiceData.status === "Paid") {
+//   const fontSize = 60; // Adjust font size for table cell
+//   const watermarkText = "PAID";
+
+//   // Get table cell dimensions
+//   const startX = 50; // X position of the table (adjust as needed)
+//   const startY = 100; // Y position where the table starts (adjust as needed)
+//   const cellWidth = 100; // Approximate width of a table cell
+//   const cellHeight = 50; // Approximate height of a table cell
+//   const textX = startX + cellWidth / 2; // Center within cell
+//   const textY = startY + cellHeight / 2; // Center within cell
+
+//   // Use a very light blue shade for a faded effect
+//   pdf.setFontSize(fontSize);
+//   pdf.setFont("helvetica", "bold");
+//   pdf.setTextColor(200, 220, 255); // Light faded color
+
+//   // Add rotated watermark inside the table cell
+//   pdf.text(watermarkText, textX, textY, {
+//     angle: 45,
+//     align: "center",
+//     baseline: "middle",
+//   });
+
+//   // Reset text color to normal
+//   pdf.setTextColor(0, 0, 0);
+//   pdf.setFontSize(12);
+//   pdf.setFont("helvetica", "normal");
+// }
+
 
       // Function to add wrapped text
       const addWrappedText = (
@@ -270,41 +338,48 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
         });
       }
 
-      // Items Table
-      const tableStartY = Math.max(
+const tableStartY = Math.max(
         gridY + (detailsData.length > 0 ? detailsData.length * 10 + 5 : 5),
         gridY + 30 // Minimum spacing from grid
       );
-        // Extract dynamic headers from the first item's data keys
-      const dynamicHeaders =
-      invoiceData.items.length > 0 ? Object.keys(invoiceData.items[0].data) : [];
 
-      // Define the table headers including static columns
-      const tableHeaders = ["Sr.No", ...dynamicHeaders, "Quantity", "Rate", "Amount"];
 
-      // Prepare table data dynamically
-      const tableData = invoiceData.items.map((item, index) => [
-      (index + 1).toString(),
-      ...dynamicHeaders.map((key) => item.data[key] || ""), // Extract values dynamically
-      item.quantity.toString(),
-      formatDownloadCurrency(item.rate, invoiceData.invoiceDetails.currency),
-      formatDownloadCurrency(item.amount, invoiceData.invoiceDetails.currency),
-      ]);
       
+      // Extract dynamic headers from the first item's data keys
+const dynamicHeaders =
+invoiceData.items.length > 0 ? Object.keys(invoiceData.items[0].data) : [];
 
+// Define the table headers including static columns
+const tableHeaders = ["Sr.No", ...dynamicHeaders, "Quantity", "Rate", "Amount"];
+
+// Prepare table data dynamically
+const tableData = invoiceData.items.map((item, index) => [
+(index + 1).toString(),
+...dynamicHeaders.map((key) => item.data[key] || ""), // Extract values dynamically
+item.quantity.toString(),
+formatDownloadCurrency(item.rate, invoiceData.invoiceDetails.currency),
+formatDownloadCurrency(item.amount, invoiceData.invoiceDetails.currency),
+]);
+
+
+
+
+
+      // Totals and Notes Section
+   
       (pdf as any).autoTable({
         startY: tableStartY,
         head: [tableHeaders],
         body: tableData,
         theme: "grid",
         headStyles: { fillColor: [12, 105, 204] },
-    columnStyles: {
-      0: { cellWidth: 20 },
-      ...Object.fromEntries(dynamicHeaders.map((_, i) => [i + 1, { cellWidth: "auto" }])),
-      [dynamicHeaders.length + 1]: { cellWidth: 25, halign: "left" },
-      [dynamicHeaders.length + 2]: { cellWidth: 25, halign: "left" },
-      [dynamicHeaders.length + 3]: { cellWidth: 25, halign: "left" },
-    },
+        columnStyles: {
+          0: { cellWidth: 20 },
+          ...Object.fromEntries(dynamicHeaders.map((_, i) => [i + 1, { cellWidth: "auto" }])),
+          [dynamicHeaders.length + 1]: { cellWidth: 25, halign: "left" },
+          [dynamicHeaders.length + 2]: { cellWidth: 25, halign: "left" },
+          [dynamicHeaders.length + 3]: { cellWidth: 25, halign: "left" },
+        },
         styles: {
           fontSize: 9,
           cellPadding: 2,
@@ -312,54 +387,53 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
         alternateRowStyles: {
           fillColor: [250, 250, 250],
         },
-
-          // Inside the autoTable's didDrawPage function
-          didDrawPage: function (data: any) {
-            if (invoiceData.status === "Paid") {
-              const fontSize = 80; // Adjust for better fit
-              const watermarkText = "PAID";
-        
-              // Get table position
-                 const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const centerX = pageWidth / 1.8;
-                const centerY = pageHeight / 1.5;
-        
-              pdf.setFont("helvetica", "bold");
-        
-              // Simulating transparency with layered red text
-              const transparencyLevels = [
-                { color: [240, 240, 240] }, // Very Light Gray (Almost Invisible)
-                { color: [230, 240, 255] }, // Lightest Blue
-                { color: [210, 230, 250] }, // Lighter Blue
-                { color: [190, 220, 245] }, // Very Light Blue
-              ];
-        
-              transparencyLevels.forEach(({ color }) => {
-                pdf.setFontSize(fontSize); // Slightly smaller for each layer
-                pdf.setTextColor(color[0], color[1], color[2]); // Set RGB color
-                pdf.text(watermarkText, centerX, centerY, {
-                  angle: 45,
-                  align: "center",
-                  baseline: "middle",
-                });
+      
+        // Inside the autoTable's didDrawPage function
+        didDrawPage: function (data: any) {
+          if (invoiceData.status === "Paid") {
+            const fontSize = 80; // Adjust for better fit
+            const watermarkText = "PAID";
+      
+            // Get table position
+               const pageWidth = pdf.internal.pageSize.getWidth();
+              const pageHeight = pdf.internal.pageSize.getHeight();
+              const centerX = pageWidth / 1.8;
+              const centerY = pageHeight / 1.5;
+      
+            pdf.setFont("helvetica", "bold");
+      
+            // Simulating transparency with layered red text
+            const transparencyLevels = [
+              { color: [240, 240, 240] }, // Very Light Gray (Almost Invisible)
+              { color: [230, 240, 255] }, // Lightest Blue
+              { color: [210, 230, 250] }, // Lighter Blue
+              { color: [190, 220, 245] }, // Very Light Blue
+            ];
+      
+            transparencyLevels.forEach(({ color }) => {
+              pdf.setFontSize(fontSize); // Slightly smaller for each layer
+              pdf.setTextColor(color[0], color[1], color[2]); // Set RGB color
+              pdf.text(watermarkText, centerX, centerY, {
+                angle: 45,
+                align: "center",
+                baseline: "middle",
               });
-        
-              // Reset styles
-              pdf.setTextColor(0, 0, 0);
-              pdf.setFontSize(12);
-              pdf.setFont("helvetica", "normal");
-            }
-          },
+            });
+      
+            // Reset styles
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(12);
+            pdf.setFont("helvetica", "normal");
+          }
+        },
       });
-
-      // Totals and Notes Section
+      
       const finalY = (pdf as any).lastAutoTable.finalY + 20;
       const totalsHeight = 70; // Height for totals box
       const notesHeight = invoiceData.notes ? pdf.getTextDimensions(invoiceData.notes).h : 0;
       const termsHeight = invoiceData.terms ? pdf.getTextDimensions(invoiceData.terms).h : 0;
       const totalContentHeight = Math.max(totalsHeight, notesHeight + termsHeight);
-      const pageHeight = pdf.internal.pageSize.getHeight();
+      // const pageHeight = pdf.internal.pageSize.getHeight();
       const remainingSpace = pageHeight - finalY - 10; // 20px margin
       const totalsX = pageWidth - 80;
 
@@ -372,15 +446,48 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
         pdf.setFillColor(250, 250, 250);
         pdf.rect(totalsX - 5, newPageY - 5, 85 - rightMargin, totalsHeight, "F");
 
+        // const totalsData = [
+        //   { label: "Subtotal", value: formatDownloadCurrency(invoiceData.totals.subtotal, invoiceData.invoiceDetails.currency) },
+        //   { label: "Discount", value: formatDownloadCurrency(invoiceData.totals.discount, invoiceData.invoiceDetails.currency) },
+        //   { label: "Tax", value: formatDownloadCurrency(invoiceData.totals.tax, invoiceData.invoiceDetails.currency) },
+        //   { label: "Tax", value: formatDownloadCurrency(invoiceData.totals.tax, invoiceData.invoiceDetails.currency) },
+        //   { label: "Total", value: formatDownloadCurrency(invoiceData.totals.total, invoiceData.invoiceDetails.currency), bold: true },
+        //   { label: "Amount Paid", value: formatDownloadCurrency(invoiceData.totals.amountPaid, invoiceData.invoiceDetails.currency) },
+        //   { label: "Balance Due", value: formatDownloadCurrency(invoiceData.totals.balanceDue, invoiceData.invoiceDetails.currency), color: "#DC2626" },
+        // ];
+
+
         const totalsData = [
           { label: "Subtotal", value: formatDownloadCurrency(invoiceData.totals.subtotal, invoiceData.invoiceDetails.currency) },
-          { label: "Discount", value: formatDownloadCurrency(invoiceData.totals.discount, invoiceData.invoiceDetails.currency) },
-          { label: "Tax", value: formatDownloadCurrency(invoiceData.totals.tax, invoiceData.invoiceDetails.currency) },
+          ...(invoiceData.totals.discount>0 ? [
+             { label: "Discount", value: formatDownloadCurrency(invoiceData.totals.discount, invoiceData.invoiceDetails.currency)} ]: []),
+          ...(invoiceData.totals.igst>0 ? [
+            { 
+              label: "IGST", 
+              value: formatDownloadCurrency(invoiceData.totals.igst || 0,  invoiceData.invoiceDetails.currency)
+            }
+          ] : []),
+          ...(invoiceData.totals.cgst>0 ? [
+            { 
+              label: "CGST", 
+              value: formatDownloadCurrency(invoiceData.totals.cgst || 0,  invoiceData.invoiceDetails.currency)
+            }
+          ] : []),
+          ...(invoiceData.totals.sgst>0 ? [
+            { 
+              label: "SGST", 
+              value: formatDownloadCurrency(invoiceData.totals.sgst || 0,  invoiceData.invoiceDetails.currency)
+            }
+          ] : []),
+       
+          ...(invoiceData.totals.tax>0 ? 
+            [{ label: "Tax", value: formatDownloadCurrency(invoiceData.totals.tax, invoiceData.invoiceDetails.currency) }] : []),
           { label: "Total", value: formatDownloadCurrency(invoiceData.totals.total, invoiceData.invoiceDetails.currency), bold: true },
           { label: "Amount Paid", value: formatDownloadCurrency(invoiceData.totals.amountPaid, invoiceData.invoiceDetails.currency) },
           { label: "Balance Due", value: formatDownloadCurrency(invoiceData.totals.balanceDue, invoiceData.invoiceDetails.currency), color: "#DC2626" },
         ];
 
+        
         totalsData.forEach((total, index) => {
           pdf.setFontSize(9);
           if (total.bold) {
@@ -432,8 +539,29 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
 
         const totalsData = [
           { label: "Subtotal", value: formatDownloadCurrency(invoiceData.totals.subtotal, invoiceData.invoiceDetails.currency) },
-          { label: "Discount", value: formatDownloadCurrency(invoiceData.totals.discount, invoiceData.invoiceDetails.currency) },
-          { label: "Tax", value: formatDownloadCurrency(invoiceData.totals.tax, invoiceData.invoiceDetails.currency) },
+          ...(invoiceData.totals.discount>0 ? [
+             { label: "Discount", value: formatDownloadCurrency(invoiceData.totals.discount, invoiceData.invoiceDetails.currency)} ]: []),
+          ...(invoiceData.totals.igst>0 ? [
+            { 
+              label: "IGST", 
+              value: formatDownloadCurrency(invoiceData.totals.igst || 0,  invoiceData.invoiceDetails.currency)
+            }
+          ] : []),
+          ...(invoiceData.totals.cgst>0 ? [
+            { 
+              label: "CGST", 
+              value: formatDownloadCurrency(invoiceData.totals.cgst || 0,  invoiceData.invoiceDetails.currency)
+            }
+          ] : []),
+          ...(invoiceData.totals.sgst>0 ? [
+            { 
+              label: "SGST", 
+              value: formatDownloadCurrency(invoiceData.totals.sgst || 0,  invoiceData.invoiceDetails.currency)
+            }
+          ] : []),
+       
+          ...(invoiceData.totals.tax>0 ? 
+            [{ label: "Tax", value: formatDownloadCurrency(invoiceData.totals.tax, invoiceData.invoiceDetails.currency) }] : []),
           { label: "Total", value: formatDownloadCurrency(invoiceData.totals.total, invoiceData.invoiceDetails.currency), bold: true },
           { label: "Amount Paid", value: formatDownloadCurrency(invoiceData.totals.amountPaid, invoiceData.invoiceDetails.currency) },
           { label: "Balance Due", value: formatDownloadCurrency(invoiceData.totals.balanceDue, invoiceData.invoiceDetails.currency), color: "#DC2626" },
