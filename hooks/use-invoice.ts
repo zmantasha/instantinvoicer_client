@@ -533,7 +533,7 @@ export function useInvoice(initialData?: InvoiceData) {
     emptyFieldMessages.forEach(message => {
       toast.error(message, {
         position: "bottom-right",
-        autoClose: 5000,
+        
       });
     });
 
