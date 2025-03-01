@@ -5,10 +5,11 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Textarea } from "../../components/ui/textarea";
 import { FormError } from "../../components/ui/form-error";
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from "axios";
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
+
 interface InvoiceHeaderProps {
   senderDetails: {
     logo: string;
@@ -40,7 +41,7 @@ interface InvoiceHeaderProps {
   formik: any;
 }
 
-const InvoiceHeader= memo(({
+const InvoiceHeader = memo(({
   senderDetails,
   recipientDetails,
   invoiceDetails,
@@ -50,105 +51,127 @@ const InvoiceHeader= memo(({
   formErrors,
   formTouched,
   formik
-}: InvoiceHeaderProps) =>{
-  // const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       onUpdateSender({ ...senderDetails, logo: reader.result });
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
-  const addressLength = 60; // Set max length
+}: InvoiceHeaderProps) => {
+  const addressLength = 60;
+  const nameLength = 35;
+  const [senderCharactersLeft, setSenderCharactersLeft] = useState(addressLength);
+  const [billAddressCharactersLeft, setBillAddressCharactersLeft] = useState(addressLength);
+  const [shipAddressCharactersLeft, setShipAddressCharactersLeft] = useState(addressLength);
+  const [senderNameCharactersLeft, setNameSenderCharactersLeft] = useState(nameLength);
+  const [billToCharactersLeft, setBillToCharactersLeft] = useState(nameLength);
+  const [shipToCharactersLeft, setShipToCharactersLeft] = useState(nameLength);
 
-  const [senderCharactersLeft, setSenderCharactersLeft] = useState(() => {
-    const initialAddress = formik.values.senderDetails.address || "";
-    return addressLength - initialAddress.length;
-  });
-  
-  const [billToCharactersLeft, setBillToCharactersLeft] = useState(() => {
-    const initialAddress = formik.values.recipientDetails.billTo.address || "";
-    return addressLength - initialAddress.length;
-  });
-  
-  const [shipToCharactersLeft, setShipToCharactersLeft] = useState(() => {
-    const initialAddress = formik.values.recipientDetails.shipTo.address || "";
-    return addressLength - initialAddress.length;
-  });
-  
-  // Function to handle sender address change
+  useEffect(() => {
+    const address = formik.values.senderDetails.address || "";
+    setSenderCharactersLeft(addressLength - address.length);
+  }, [formik.values.senderDetails.address]);
+
+  useEffect(() => {
+    const address = formik.values.recipientDetails.billTo.address || "";
+    setBillAddressCharactersLeft(addressLength - address.length);
+  }, [formik.values.recipientDetails.billTo.address]);
+
+  useEffect(() => {
+    const address = formik.values.recipientDetails.shipTo.address || "";
+    setShipAddressCharactersLeft(addressLength - address.length);
+  }, [formik.values.recipientDetails.shipTo.address]);
+
+  useEffect(() => {
+    const name = formik.values.senderDetails.name || "";
+    setNameSenderCharactersLeft(nameLength - name.length);
+  }, [formik.values.senderDetails.name]);
+
+  useEffect(() => {
+    const name = formik.values.recipientDetails.billTo.name || "";
+    setBillToCharactersLeft(nameLength - name.length);
+  }, [formik.values.recipientDetails.billTo.name]);
+
+  useEffect(() => {
+    const name = formik.values.recipientDetails.shipTo.name || "";
+    setShipToCharactersLeft(nameLength - name.length);
+  }, [formik.values.recipientDetails.shipTo.name]);
+
+  // Fixed event types for Input elements (HTMLInputElement instead of HTMLTextAreaElement)
+  const handleSenderNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedName = e.target.value;
+    onUpdateSender({ ...senderDetails, name: updatedName });
+  };
+
+  const handleBillToNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedName = e.target.value;
+    onUpdateRecipient({
+      ...recipientDetails,
+      billTo: { ...recipientDetails.billTo, name: updatedName },
+    });
+  };
+
+  const handleShipToNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedName = e.target.value;
+    onUpdateRecipient({
+      ...recipientDetails,
+      shipTo: { ...recipientDetails.shipTo, name: updatedName },
+    });
+  };
+
   const handleSenderAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const updatedAddress = e.target.value;
-    setSenderCharactersLeft(addressLength - updatedAddress.length);
     onUpdateSender({ ...senderDetails, address: updatedAddress });
   };
-  
-  // Function to handle billing address change
+
   const handleBillToAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const updatedAddress = e.target.value;
-    setBillToCharactersLeft(addressLength - updatedAddress.length);
     onUpdateRecipient({
       ...recipientDetails,
       billTo: { ...recipientDetails.billTo, address: updatedAddress },
     });
   };
-  
-  // Function to handle shipping address change
+
   const handleShipToAddressChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const updatedAddress = e.target.value;
-    setShipToCharactersLeft(addressLength - updatedAddress.length);
     onUpdateRecipient({
       ...recipientDetails,
       shipTo: { ...recipientDetails.shipTo, address: updatedAddress },
     });
   };
-  
- 
-  // console.log(charactersLeft);
 
-const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (file) {
-    const formData = new FormData();
-    formData.append("file", file);
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    try {
-      const accessToken = Cookies.get("accessToken");
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/upload-logo`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true, // Ensures cookies are sent with the request
+      try {
+        const accessToken = Cookies.get("accessToken");
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/upload-logo`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        );
+
+        const { data } = response;
+        toast.success("Logo uploaded successfully!", {
+          position: "bottom-right",
+        });
+        onUpdateSender({ ...senderDetails, logo: data.logoUrl });
+      } catch (error) {
+        console.error("Error uploading logo:", error);
+        if (axios.isAxiosError(error) && error.response) {
+          toast.error(`Upload failed: ${error.response.data.message || "Server error"}`, {
+            position: "bottom-right",
+          });
+        } else {
+          toast.error("Unexpected error occurred while uploading.", {
+            position: "bottom-right",
+          });
         }
-      );
-
-      const { data } = response;
-      toast.success("Logo uploaded successfully!", {
-        position: "bottom-right",
-      });
-
-      onUpdateSender({ ...senderDetails, logo: data.logoUrl });
-    } catch (error) {
-      console.error("Error uploading logo:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        toast.error(`Upload failed: ${error.response.data.message || "Server error"}`, {
-          position: "bottom-right",
-        });
-      } else {
-        toast.error("Unexpected error occurred while uploading.", {
-          position: "bottom-right",
-        });
       }
     }
-  }
-};
-
-  
+  };
 
   const removeLogo = () => {
     onUpdateSender({ ...senderDetails, logo: "" });
@@ -198,23 +221,19 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           <div>
             <Label htmlFor="sender-name">Who is this from?</Label>
             <Input
+             maxLength={nameLength}
               id="sender-name"
               value={formik.values.senderDetails.name}
-              onChange={(e) =>
-                onUpdateSender({
-                  ...senderDetails,
-                  name: e.target.value,
-                })
-              }
+              onChange={handleSenderNameChange}
               placeholder="Your business name"
             />
+            <p className="text-xs mt-1 text-gray-500">{senderNameCharactersLeft} characters left</p>
             <FormError
               message={formErrors.senderDetails?.name}
               className={formTouched.senderDetails?.name ? "block" : "hidden"}
             />
           </div>
           <div>
-            {/* Sender Address */}
             <Label htmlFor="sender-address">Address</Label>
             <Textarea
               maxLength={addressLength}
@@ -225,8 +244,6 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               rows={3}
             />
             <p className="text-xs mt-1 text-gray-500">{senderCharactersLeft} characters left</p>
-
-
             <FormError 
               message={formErrors.senderDetails?.address}
               className={formTouched.senderDetails?.address ? "block" : "hidden"}
@@ -241,20 +258,17 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           <div>
             <Label>Bill To</Label>
             <Input
+              maxLength={nameLength}
               value={formik.values.recipientDetails.billTo.name}
-              onChange={(e) =>
-                onUpdateRecipient({
-                  ...recipientDetails,
-                  billTo: { ...recipientDetails.billTo, name: e.target.value },
-                })
-              }
+              onChange={handleBillToNameChange}
               placeholder="Who is this to?"
             />
+            <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft} characters left</p>
             <FormError 
               message={formErrors.recipientDetails?.billTo?.name}
               className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
             />
-           <Textarea
+            <Textarea
               maxLength={addressLength}
               value={formik.values.recipientDetails.billTo.address}
               onChange={handleBillToAddressChange}
@@ -262,8 +276,7 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               className="mt-2"
               rows={3}
             />
-            <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft} characters left</p>
-
+            <p className="text-xs mt-1 text-gray-500">{billAddressCharactersLeft} characters left</p>
             <FormError 
               message={formErrors.recipientDetails?.billTo?.address}
               className={formTouched.recipientDetails?.billTo?.address ? "block" : "hidden"}
@@ -275,15 +288,12 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           <div>
             <Label>Ship To (optional)</Label>
             <Input
+              maxLength={nameLength}
               value={formik.values.recipientDetails.shipTo.name}
-              onChange={(e) =>
-                onUpdateRecipient({
-                  ...recipientDetails,
-                  shipTo: { ...recipientDetails.shipTo, name: e.target.value },
-                })
-              }
+              onChange={handleShipToNameChange}
               placeholder="Shipping recipient"
             />
+            <p className="text-xs mt-1 text-gray-500">{shipToCharactersLeft} characters left</p>
             <Textarea
               maxLength={addressLength}
               value={formik.values.recipientDetails.shipTo.address}
@@ -292,7 +302,7 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               className="mt-2"
               rows={3}
             />
-            <p className="text-xs mt-1 text-gray-500">{shipToCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{shipAddressCharactersLeft} characters left</p>
           </div>
         </div>
       </div>
@@ -309,7 +319,7 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 onUpdateInvoice({ ...invoiceDetails, number: e.target.value })
               }
               className="text-right"
-              readOnly={!!formik.initialValues._id} // Make read-only if editing
+              readOnly={!!formik.initialValues._id}
             />
             <FormError 
               message={formErrors?.invoiceDetails?.number}
@@ -324,7 +334,7 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               onChange={(e) =>
                 onUpdateInvoice({ ...invoiceDetails, date: e.target.value })
               }
-              readOnly={!!formik.initialValues._id} // Make read-only if editing
+              readOnly={!!formik.initialValues._id}
             />
             <FormError 
               message={formErrors?.invoiceDetails?.date}
@@ -348,7 +358,6 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
               onChange={(e) =>
                 onUpdateInvoice({ ...invoiceDetails, dueDate: e.target.value })
               }
-              // readOnly={!!formik.initialValues._id} // Make read-only if editing
               min={formik.values.invoiceDetails.date}
             />
             <FormError 
@@ -369,7 +378,7 @@ const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       </Card>
     </div>
   );
-})
+});
 
 InvoiceHeader.displayName = 'InvoiceHeader';
 export { InvoiceHeader };
