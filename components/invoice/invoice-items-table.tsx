@@ -43,7 +43,9 @@ const InvoiceItemsTable = memo(({ items, currency, itemHeaders, onUpdateItems, o
 
   const addHeader = () => {
     if (itemHeaders.length > 4) {
-      toast.error("Only 5 headers are allowed!", { position: "top-right" });
+      toast.error("Only 5 headers are allowed!", {
+        position: "bottom-right",
+      });
       return;
     }
     const newHeader = `Header ${itemHeaders.length + 1}`;
@@ -86,7 +88,9 @@ const updateHeader = (index: number, value: string) => {
 
 const removeHeader = (index: number) => {
   if (itemHeaders.length === 1) {
-    toast.error("At least one header is required.");
+    toast.error("At least one header is required.",{
+      position: "bottom-right",
+    });
     return;
   }
 
