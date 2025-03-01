@@ -227,7 +227,7 @@ const InvoiceHeader = memo(({
               onChange={handleSenderNameChange}
               placeholder="Your business name"
             />
-            <p className="text-xs mt-1 text-gray-500">{senderNameCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{senderNameCharactersLeft}</p>
             <FormError
               message={formErrors.senderDetails?.name}
               className={formTouched.senderDetails?.name ? "block" : "hidden"}
@@ -243,7 +243,7 @@ const InvoiceHeader = memo(({
               placeholder="Your business address"
               rows={3}
             />
-            <p className="text-xs mt-1 text-gray-500">{senderCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{senderCharactersLeft}</p>
             <FormError 
               message={formErrors.senderDetails?.address}
               className={formTouched.senderDetails?.address ? "block" : "hidden"}
@@ -263,7 +263,7 @@ const InvoiceHeader = memo(({
               onChange={handleBillToNameChange}
               placeholder="Who is this to?"
             />
-            <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
             <FormError 
               message={formErrors.recipientDetails?.billTo?.name}
               className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
@@ -276,7 +276,7 @@ const InvoiceHeader = memo(({
               className="mt-2"
               rows={3}
             />
-            <p className="text-xs mt-1 text-gray-500">{billAddressCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{billAddressCharactersLeft}</p>
             <FormError 
               message={formErrors.recipientDetails?.billTo?.address}
               className={formTouched.recipientDetails?.billTo?.address ? "block" : "hidden"}
@@ -293,7 +293,7 @@ const InvoiceHeader = memo(({
               onChange={handleShipToNameChange}
               placeholder="Shipping recipient"
             />
-            <p className="text-xs mt-1 text-gray-500">{shipToCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{shipToCharactersLeft} </p>
             <Textarea
               maxLength={addressLength}
               value={formik.values.recipientDetails.shipTo.address}
@@ -302,7 +302,7 @@ const InvoiceHeader = memo(({
               className="mt-2"
               rows={3}
             />
-            <p className="text-xs mt-1 text-gray-500">{shipAddressCharactersLeft} characters left</p>
+            <p className="text-xs mt-1 text-gray-500">{shipAddressCharactersLeft} </p>
           </div>
         </div>
       </div>
