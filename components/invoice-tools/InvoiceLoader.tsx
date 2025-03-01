@@ -112,6 +112,7 @@ export default function InvoiceLoader() {
             handleDelete={handleDelete}
             currentPage={currentPage}
             limit={limit}
+            refreshData={fetchInvoice}
           />
 
           <div className={styles.paginationBox}>
@@ -181,7 +182,7 @@ export default function InvoiceLoader() {
                 )
               )}
               <Button
-                className={styles.next}
+                className={styles.nextbutton}
                 disabled={currentPage === totalPages}
                 onClick={() =>
                   setCurrentPage((p) => (p < totalPages ? p + 1 : p))
