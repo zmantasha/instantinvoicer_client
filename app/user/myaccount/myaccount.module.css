@@ -28,6 +28,11 @@
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     padding: 2rem;
   }
+  .profileMainSection{
+    display: flex;
+    justify-content: space-between;
+
+  }
   
   .avatarSection {
     display: flex;
@@ -36,17 +41,23 @@
     margin-bottom: 3rem;
   }
   
-  .avatarWrapper {
+  .avatarWrapper,.logoWrapper{
     position: relative;
     width: 120px;
     height: 120px;
   }
+ 
   
   .avatar {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+  }
+  .logo{
+    width: 100%;
+    height: 100%; 
+    object-fit: contain;
   }
   
   .avatarUpload {

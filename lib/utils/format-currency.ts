@@ -46,7 +46,7 @@ export function formatCurrency(amount: number | undefined, currencyCode: string)
     style: "currency",
     currency: currencyCode || "USD",
     currencyDisplay: "symbol",
-    minimumFractionDigits: 3,  // Use more decimals for small numbers
+    minimumFractionDigits: 2,  // Use more decimals for small numbers
     maximumFractionDigits: 5,
   }).format(amount);
 

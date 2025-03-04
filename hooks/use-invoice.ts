@@ -160,24 +160,24 @@ export function useInvoice(initialData?: InvoiceData) {
     return Yup.object({
       senderDetails: Yup.object({
         name: Yup.string()
-          .max(50, "Sender Name must be at most 50 characters")
+          .max(100, "Sender Name must be at most 50 characters")
           .required("Business name is required"),
         address: Yup.string()
-          .max(60, "Sender Address must be at most 60 characters")
+          .max(100, "Sender Address must be at most 60 characters")
           .required("Business address is required"),
       }),
       recipientDetails: Yup.object({
         billTo: Yup.object({
           name: Yup.string()
-            .max(50, "Billing Name must be at most 50 characters")
+            .max(100, "Billing Name must be at most 50 characters")
             .required("Recipient name is required"),
           address: Yup.string()
-            .max(60, "Billing Address must be at most 60 characters")
+            .max(100, "Billing Address must be at most 60 characters")
             .required("Billing address is required"),
         }),
         shipTo: Yup.object({
-          name: Yup.string().max(50, "Shipping Name must be at most 50 characters"),
-          address: Yup.string().max(60, "Shipping Address must be at most 60 characters"),
+          name: Yup.string().max(100, "Shipping Name must be at most 50 characters"),
+          address: Yup.string().max(100, "Shipping Address must be at most 60 characters"),
         }),
       }),
       invoiceDetails: Yup.object({
@@ -188,22 +188,29 @@ export function useInvoice(initialData?: InvoiceData) {
       itemHeaders: Yup.array()
         .of(Yup.string().required("Header name is required"))
         .min(1, "At least one header is required"),
-      items: Yup.array().of(
-        Yup.object().shape({
-          data: Yup.lazy((obj) => 
-            Yup.object(
-              Object.keys(obj || {}).reduce((acc, key) => {
-                acc[key] = Yup.string().required(`${key} is required`);
-                return acc;
-              }, {} as Record<string, Yup.StringSchema>)
-            )
-          ),
+        items: Yup.array().of(
+          Yup.object().shape({
+            data: Yup.lazy((obj) =>
+              Yup.object(
+                Object.keys(obj || {}).reduce((acc, key) => {
+                  acc[key] = Yup.string()
+                    .trim()
+                    .required(`${key} is required`);
+                  return acc;
+                }, {} as Record<string, Yup.StringSchema>)
+              )
+            ),
+        
           quantity: Yup.number()
             .min(1, "Quantity must be at least 1")
             .required("Quantity is required"),
-          rate: Yup.number()
-            .min(0, "Rate must be positive")
+            rate: Yup.mixed()
+            .test("is-number", "Rate must be a valid number", (value) => 
+              value !== null && value !== undefined && value !== "" && !isNaN(Number(value))
+            )
+            .test("is-positive", "Rate must be positive", (value) => typeof value === "number" && value >= 0)
             .required("Rate is required"),
+
         })
       ),
     });
@@ -375,7 +382,7 @@ export function useInvoice(initialData?: InvoiceData) {
   
       let newInvoiceNumber = "INV-0001";
   
-      if (!initialData) { // ✅ Ensure it's only for new invoices
+      if (!initialData) {
         if (invoices?.length > 0) {
           const latestInvoice = invoices[invoices.length - 1];
   
@@ -389,9 +396,21 @@ export function useInvoice(initialData?: InvoiceData) {
         }
   
         formik.setFieldValue("invoiceDetails.number", newInvoiceNumber);
-      formik.setFieldValue("senderDetails.name", user.user.firstName || invoices.senderDetails.firstName);
-      formik.setFieldValue("senderDetails.address", user.user.address || invoices.senderDetails.address);
-      formik.setFieldValue("senderDetails.logo", user.user.logo || invoices.senderDetails.logo);
+        formik.setFieldValue(
+          "senderDetails.name",
+          user?.user?.firstName || invoices?.senderDetails?.firstName || ""
+        );
+        
+        formik.setFieldValue(
+          "senderDetails.address",
+          user?.user?.address || invoices?.senderDetails?.address || ""
+        );
+        
+        formik.setFieldValue(
+          "senderDetails.logo",
+          user?.user?.logo || invoices?.senderDetails?.logo || "/default-logo.png"
+        );
+        
       }
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -422,23 +441,64 @@ export function useInvoice(initialData?: InvoiceData) {
   
   const generatePDF = useCallback(async () => {
     try {
+      const errors = await formik.validateForm();
+      const emptyFieldMessages = getEmptyFields(errors);
+  
+      // 🔹 Check if `items` array is empty
+      if (formik.values.items.length === 0) {
+        emptyFieldMessages.push("At least one item is required.");
+      }
+  
+      // 🔹 Validate each item's fields
+      formik.values.items.forEach((item, index) => {
+        Object.entries(item.data).forEach(([key, value]) => {
+          if (!value.trim()) {
+            emptyFieldMessages.push(`Item ${index + 1}: ${key} is required`);
+          }
+        });
+      });
+  
+      // 🔹 Validate item rates
+      formik.values.items.forEach((item, index) => {
+        if (item.rate === null || item.rate === undefined) {
+          emptyFieldMessages.push(`Item ${index + 1}: Rate is required`);
+        } else if (isNaN(Number(item.rate))) {
+          emptyFieldMessages.push(`Item ${index + 1}: Rate must be a valid number`);
+        } else if (Number(item.rate) < 0) {
+          emptyFieldMessages.push(`Item ${index + 1}: Rate must be positive`);
+        }
+      });
+  
+      // 🔹 If any errors, show them and stop PDF generation
+      if (emptyFieldMessages.length > 0) {
+        emptyFieldMessages.forEach((message) => {
+          toast.error(message, { position: "bottom-right" });
+        });
+        return; // Stop PDF generation if validation fails
+      }
+  
+      // 🔹 Proceed with PDF generation
       const invoiceDataWithId = {
         ...formik.values,
-        _id: initialData?._id || 'dummy-id',
+        _id: initialData?._id || "dummy-id",
       };
+  
       const pdfBlob = await generateInvoicePDF(invoiceDataWithId);
       const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `invoice-${formik.values.invoiceDetails.number || 'draft'}.pdf`;
+      link.download = `invoice-${formik.values.invoiceDetails.number || "draft"}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
     }
   }, [formik.values, initialData]);
+  
+
+  
 
   const updateSenderDetails = useCallback((details: typeof initialInvoiceData.senderDetails) => {
     formik.setFieldValue("senderDetails", details);
@@ -527,23 +587,57 @@ export function useInvoice(initialData?: InvoiceData) {
   const saveInvoice = async () => {
     const errors = await formik.validateForm();
     const emptyFieldMessages = getEmptyFields(errors);
-
-    formik.setTouched({
-      senderDetails: { name: true, address: true },
-      recipientDetails: { billTo: { name: true, address: true } },
-      invoiceDetails: { number: true, date: true, dueDate: true },
-      items: formik.values.items.map(() => ({ data: {}, quantity: true, rate: true })),
-    }, true);
-
-    emptyFieldMessages.forEach(message => {
-      toast.error(message, {
-        position: "bottom-right",
-        
+  
+    // Set touched fields for validation highlighting
+    formik.setTouched(
+      {
+        senderDetails: { name: true, address: true },
+        recipientDetails: { billTo: { name: true, address: true } },
+        invoiceDetails: { number: true, date: true, dueDate: true },
+        items: formik.values.items.map((item) => ({
+          data: Object.keys(item.data).reduce(
+            (acc, key) => ({ ...acc, [key]: true }),
+            {}
+          ),
+          quantity: true,
+          rate: true,
+        })),
+      },
+      true
+    );
+  
+    if (formik.values.items.length === 0) {
+      emptyFieldMessages.push("At least one item is required.");
+    }
+    formik.values.items.forEach((item, index) => {
+      Object.entries(item.data).forEach(([key, value]) => {
+        if (!value.trim()) {
+          emptyFieldMessages.push(`Item ${index + 1}: ${key} is required`);
+        }
       });
     });
-
+    // Validate item rates
+    formik.values.items.forEach((item, index) => {
+      if (item.rate === null || item.rate === undefined ) {
+        emptyFieldMessages.push(`Item ${index + 1}: Rate is required`);
+      } else if (isNaN(Number(item.rate))) {
+        emptyFieldMessages.push(`Item ${index + 1}: Rate must be a valid number`);
+      } else if (Number(item.rate) < 0) {
+        emptyFieldMessages.push(`Item ${index + 1}: Rate must be positive`);
+      }
+    });
+  
+    // Display toast errors
+    if (emptyFieldMessages.length > 0) {
+      emptyFieldMessages.forEach((message) =>
+        toast.error(message, { position: "bottom-right" })
+      );
+      return; // Stop execution if errors exist
+    }
+  
     formik.handleSubmit();
   };
+  
 
   return {
     invoiceData: formik.values,

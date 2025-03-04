@@ -122,7 +122,10 @@
     padding: 20px;
     border-radius: 8px;
     text-align: center;
-    width: 350px;
+    min-width: 350px; 
+    width: fit-content; 
+    max-width: 600px;
+    
   }
   
   .popupButtons {

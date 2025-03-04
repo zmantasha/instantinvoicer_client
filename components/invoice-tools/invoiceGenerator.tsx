@@ -61,10 +61,89 @@ interface InvoiceItem {
         </div>
           </div>
         )}
+        <div className="relative">
+  {/* Invoice Number - Centered ONLY on Mobile */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center sm:hidden mt-4">
+        {invoiceItem.invoiceDetails.number}
+      </h1>
+
+      <div className="flex flex-col sm:flex-row sm:justify-between items-start mt-12">
+        {/* Sender Details */}
+        <div className="flex flex-col sm:flex-row sm:items-center space-x-0 sm:space-x-4">
+          <div className="flex flex-col">
+            {invoiceItem.senderDetails.logo && (
+              <img
+                src={invoiceItem.senderDetails.logo}
+                alt="Profile"
+                className="max-w-full max-h-full w-auto h-auto sm:w-32 sm:h-32 object-contain rounded-sm"
+              />
+            )}
+            <div className="mt-4 sm:mt-0">
+              <p className="text-gray-600">From</p>
+              <p className="text-gray-900 capitalize break-words whitespace-normal overflow-hidden">
+                {invoiceItem.senderDetails.name}
+              </p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <p className="text-gray-600">Address</p>
+              <p className="text-gray-900 capitalize break-words whitespace-normal overflow-hidden">
+                {invoiceItem.senderDetails.address}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Invoice Number - Shown Normally on Larger Screens */}
+        <h1 className="text-3xl sm:text-4xl font-bold hidden sm:block">
+          {invoiceItem.invoiceDetails.number}
+        </h1>
+      </div>
+
+      {/* Recipient and Invoice Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        <div>
+          {invoiceItem.recipientDetails.billTo.name && (
+            <div>
+              <p className="text-gray-600">Bill To</p>
+              <p className="text-gray-900 capitalize break-words whitespace-normal overflow-hidden">
+                {invoiceItem.recipientDetails.billTo.name}
+              </p>
+            </div>
+          )}
+          {invoiceItem.recipientDetails.billTo.address && (
+            <div>
+              <p className="text-gray-600 mt-3">Billing Address</p>
+              <p className="text-gray-900 capitalize break-words whitespace-normal overflow-hidden">
+                {invoiceItem.recipientDetails.billTo.address}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div>
+          {invoiceItem.recipientDetails.shipTo.name && (
+            <div>
+              <p className="text-gray-600">Ship To</p>
+              <p className="text-gray-900 capitalize break-words whitespace-normal overflow-hidden">
+                {invoiceItem.recipientDetails.shipTo.name}
+              </p>
+            </div>
+          )}
+          {invoiceItem.recipientDetails.shipTo.address && (
+            <div>
+              <p className="text-gray-600 mt-3">Shipping Address</p>
+              <p className="text-gray-900 capitalize break-words whitespace-normal overflow-hidden">
+                {invoiceItem.recipientDetails.shipTo.address}
+              </p>
+            </div>
+          )}
+        </div>
+     
+
           {/* Header Section */}
-          <div className="flex flex-col sm:flex-row sm:justify-between items-start">
+          {/* <div className="flex flex-col sm:flex-row sm:justify-between items-start"> */}
             {/* Sender Details */}
-            <div className="flex flex-col sm:flex-row sm:items-center space-x-0 sm:space-x-4">
+            {/* <div className="flex flex-col sm:flex-row sm:items-center space-x-0 sm:space-x-4">
               <div className="flex flex-col">
               {invoiceItem.senderDetails.logo && (
                 <img
@@ -82,14 +161,14 @@ interface InvoiceItem {
                 <p className="text-gray-900 capitalize">{invoiceItem.senderDetails.address}</p>
               </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Invoice Number */}
-            <h1 className="text-3xl sm:text-4xl mt-4 sm:mt-0">{invoiceItem.invoiceDetails.number}</h1>
-          </div>
+            {/* <h1 className="text-3xl sm:text-4xl mt-4 sm:mt-0">{invoiceItem.invoiceDetails.number}</h1>
+          </div> */}
 
           {/* Recipient and Invoice Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             <div>
               {invoiceItem.recipientDetails.billTo.name && (
                 <div>
@@ -103,9 +182,9 @@ interface InvoiceItem {
                   <p className="text-gray-900 capitalize">{invoiceItem.recipientDetails.billTo.address}</p>
                 </div>
               )}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               {invoiceItem.recipientDetails.shipTo.name && (
                 <div>
                   <p className="text-gray-600">Ship To</p>
@@ -118,7 +197,7 @@ interface InvoiceItem {
                   <p>{invoiceItem.recipientDetails.shipTo.address}</p>
                 </div>
               )}
-            </div>
+            </div> */}
             <div className="bg-gray-50 p-4 shadow-sm rounded">
               {invoiceItem.invoiceDetails.date && (
                 <div className="flex justify-between py-1">
@@ -154,7 +233,8 @@ interface InvoiceItem {
                 </p>
               </div>
             </div>
-          </div>
+            </div>
+            </div>
   
           {/* Items Table */}
           <div className="mt-8 overflow-x-auto">
