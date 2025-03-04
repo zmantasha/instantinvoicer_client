@@ -10,19 +10,44 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
   const margin = 18;
   let contentY = margin;
   // Function to add wrapped text
-  const addWrappedText = (
-   doc: jsPDF,
-    text: string,
+  const addAddressSection = (
+    pdf: jsPDF,
+    title: string,
+    name: string,
+    address: string,
     x: number,
     y: number,
-    maxWidth: number,
-    lineHeight: number
+    maxWidth: number
   ) => {
-    const lines =doc.splitTextToSize(text, maxWidth); // Split text into lines
-    lines.forEach((line: string, index: number) => {
-     doc.text(line, x, y + index * lineHeight); // Add each line
-    });
-    return lines.length * lineHeight; // Return the total height used
+    const lineHeight = 5;
+    const sectionMargin = 3;
+    let currentY = y;
+
+    // Add title
+    pdf.setFontSize(10);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text(title, x, currentY);
+    currentY += 5;
+
+    // Add name
+    pdf.setTextColor(0, 0, 0);
+    const nameLines = pdf.splitTextToSize(name, maxWidth);
+    pdf.text(nameLines, x, currentY);
+    currentY += (nameLines.length * lineHeight) + sectionMargin;
+
+    // Add address title
+    pdf.setFontSize(10);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text("Address:", x, currentY);
+    currentY += 5;
+
+    // Add address
+    pdf.setTextColor(0, 0, 0);
+    const addressLines = pdf.splitTextToSize(address, maxWidth);
+    pdf.text(addressLines, x, currentY);
+    currentY += (addressLines.length * lineHeight);
+
+    return currentY - y; // Return total height used
   };
   // Header Section with Logo and Invoice Number
   const addLogo = async () => {
@@ -67,14 +92,13 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
   doc.text(invoice.senderDetails.name, margin, contentY + 5);
   
   // Address label
-  if (invoice.senderDetails.address) {
   doc.setFontSize(10);
   doc.setTextColor(128, 128, 128);
   doc.text("Address:", margin, contentY + 12);
   doc.setTextColor(0, 0, 0);
   doc.text(invoice.senderDetails.address, margin, contentY + 17);
-  contentY += 13; // Move further down
-  }
+  contentY += 25; // Move further down
+  
   // Invoice Number (right-aligned)
   if (invoice.senderDetails.logo) {
   doc.setFontSize(24);
@@ -87,78 +111,21 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
   const gridY = contentY + 18; // Adjust position
   
   // Bill To Column
-  if (invoice.recipientDetails.billTo.name) {
-    doc.setFontSize(10);
-    doc.setTextColor(128, 128, 128);
-    doc.text("Bill To:", margin, gridY);
-    doc.setTextColor(0, 0, 0);
-    // doc.text(invoice.recipientDetails.billTo.name, margin, gridY + 5);
-  // Add wrapped text for billing name
-  const billingNameHeight = addWrappedText(
-   doc,
-    invoice.recipientDetails.billTo.name,
-    margin,
-    gridY + 5,
-    pageWidth / 2.9 - margin - 10, // Max width for billing name
-    4 // Line height
-  );
-    // Address label
-    doc.setFontSize(10);
-    doc.setTextColor(128, 128, 128);
-    doc.text("Billing Address", margin, gridY + 8 + billingNameHeight);
-    doc.setTextColor(0, 0, 0);
-    // doc.text(invoice.recipientDetails.billTo.address, margin, gridY + 17);
-    const billingAddressHeight = addWrappedText(
-     doc,
-      invoice.recipientDetails.billTo.address,
-      margin,
-      gridY + 13 + billingNameHeight,
-      pageWidth / 2.9 - margin - 10, // Max width for billing address
-      4// Line height
-    );
-    contentY += billingNameHeight + billingAddressHeight + 10;
-  }
-  
-
-  // Ship To Column
-  if (invoice.recipientDetails.shipTo.name) {
-    const middleX = pageWidth / 2.4 - 20;
-    doc.setFontSize(10);
-    doc.setTextColor(128, 128, 128);
-    doc.text("Ship To", middleX, gridY);
-    doc.setTextColor(0, 0, 0);
-    // doc.text(invoice.recipientDetails.shipTo.name, middleX, gridY + 5);
-
-   // Add wrapped text for shipping name
-   const shippingNameHeight = addWrappedText(
-   doc,
-    invoice.recipientDetails.shipTo.name,
-    middleX,
-    gridY + 5,
-    pageWidth / 2.5 - margin - 10, // Max width for shipping name
-    4 // Line height
-  );
-    
-    // Address label
-    
-    doc.setFontSize(10);
-    doc.setTextColor(128, 128, 128);
-   doc.text("Shipping Address", middleX, gridY + 8 + shippingNameHeight);
-    doc.setTextColor(0, 0, 0);
-    // doc.text(invoice.recipientDetails.shipTo.address,middleX, gridY + 17);
-     // Add wrapped text for shipping address
-     const shippingAddressHeight = addWrappedText(
-     doc,
-      invoice.recipientDetails.shipTo.address,
-      middleX,
-      gridY + 13 + shippingNameHeight,
-      pageWidth / 2.5 - margin - 10, // Max width for shipping address
-      4 // Line height
-    );
-
-    // Adjust the contentY position based on the height used by the shipping name and address
-    contentY += shippingNameHeight + shippingAddressHeight + 10;
-  }
+  const columnWidth = (pageWidth - margin * 2) / 3;
+  const addressColumns = [
+    {
+      type: 'billTo',
+      title: 'Bill To',
+      data: invoice.recipientDetails.billTo,
+      x: margin
+    },
+    {
+      type: 'shipTo',
+      title: 'Ship To',
+      data: invoice.recipientDetails.shipTo,
+      x: margin + columnWidth
+    }
+  ];
 
   // Invoice Details Box (right column)
   const detailsX = pageWidth - 80;
@@ -188,11 +155,13 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
       color: "#DC2626"
     }
   ].filter(Boolean) as { label: string; value: string }[];
+  const detailsStartY = contentY + 10; // Align with addresses
+  const detailsBoxHeight = detailsData.length * 10 + 1;
 
   if (detailsData.length > 0) {
     // Add gray background for details box
     doc.setFillColor(250, 250, 250);
-    doc.rect(detailsX - 5, gridY - 5, 85-rightMargin, detailsData.length * 10 + 1, "F");
+    doc.rect(detailsX - 5, detailsStartY - 5, 85-rightMargin, detailsBoxHeight, "F");
 
     detailsData.forEach((detail, index) => {
       doc.setFontSize(8);
@@ -204,13 +173,31 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
   }
 
   
+  let maxColumnHeight = 0;
+  addressColumns.forEach(col => {
+    if (col.data.name) {
+      const colHeight = addAddressSection(
+        doc,
+        col.title,
+        col.data.name,
+        col.data.address,
+        col.x,
+        detailsStartY, // Use same starting Y as details box
+        columnWidth - 10
+      );
+      maxColumnHeight = Math.max(maxColumnHeight, colHeight);
+    }
+  });
+  const detailsBoxContentHeight = detailsData.length * 10;
+contentY += Math.max(maxColumnHeight, detailsBoxContentHeight) + 15;
 
   // Items Table
   // const tableY = gridY + 60;
-  const tableStartY = Math.max(
-    gridY + (detailsData.length > 0 ? detailsData.length * 10 + 5 : 5),
-    gridY + 30 // Minimum spacing from grid
-  );
+  // const tableStartY = Math.max(
+  //   gridY + (detailsData.length > 0 ? detailsData.length * 10 + 5 : 5),
+  //   gridY + 30 // Minimum spacing from grid
+  // );
+  const tableStartY = contentY ;
 
   const dynamicHeaders =
 invoice.items.length > 0 ? Object.keys(invoice.items[0].data) : [];
