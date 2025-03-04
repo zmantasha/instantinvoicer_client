@@ -383,43 +383,43 @@ formatDownloadCurrency(item.amount, invoiceData.invoiceDetails.currency),
         },
       
         // Inside the autoTable's didDrawPage function
-        didDrawPage: function (data: any) {
-          if (invoiceData.status === "Paid") {
-            const fontSize = 80; // Adjust for better fit
-            const watermarkText = "PAID";
+        // didDrawPage: function (data: any) {
+        //   if (invoiceData.status === "Paid") {
+        //     const fontSize = 80; // Adjust for better fit
+        //     const watermarkText = "PAID";
       
-            // Get table position
-               const pageWidth = pdf.internal.pageSize.getWidth();
-              const pageHeight = pdf.internal.pageSize.getHeight();
-              const centerX = pageWidth / 1.8;
-              const centerY = pageHeight / 1.5;
+        //     // Get table position
+        //        const pageWidth = pdf.internal.pageSize.getWidth();
+        //       const pageHeight = pdf.internal.pageSize.getHeight();
+        //       const centerX = pageWidth / 1.8;
+        //       const centerY = pageHeight / 1.5;
       
-            pdf.setFont("helvetica", "bold");
+        //     pdf.setFont("helvetica", "bold");
       
-            // Simulating transparency with layered red text
-            const transparencyLevels = [
-              { color: [240, 240, 240] }, // Very Light Gray (Almost Invisible)
-              { color: [230, 240, 255] }, // Lightest Blue
-              { color: [210, 230, 250] }, // Lighter Blue
-              { color: [190, 220, 245] }, // Very Light Blue
-            ];
+        //     // Simulating transparency with layered red text
+        //     const transparencyLevels = [
+        //       { color: [240, 240, 240] }, // Very Light Gray (Almost Invisible)
+        //       { color: [230, 240, 255] }, // Lightest Blue
+        //       { color: [210, 230, 250] }, // Lighter Blue
+        //       { color: [190, 220, 245] }, // Very Light Blue
+        //     ];
       
-            transparencyLevels.forEach(({ color }) => {
-              pdf.setFontSize(fontSize); // Slightly smaller for each layer
-              pdf.setTextColor(color[0], color[1], color[2]); // Set RGB color
-              pdf.text(watermarkText, centerX, centerY, {
-                angle: 45,
-                align: "center",
-                baseline: "middle",
-              });
-            });
+        //     transparencyLevels.forEach(({ color }) => {
+        //       pdf.setFontSize(fontSize); // Slightly smaller for each layer
+        //       pdf.setTextColor(color[0], color[1], color[2]); // Set RGB color
+        //       pdf.text(watermarkText, centerX, centerY, {
+        //         angle: 45,
+        //         align: "center",
+        //         baseline: "middle",
+        //       });
+        //     });
       
-            // Reset styles
-            pdf.setTextColor(0, 0, 0);
-            pdf.setFontSize(12);
-            pdf.setFont("helvetica", "normal");
-          }
-        },
+        //     // Reset styles
+        //     pdf.setTextColor(0, 0, 0);
+        //     pdf.setFontSize(12);
+        //     pdf.setFont("helvetica", "normal");
+        //   }
+        // },
       });
       
       const finalY = (pdf as any).lastAutoTable.finalY + 20;
