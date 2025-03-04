@@ -28,7 +28,7 @@ export default function MyInvoice() {
             </Button>
           </div>
           <div>
-            {/* <FilterComponent /> */}
+            <FilterComponent />
           </div>
           <div className={styles.invoiceContainer}>
             <InvoiceLoader />

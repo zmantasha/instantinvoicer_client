@@ -257,6 +257,7 @@ const handleCellPaste = (
 ) => {
   e.stopPropagation();
   const clipboardData = e.clipboardData.getData('text');
+
   if (!clipboardData) return;
   e.preventDefault();
 
@@ -276,18 +277,23 @@ const handleCellPaste = (
     
     if (field === 'data' && typeof headerIndex !== 'undefined') {
       const currentHeader = itemHeaders[headerIndex];
+      const existingValue = updatedItems[targetIndex].data[currentHeader] || "";
+     
       updatedItems[targetIndex] = {
         ...updatedItems[targetIndex],
         data: {
           ...updatedItems[targetIndex].data,
-          [currentHeader]: value
+          [currentHeader]: existingValue 
+          ? `${existingValue} ${value}` 
+          : `${value}`
+        
         }
       };
     } else if (field === 'quantity' || field === 'rate') {
       const numericValue = parseFloat(value) || 0;
       updatedItems[targetIndex] = {
         ...updatedItems[targetIndex],
-        [field]: numericValue,
+        [field]: (updatedItems[targetIndex][field] as number || 0) + numericValue,
         amount: calculateItemAmount(
           field === 'quantity' ? numericValue : updatedItems[targetIndex].quantity,
           field === 'rate' ? numericValue : updatedItems[targetIndex].rate
@@ -453,7 +459,7 @@ useEffect(() => {
                     <Input
                       value={item.data[header] || ""}
                       onChange={(e) => updateItem(item.id, "data", { ...item.data, [header]: e.target.value })}
-                      placeholder={`Enter ${header}`}
+                      placeholder={`Enter ${header} `}
                       onPaste={(e) => handleCellPaste(e, item.id, "data", headerIndex)}
                       className="border-transparent hover:border-input focus:border-input bg-transparent"
                     />
@@ -483,7 +489,7 @@ useEffect(() => {
                       <Input
                         type="number"
                         ref={(el) => (inputRefs.current[index] = el)}
-                        value={item.rate}
+                        value={isNaN(item.rate) ? "" : item.rate}
                         placeholder="rate"
                         step="any" // Allows decimal values
                         inputMode="decimal" // Mobile-friendly

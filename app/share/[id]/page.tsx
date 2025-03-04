@@ -60,7 +60,7 @@ export default function SharePage() {
           <div className={styles.viewHeader}>
             {invoiceItem.invoiceDetails && (
               <div className={styles.headerTop}>
-                <h1>{invoiceItem.invoiceDetails.number} from {invoiceItem.recipientDetails.billTo.name}</h1>
+                <h1>{invoiceItem.invoiceDetails.number} from {invoiceItem.senderDetails.name}</h1>
               
               </div>
             )}

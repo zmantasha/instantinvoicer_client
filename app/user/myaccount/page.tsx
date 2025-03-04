@@ -12,6 +12,7 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FiUpload, FiTrash2, FiUser, FiHome, FiCamera } from "react-icons/fi";
+import Image from "next/image";
 
 interface FormValues {
   firstName: string;
@@ -118,13 +119,15 @@ export default function MyAccount() {
       </div>
 
       <div className={styles.profileSection}>
+        <div className={styles.profileMainSection}>
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <img 
+            {/* <img 
               src={user?.user?.avatar || "/default-avatar.png"} 
               alt="Avatar" 
               className={styles.avatar}
-            />
+            /> */}
+            <Image src={user?.user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
             <label className={styles.avatarUpload}>
               <FiCamera size={20} />
               <input
@@ -139,6 +142,10 @@ export default function MyAccount() {
             <h2>{user?.user?.firstName} {user?.user?.lastName}</h2>
             <p className={styles.userEmail}>{user?.user?.email}</p>
           </div>
+          </div>
+          <div className={styles.logoWrapper}>
+            {user?.user?.logo ?<Image src = {user?.user?.logo  ||"/default.avif"} alt="Avatar" width={150} height={100} className={styles.logo}/> : ""}
+          </div>
         </div>
 
         <form onSubmit={formik.handleSubmit} className={styles.formSection}>
@@ -148,6 +155,7 @@ export default function MyAccount() {
               <Input
                 type="text"
                 name="firstName"
+                placeholder="Enter your first name"
                 value={formik.values.firstName}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -163,6 +171,7 @@ export default function MyAccount() {
               <Input
                 type="text"
                 name="lastName"
+                placeholder="Enter your last name"
                 value={formik.values.lastName}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -178,6 +187,7 @@ export default function MyAccount() {
               <Input
                 type="text"
                 name="address"
+                placeholder="Enter your address"
                 value={formik.values.address}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}

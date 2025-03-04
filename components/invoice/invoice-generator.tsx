@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import { InvoiceHeader } from "./invoice-header";
@@ -95,14 +92,14 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
           </div>
           
           <Button 
-  type="button" 
-  variant="outline" 
-  className="text-[#003366] w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
-  onClick={() => saveInvoice()}
-  disabled={formik.isSubmitting} // Disable when submitting
->
-  {formik.isSubmitting ? "Saving..." : invoiceId ? "Update Invoice" : "Save Invoice"}
-</Button>
+          type="button" 
+          variant="outline" 
+          className="text-[#003366] w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={() => saveInvoice()}
+          disabled={formik.isSubmitting} // Disable when submitting
+        >
+        {formik.isSubmitting ? "Saving..." : invoiceId ? "Update Invoice" : "Save Invoice"}
+      </Button>
         </div>
       </div>
 
