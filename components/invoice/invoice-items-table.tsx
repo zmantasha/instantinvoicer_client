@@ -140,6 +140,13 @@ const removeHeader = (index: number) => {
     }
   }, [items.length]);
 
+  useEffect(() => {
+    if (items.length === 0) {
+      addItem();
+    }
+  }, [items, addItem]);
+
+  
   const add10Items = useCallback(() => {
     const newItems = Array.from({ length: 10 }, () => ({
       id: crypto.randomUUID(),
@@ -537,7 +544,8 @@ useEffect(() => {
       
 {isRatePopupOpen && popupPosition && (
   <div
-    className="fixed z-50 bg-white p-4 rounded-lg rounded-sm rounded-md shadow-lg border border-gray-200"
+    className="fixed z-50 bg-white p-4 rounded-md shadow-lg border border-gray-200"
+
     style={{
       top: `${Math.max(popupPosition.top, 20)}px`,
       left: `${Math.max(popupPosition.left, 20)}px`,

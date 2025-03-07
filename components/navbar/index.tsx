@@ -1,7 +1,8 @@
+// components/NavBar.tsx
 "use client";
 
 import Link from "next/link";
-import { FC, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -9,238 +10,169 @@ import styles from "./navbar.module.css";
 import { useUser } from "../../hooks/UserContext";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu } from "lucide-react";
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import Image from "next/image";
 
-const NavBar: FC = () => {
-  const [isLoggedin, setIsLoggedin] = useState<string | null>(null);
-  const [showDropdown, setShowDropdown] = useState<string | null>(null);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+// the axios interceptor
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      Cookies.remove("accessToken");
+      localStorage.removeItem("user");
+      window.location.href = "/account/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+const NavBar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, fetchUserProfile } = useUser();
-  const dropdownRef = useRef<HTMLDivElement | null>(null);  // Type ref here
-  const checkLoginStatus = () => {
-    const isloggedinCookie = Cookies.get("accessToken");
-    // const isloggedinCookie= localStorage.getItem("accessToken")
-    setIsLoggedin(isloggedinCookie || null);
-  };
+  const { user, setUser, clearUser } = useUser();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Initialize user data on mount
   useEffect(() => {
-    checkLoginStatus();
+    const validateSession = async () => {
+      const token = Cookies.get("accessToken");
+      const storedUser = localStorage.getItem("user");
+      
+      if (token && storedUser) {
+        try {
+          // Verify token validity
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          
+          // Update user context with fresh data
+          setUser(response.data.user);
+          console.log(response.data.user);
+          // localStorage.setItem("user", JSON.stringify(response.data.user));
+        } catch (error) {
+          // Clear invalid session
+          Cookies.remove("accessToken");
+          localStorage.removeItem("user");
+          clearUser();
+          router.replace("/account/login");
+        }
+      }
+    };
 
-    if (isLoggedin) {
-      fetchUserProfile();
-    }
-
-    const interval = setInterval(() => {
-      checkLoginStatus();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isLoggedin]);
+    validateSession();
+  }, []);
 
   const handleLogout = async () => {
     try {
       const accessToken = Cookies.get("accessToken");
-  
-      if (!accessToken) {
-        toast.error("You are not logged in.", { position: "bottom-right" });
-        router.replace("/account/login");
-        return;
-      }
-  
-      const response = await axios.post(
+      if (!accessToken) return;
+
+      await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/logout`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-  
-      if (response.data && response.data.status === "success") {
-        Cookies.remove("accessToken");
-        toast.success("Successfully logged out.", { position: "bottom-right" });
-        router.replace("/account/login");
-        setShowDropdown(null);
-        setShowMobileMenu(false);
-      }
+
+      // Clear all user data
+      Cookies.remove("accessToken");
+      localStorage.removeItem("user");
+      clearUser();
+      setShowDropdown(false)
+      setShowMobileMenu(false)
+      router.replace("/account/login");
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Something went wrong while logging out.", { position: "bottom-right" });
+      toast.error("Logout failed");
     }
   };
 
-  const toggleDropdown = () => {
-    setShowDropdown((prev) => (prev ? null : "dropdown"));
-  };
-
-  const toggleMobileMenu = () => {
-    setShowMobileMenu(!showMobileMenu);
-    setShowDropdown(null);  // Close dropdown when mobile menu is opened
-  };
-
-  const handleNavigation = (path: string) => {
-    router.push(path);
-    
-    setShowDropdown(null);
-    setShowMobileMenu(false);
-  };
-
-  const handleClickOutside = (e: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-      setShowDropdown(null); // Close dropdown if clicked outside
-    }
-  };
-
-  // Attach event listener when dropdown is open
+  // Click outside handler
   useEffect(() => {
-    if (showDropdown) {
-      document.addEventListener("click", handleClickOutside);
-    } else {
-      document.removeEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
     };
-  }, [showDropdown]);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <nav className={styles.nav}>
+    <nav className={styles.nav} aria-label="Main navigation">
       <div className={styles.navContent}>
         <div className={styles.leftContainer}>
-        <h3
-          className={styles.logo}
-          onClick={() => handleNavigation(isLoggedin ? "/user/myinvoice" : "/")}
-        >
-          instantinvoicer.com
-        </h3>
+          <Link href={user ? "/user/myinvoice" : "/"} className={styles.logo}>
+            instantinvoicer.com
+          </Link>
 
-          <div
-            className={`${styles.menuContainer} ${
-              showMobileMenu ? styles.showMobileMenu : ""
-            }`}
-          >
-            {isLoggedin ? (
+          {user && (
+            <div className={`${styles.menuContainer} ${showMobileMenu ? styles.showMobileMenu : ""}`}>
               <ul className={styles.menuList}>
                 <li className={styles.menuItem}>
                   <Link
                     href="/user/myinvoice"
-                    className={`${styles.link} ${
-                      pathname === "/user/myinvoice" ? styles.active : ""
-                    }`}
+                    className={`${styles.link} ${pathname === "/user/myinvoice" ? styles.active : ""}`}
                     onClick={() => setShowMobileMenu(false)}
                   >
                     My Invoices
                   </Link>
                 </li>
-                {/* <li className={styles.menuItem}>
-                  <Link
-                    href="/user/setting"
-                    className={`${styles.link} ${
-                      pathname === "/user/setting" ? styles.active : ""
-                    }`}
-                    onClick={() => setShowMobileMenu(false)}
-                  >
-                    Setting
-                  </Link>
-                </li>
-                <li className={styles.menuItem}>
-                  <Button href="/user/upgrade" onClick={() => setShowMobileMenu(false)}>
-                    Upgrade
-                  </Button>
-                </li> */}
               </ul>
-            ) : (
-              <ul className={styles.menuList}>
-                {/* <li className={styles.menuItem}>
-                  <Link
-                    href="/help"
-                    className={styles.link}
-                    onClick={() => setShowMobileMenu(false)}
-                  >
-                    Help
-                  </Link>
-                </li> */}
-                {/* <li className={styles.menuItem}>
-                  <Link
-                    href="/history"
-                    className={styles.link}
-                    onClick={() => setShowMobileMenu(false)}
-                  >
-                    History
-                  </Link>
-                </li> */}
-                {/* <li className={styles.menuItem}>
-                  <Link
-                    href="/guide"
-                    className={styles.link}
-                    onClick={() => setShowMobileMenu(false)}
-                  >
-                    Invoicing Guide
-                  </Link>
-                </li> */}
-              </ul>
-            )}
 
-            <div className={styles.mobileAuth}>
-              {isLoggedin && (
+              <div className={styles.mobileAuth}>
                 <div className={styles.dropdownContainer}>
-                  <div  className={styles.linkProfile} onClick={toggleDropdown}>
-                    {user?.user ? `${user?.user?.firstName} ${user?.user?.lastName}` : <></>}
-                    <ChevronDown className="w-4 h-4 ml-2"/>
-                  </div>
+                  <button 
+                    className={styles.linkProfile} 
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    aria-expanded={showDropdown}
+                    aria-label="User menu"
+                  >
+                    {`${user?.firstName} ${user?.lastName}`}
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </button>
+                  
                   {showDropdown && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
                       <div className={styles.dropdownProfile}>
-                        <div className={styles.avatar}>{user?.user?.avatar ?<Image src={user?.user?.avatar } alt="Profile" width={50} height={50} className={styles.profileImage} />:<Image src={"/default.avif" } alt="Profile" width={50} height={50} className={styles.profileImage} />}</div>
+                        <Image 
+                          src={user.avatar || "/default.avif"} 
+                          alt="Profile" 
+                          width={50} 
+                          height={50} 
+                          className={styles.profileImage}
+                        />
                         <div>
-                          <p className={styles.dropdownProfileName}>
-                            {user && user?.user?.firstName}
-                          </p>
-                          <p className={styles.dropdownProfileEmail}>
-                            {user && user?.user?.email}
-                          </p>
+                          <p className={styles.dropdownProfileName}>{user.firstName}</p>
+                          <p className={styles.dropdownProfileEmail}>{user.email}</p>
                         </div>
                       </div>
-                      <div
-                        className={styles.dropdownItem}
-                        onClick={() => handleNavigation("/user/myaccount")}
-                      >
+                      <Link href="/user/myaccount" className={styles.dropdownItem}>
                         Account Settings
-                      </div>
-                      <div onClick={handleLogout} className={styles.dropdownItem}>
+                      </Link>
+                      <button onClick={handleLogout} className={styles.dropdownItem}>
                         Sign Out
-                      </div>
+                      </button>
                     </div>
                   )}
                 </div>
-              ) 
-              //  (
-              //   <>
-              //   </>
-              //   // <div className={styles.authButtons}>
-              //   //   <Button href="/account/login" onClick={() => setShowMobileMenu(false)}>
-              //   //     Login
-              //   //   </Button>
-              //   //   <Button href="/account/signup" onClick={() => setShowMobileMenu(false)}>
-              //   //     Signup
-              //   //   </Button>
-              //   // </div>
-              // )
-              }
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-          {isLoggedin && <button className={styles.hamburger} onClick={toggleMobileMenu} aria-label="Toggle menu">
-          <Menu size={24} />
-        </button>
-          }
+        {user && (
+          <button 
+            className={styles.hamburger} 
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle mobile menu"
+          >
+            <Menu size={24} />
+          </button>
+        )}
       </div>
     </nav>
   );

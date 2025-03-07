@@ -16,12 +16,14 @@ export default function AuthRedirect() {
   }, []);
 
   useEffect(() => {
-    // Redirect based on authentication state
-    if (isAuthenticated === null) return; // Wait until authentication is checked
-    if (isAuthenticated) {
-      router.replace("/user/myinvoice"); // Redirect to the dashboard if logged in
+    if (isAuthenticated === null) return;
+    
+    const storedUser = localStorage.getItem("user");
+    if (isAuthenticated && storedUser) {
+      router.replace("/user/myinvoice");
     } else {
-      router.replace("/account/login"); // Redirect to login page
+      localStorage.removeItem("user");
+      router.replace("/account/login");
     }
   }, [isAuthenticated, router]);
 

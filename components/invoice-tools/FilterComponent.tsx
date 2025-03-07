@@ -1,7 +1,4 @@
-// export default function FilterComponent(){
-
-// }
-
+"use client"
 // Add these imports at the top
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,15 +10,62 @@ import { Input } from "../ui/input";
 import { useState } from "react";
 import { format } from "date-fns";
 
+interface FilterComponentProps {
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (value: string) => void;
+  dateRange: { start?: Date; end?: Date };
+  setDateRange: (range: { start?: Date; end?: Date }) => void;
+  selectedCurrency: string;
+  setSelectedCurrency: (value: string) => void;
+  amountRange: { min?: number; max?: number };
+  setAmountRange: (range: { min?: number; max?: number }) => void;
+  clearFilters: () => void;
+  selectedFilter: string;
+  setSelectedFilter: (value: string) => void;
+}
+
 // Add these state variables
-export default function FilterComponent(){
-const [selectedFilter, setSelectedFilter] = useState("all");
-const [searchQuery, setSearchQuery] = useState("");
+export default function FilterComponent({
+  searchQuery,
+  setSearchQuery,
+  selectedStatus,
+  setSelectedStatus,
+  dateRange,
+  setDateRange,
+  selectedCurrency,
+  setSelectedCurrency,
+  amountRange,
+  setAmountRange,
+  clearFilters,
+  selectedFilter,
+  setSelectedFilter
+}: FilterComponentProps){
+// const [selectedFilter, setSelectedFilter] = useState("all");
+// const [searchQuery, setSearchQuery] = useState("");
 const [openDatePicker, setOpenDatePicker] = useState(false);
-const [dateRange, setDateRange] = useState<{ start?: Date; end?: Date }>({});
-const [selectedStatus, setSelectedStatus] = useState("");
-const [selectedCurrency, setSelectedCurrency] = useState("");
-const [amountRange, setAmountRange] = useState({ min: "", max: "" });
+
+  const handleAmountChange = (type: 'min' | 'max', value: string) => {
+    const numericValue = value.trim() === "" ? undefined : Number(value);
+    if (isNaN(numericValue as number)) return;
+
+    setAmountRange(prev => ({
+      ...prev,
+      [type]: numericValue,
+    }));
+  };
+
+  const getSearchPlaceholder = () => {
+    switch (selectedFilter) {
+      case 'name': return 'Search by name...';
+      case 'status': return 'Search by status...';
+      case 'dueDate': return 'Search by due date...';
+      case 'date': return 'Search by date...';
+      case 'currency': return 'Search by currency...';
+      default: return 'Search all...';
+    }
+  };
 
 // Add the filter component JSX before the view header
 return (
@@ -30,30 +74,30 @@ return (
   <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm">
     {/* Filter Type Dropdown */}
     <div className="w-full sm:w-64">
-      <Select onValueChange={(value) => setSelectedFilter(value)}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Filter by..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          <SelectItem value="name">Name</SelectItem>
-          <SelectItem value="status">Status</SelectItem>
-          <SelectItem value="dueDate">Due Date</SelectItem>
-          <SelectItem value="date">Date</SelectItem>
-          <SelectItem value="currency">Currency</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+          <Select value={selectedFilter} onValueChange={setSelectedFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="status">Status</SelectItem>
+              <SelectItem value="dueDate">Due Date</SelectItem>
+              <SelectItem value="date">Date</SelectItem>
+              <SelectItem value="currency">Currency</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
     {/* Search Input */}
     <div className="w-full sm:flex-1">
-      <Input
-        placeholder={`Search by ${selectedFilter}...`}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full"
-      />
-    </div>
+          <Input
+            placeholder={getSearchPlaceholder()}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
+        </div>
 
     {/* Advanced Filter Button */}
     <Popover>
@@ -113,16 +157,18 @@ return (
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                mode="range"
-                selected={dateRange.start ? { from: dateRange.start, to: dateRange.end } : undefined}
-                onSelect={(range) =>
+              mode="range"
+              selected={dateRange.start && dateRange.end ? 
+                { from: dateRange.start, to: dateRange.end } : 
+                undefined}
+              onSelect={(range) => {
                 setDateRange({
-                    start: range?.from ? new Date(range.from) : undefined,
-                    end: range?.to ? new Date(range.to) : undefined,
-                })
-                }
-                />
-              </PopoverContent>
+                  start: range?.from,
+                  end: range?.to
+                });
+              }}
+            />
+                          </PopoverContent>
             </Popover>
           </div>
 
@@ -174,11 +220,8 @@ return (
               <Input
                 type="number"
                 placeholder="0.00"
-                value={amountRange.min}
-                onChange={(e) => setAmountRange(prev => ({
-                  ...prev,
-                  min: e.target.value
-                }))}
+                value={amountRange.min ?? ""}
+                onChange={(e) => handleAmountChange('min', e.target.value)}
               />
             </div>
             <div>
@@ -187,10 +230,7 @@ return (
                 type="number"
                 placeholder="1000.00"
                 value={amountRange.max}
-                onChange={(e) => setAmountRange(prev => ({
-                  ...prev,
-                  max: e.target.value
-                }))}
+                onChange={(e) => handleAmountChange('max', e.target.value)}
               />
             </div>
           </div>
@@ -204,7 +244,7 @@ return (
                 setDateRange({});
                 setSelectedStatus("");
                 setSelectedCurrency("");
-                setAmountRange({ min: "", max: "" });
+                setAmountRange({ min: undefined, max: undefined });
               }}
             >
               Clear All
@@ -248,13 +288,13 @@ return (
     )}
     
     {(amountRange.min || amountRange.max) && (
-      <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm flex items-center gap-2">
-        Amount: {amountRange.min || '0'} - {amountRange.max || '∞'}
-        <button onClick={() => setAmountRange({ min: "", max: "" })} className="text-orange-500 hover:text-orange-700">
-          ×
-        </button>
-      </span>
-    )}
+  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm flex items-center gap-2">
+    Amount: {amountRange.min?.toString() || '0'} - {amountRange.max?.toString() || '∞'}
+    <button onClick={() => setAmountRange({ min: undefined, max: undefined })} className="text-orange-500 hover:text-orange-700">
+      ×
+    </button>
+  </span>
+)}
   </div>
 </div>
 )}
