@@ -35,16 +35,16 @@ export default function ViewPageClient({
   const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   // Handle client-side data refresh if needed
-  const fetchInvoice = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`
-      )
-      setInvoiceItem(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }, [id])
+  // const fetchInvoice = useCallback(async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`
+  //     )
+  //     setInvoiceItem(response.data)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }, [id])
 
   useEffect(() => {
     if (searchParams.get('openModal') === 'true') {
@@ -77,11 +77,14 @@ export default function ViewPageClient({
    
   
 
-  useEffect(() => {
-    if (id && !invoiceItem) {
-      fetchInvoice();
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id && !invoiceItem) {
+  //     fetchInvoice();
+  //   }
+  // }, [id]);
+  useEffect(()=>{
+    setInvoiceItem(initialInvoice)
+  },[initialInvoice])
 
   const toggleDropdown = () => {
     setShowDropdown((prev) => (prev ? null : "dropdown"));
