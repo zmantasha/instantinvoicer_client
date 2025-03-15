@@ -1,37 +1,60 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { Button } from "../../../components/ui/button";
+// app/user/myinvoice/page.tsx
+import { cookies } from "next/headers";
 import styles from "./myinvoice.module.css";
-import FilterComponent from "@/components/invoice-tools/FilterComponent";
+import NewInvoiceButton from "@/components/invoice-tools/NewInvoiceButton";
 import InvoiceLoader from "@/components/invoice-tools/InvoiceLoader";
+import { revalidateTag } from "next/cache";
 
-export default function MyInvoice() {
-  const router = useRouter();
+async function fetchUser() {
+  const accessToken = cookies().get("accessToken")?.value;
+  if (!accessToken) return null;
 
-  const handleNewInvoice = () => {
-    router.push("/user/invoicetamplate");
-  };
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        cache: "no-store",
+      }
+    );
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
+  }
+}
 
+async function fetchAllInvoices(userId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${userId}`,
+      { 
+        next: { tags: ['invoices'] }, // Add cache tag
+        cache: "no-store"
+      }
+    );
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    return [];
+  }
+}
+
+export default async function MyInvoice() {
+  const user = await fetchUser();
+  // console.log(user.user._id);
+  const invoices = user ? await fetchAllInvoices(user?.user._id) : [];
+  //  console.log(invoices);
   return (
     <div className={styles.myInvoicePage}>
       <div className={styles.myInvoiceContainer}>
         <div className={styles.invoiceCard}>
           <div className={styles.invoiceHeader}>
             <h2 className={styles.invoiceTitle}>My Invoices</h2>
-            <Button
-              variant="outline"
-              className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white"
-              onClick={handleNewInvoice}
-            >
-              New Invoice
-            </Button>
-          </div>
-          <div>
-            {/* <FilterComponent /> */}
+            <NewInvoiceButton />
           </div>
           <div className={styles.invoiceContainer}>
-            <InvoiceLoader />
+            <InvoiceLoader initialInvoices={invoices} />
           </div>
         </div>
       </div>

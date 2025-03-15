@@ -1,33 +1,37 @@
-"use client"
+"use client";
 import Link from 'next/link';
-import styles from '../login/login.module.css';
 import { useFormik } from 'formik';
-import { registerSchema } from "../../../validation/schemas"
+import { registerSchema } from "../../../validation/schemas";
 import axios from 'axios';
-// import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from "react-hot-toast";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import styles from '../login/login.module.css';
+import { useState } from 'react';
 
-import { useRouter } from 'next/navigation'
-import {toast} from "react-hot-toast"
-interface FormValues{
-  firstName:string,
-  lastName:string,
-  email:string,
-  password:string,
-  confirmPassword:string
+interface FormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const formik=useFormik<FormValues>({
-       initialValues:{
-        firstName:"",
-        lastName:"",
-        email:"",
-        password:"",
-        confirmPassword:""
-       },
-       validationSchema:registerSchema,
-       onSubmit:async(values,{ resetForm })=>{
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const formik = useFormik<FormValues>({
+    initialValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    },
+    validationSchema: registerSchema,
+    onSubmit: async (values, { resetForm }) => {
         try {
           const response= await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/registration`,values, { withCredentials: true })
           if(response.data  && response.data.success===true){
@@ -58,87 +62,127 @@ export default function SignUpPage() {
     );
   }
     return (
-        <div className={styles.container}>
-        <div className={styles.card}>
-          <h1 className={styles.title}>SignUp</h1>
-          <form onSubmit={formik.handleSubmit} className={styles.form}>
+      <div className={styles.container}>
+      <div className={styles.card}>
+        <div className={styles.header}>
+        <h1 className={styles.title}>Create Account</h1>
+        <p className={styles.subtitle}>Signup in to continue to <Link href="/" className={styles.link}> Instant Invoicer</Link></p>
+      </div>
+
+        <form onSubmit={formik.handleSubmit} className={styles.form}>
+          <div className={styles.nameGroup}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="firstName" className={styles.label}>First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                className={styles.input}
+                value={formik.values.firstName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter your first name"
+              />
+              {formik.touched.firstName && formik.errors.firstName && (
+                <div className={styles.error}>{formik.errors.firstName}</div>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="lastName" className={styles.label}>Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                className={styles.input}
+                value={formik.values.lastName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter your last name"
+              />
+            </div>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="email" className={styles.label}>Email</label>
             <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
+              type="email"
+              id="email"
+              name="email"
               className={styles.input}
-              value={formik.values.firstName}
+              value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              placeholder="Enter your email"
             />
-             {formik.touched.firstName && formik.errors.firstName ? (
-            <div className={styles.error}>{formik.errors.firstName}</div>
-          ) : null}
+            {formik.touched.email && formik.errors.email && (
+              <div className={styles.error}>{formik.errors.email}</div>
+            )}
+          </div>
 
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              className={styles.input}
-              value={formik.values.lastName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-             {/* {formik.touched.lastName && formik.errors.lastName ? (
-            <div className={styles.error}>{formik.errors.lastName}</div>
-          ) : null} */}
+          <div className={styles.inputGroup}>
+            <label htmlFor="password" className={styles.label}>Password</label>
+            <div className={styles.passwordContainer}>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                className={styles.input}
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Create a password"
+              />
+              <button
+                type="button"
+                className={styles.toggleButton}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {formik.touched.password && formik.errors.password && (
+              <div className={styles.error}>{formik.errors.password}</div>
+            )}
+          </div>
 
-            <input
-               type="email"
-               name="email"
-               placeholder="Email"
-               className={styles.input}
-               value={formik.values.email}
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-            />
-             {formik.touched.email && formik.errors.email ? (
-            <div className={styles.error}>{formik.errors.email}</div>
-          ) : null}
-            <input
-             type="password"
-             name="password"
-             placeholder="Password"
-             className={styles.input}
-             value={formik.values.password}
-             onChange={formik.handleChange}
-             onBlur={formik.handleBlur}
-            />
-             {formik.touched.password && formik.errors.password ? (
-            <div className={styles.error}>{formik.errors.password}</div>
-          ) : null}
-            <input
-             type="password"
-             name="confirmPassword"
-             placeholder="Confirm Password"
-             className={styles.input}
-             value={formik.values.confirmPassword}
-             onChange={formik.handleChange}
-             onBlur={formik.handleBlur}
-            />
-             {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
-            <div className={styles.error}>{formik.errors.confirmPassword}</div>
-          ) : null}
-           <button 
-            type="submit" 
-            className={styles.button} 
-            disabled={formik.isSubmitting}
-          >
-             {formik.isSubmitting ? "Signing up..." : "Signup"}
+          <div className={styles.inputGroup}>
+            <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
+            <div className={styles.passwordContainer}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                name="confirmPassword"
+                className={styles.input}
+                value={formik.values.confirmPassword}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                className={styles.toggleButton}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+              <div className={styles.error}>{formik.errors.confirmPassword}</div>
+            )}
+          </div>
+
+          <button type="submit" className={styles.button} disabled={formik.isSubmitting}>
+            {formik.isSubmitting ? "Creating account..." : "Sign Up"}
           </button>
-            <p className={styles.text}>
-              Don&apos;t have an account?{' '}
-              <Link href="/account/login" className={styles.link}>
-                login
-              </Link>
-            </p>
-          </form>
-          <button onClick={handleGoogleLogin} className={styles.googleButton}>
+
+          <div className={styles.divider}>
+            <span className={styles.dividerText}>OR</span>
+          </div>
+
+          <button type="button" onClick={handleGoogleLogin} className={styles.googleButton}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className={styles.googleIcon}>
         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
         <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
@@ -147,7 +191,14 @@ export default function SignUpPage() {
       </svg>
       <span>Login with Google</span>
     </button>
-        </div>
+    <p className={styles.text}>
+            Already have an account?{" "}
+            <Link href="/account/login" className={styles.link}>
+              Log in
+            </Link>
+          </p>
+        </form>
       </div>
+    </div>
     );
   }

@@ -1,62 +1,61 @@
-"use client"
-import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
-import Cookies from "js-cookie";
+// hooks/UserContext.tsx
+"use client";
 
-// Define the User type (you can extend this with other properties if necessary)
-interface User {
-  _id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface UserContextType {
-  user: any | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  fetchUserProfile: () => void;
+  user: any;
+  setUser: (user: any) => void;
+  clearUser: () => void;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType>({
+  user: null,
+  setUser: () => {},
+  clearUser: () => {},
+});
 
-// Create a provider component
-export const UserProvider = ({ children }:{children: React.ReactNode}) => {
+export function UserProvider({ 
+  children
+}: { 
+  children: React.ReactNode,
+  serverUser?: any 
+}) {
   const [user, setUser] = useState<any>(null);
 
-  // Fetch the user profile
-  const fetchUserProfile = async () => {
-    try {
-      const accessToken = Cookies.get("accessToken");
-      // const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error("Failed to fetch user:", error);
+  useEffect(() => {
+    const loadUser = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (error) {
+          localStorage.removeItem("user");
+        }
+      }
+    };
+    loadUser();
+  }, []);
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
     }
+  }, [user]);
+
+ const clearUser = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    
   };
 
-  useEffect(() => {
-    if(!user) return
-    fetchUserProfile();
-  }, []);
-
   return (
-    <UserContext.Provider value={{ user, setUser, fetchUserProfile }}>
+    <UserContext.Provider value={{ user, setUser, clearUser }}>
       {children}
     </UserContext.Provider>
   );
-};
+}
 
-// Custom hook to use the UserContext
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-  return context;
-};
+export const useUser = () => useContext(UserContext);

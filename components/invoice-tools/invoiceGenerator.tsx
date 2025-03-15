@@ -202,7 +202,11 @@ interface InvoiceItem {
               {invoiceItem.invoiceDetails.date && (
                 <div className="flex justify-between py-1">
                   <p className="text-gray-600">Date</p>
-                  <p>{new Date(invoiceItem.invoiceDetails.date).toLocaleDateString()}</p>
+                  <p>{new Date(invoiceItem.invoiceDetails.date).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                          })}</p>
                 </div>
               )}
               {invoiceItem.invoiceDetails.paymentTerms && (
@@ -214,7 +218,11 @@ interface InvoiceItem {
               {invoiceItem.invoiceDetails.dueDate && (
                 <div className="flex justify-between py-1">
                   <p className="text-gray-600">Due Date</p>
-                  <p>{new Date(invoiceItem.invoiceDetails.dueDate).toLocaleDateString()}</p>
+                  <p>{new Date(invoiceItem.invoiceDetails.dueDate).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                          })}</p>
                 </div>
               )}
               {invoiceItem.invoiceDetails.poNumber && (

@@ -1,3 +1,4 @@
+// components/invoice-tools/InvoiceTable.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +9,7 @@ import { formatCurrency } from "../../lib/utils/format-currency";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
-interface InvoiceItem {
+export interface InvoiceItem {
   _id: string;
   invoiceDetails: {
     number: string;
@@ -19,50 +20,48 @@ interface InvoiceItem {
   recipientDetails: {
     billTo: {
       name: string;
+      email?: string;
+      address?: string;
     };
   };
   totals: {
     total: number;
+    tax?: number;
+    discount?: number;
   };
-  status: string;
+  status: "Paid" | "Pending" | "Draft";
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface InvoiceTableProps {
-  invoiceItem: InvoiceItem[];
-  handleNavigation: (path: string) => void;
+  invoiceItems: InvoiceItem[];
   handleDelete: (id: string) => void;
-  currentPage: Number;
-  limit: Number;
-  refreshData: () => void; // Add refreshData prop
+  handleStatusChange: (id: string, currentStatus: string) => void;
 }
 
 export default function InvoiceTable({
-  invoiceItem,
-  handleNavigation,
+  invoiceItems,
   handleDelete,
-  currentPage,
-  limit,
-  refreshData, // Receive refreshData prop
+  handleStatusChange,
 }: InvoiceTableProps) {
-  const headers = ["Customer", "Reference", "Date", "Due Date", "Status", "Total", "Action"];
+  const router = useRouter();
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
-  const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const headers = [
+    "Customer",
+    "Reference",
+    "Date",
+    "Due Date",
+    "Status",
+    "Total",
+    "Action",
+  ];
 
   const toggleDropdown = (id: string) => {
     setShowDropdown((prevId) => (prevId === id ? null : id));
-  };
-
-  const confirmDelete = () => {
-    if (deleteItemId) {
-      handleDelete(deleteItemId);
-      setDeleteItemId(null);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteItemId(null);
   };
 
   const handleEditInvoice = (id: string) => {
@@ -84,73 +83,88 @@ export default function InvoiceTable({
     };
   }, [showDropdown]);
 
-  const handleStatusChange = async (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === "Paid" ? "Pending" : "Paid";
-    const invoice = invoiceItem.find((inv) => inv._id === id);
-    if (!invoice) return;
-
-    const { total } = invoice.totals;
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: newStatus,
-          total,
-          amountPaid: newStatus === "Paid" ? total : 0,
-          balanceDue: newStatus === "Paid" ? 0 : total,
-        }),
-      });
-
-      if (response.ok) {
-        refreshData(); // Trigger parent to refresh data
-      } else {
-        console.error("Failed to update invoice status.");
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
-
   return (
     <div className={styles.tableContainer}>
       <table className={styles.invoiceTable}>
         <thead>
           <tr>
-            {headers.map((item, i) => (
-              <th key={i}>{item}</th>
+            {headers.map((header, index) => (
+              <th key={index}>{header}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {invoiceItem.map((item) => ( // Use invoiceItem directly
+          {invoiceItems.map((item) => (
             <tr key={item._id}>
-              <td>{item?.recipientDetails.billTo.name}</td>
+              <td>{item.recipientDetails.billTo.name}</td>
               <td>{item.invoiceDetails.number}</td>
-              <td>{new Date(item.invoiceDetails.date).toLocaleDateString()}</td>
-              <td>{new Date(item.invoiceDetails.dueDate).toLocaleDateString()}</td>
-              <td>{item.status || "Pending"}</td>
-              <td>{formatCurrency(item.totals.total, item.invoiceDetails.currency)}</td>
+              <td>
+                {new Date(item.invoiceDetails.date).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })}
+              </td>
+              <td>
+                {new Date(item.invoiceDetails.dueDate).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })}
+              </td>
+              <td>
+                <span
+                  className={`${styles.statusBadge} ${
+                    styles[item.status.toLowerCase()]
+                  }`}
+                >
+                  {item.status}
+                </span>
+              </td>
+              <td>
+                {formatCurrency(
+                  item.totals.total,
+                  item.invoiceDetails.currency
+                )}
+              </td>
               <td>
                 <div className={styles.invoicedropdown}>
-                  <button className={styles.viewButton} onClick={() => handleNavigation(`/user/d/${item._id}`)}>
-                    View  
+                  <button
+                    className={styles.viewButton}
+                    onClick={() => router.push(`/user/d/${item._id}`)}
+                  >
+                    View
                   </button>
-                  <div onClick={() => toggleDropdown(item._id)}><ChevronDown className="w-4 h-4 ml-2" /></div>
+                  <button
+                    onClick={() => toggleDropdown(item._id)}
+                    aria-label="More actions"
+                  >
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </button>
                   {showDropdown === item._id && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
-                      <div className={styles.dropdownContent} onClick={() => handleEditInvoice(item._id)}>
+                      <div
+                        className={styles.dropdownContent}
+                        onClick={() => handleEditInvoice(item._id)}
+                      >
                         <MdEdit size={20} />
                         Edit
                       </div>
-                      <div className={styles.dropdownContent} onClick={() => handleStatusChange(item._id, item.status)}>
+                      <div
+                        className={styles.dropdownContent}
+                        onClick={() =>
+                          handleStatusChange(item._id, item.status)
+                        }
+                      >
                         <FcPaid size={20} />
-                        {item.status === "Paid" ? "Mark as Not Paid" : "Mark as Paid"}
+                        {item.status === "Paid"
+                          ? "Mark as Pending"
+                          : "Mark as Paid"}
                       </div>
-                      <div onClick={() => setDeleteItemId(item._id)} className={styles.dropdownContent}>
+                      <div
+                        className={styles.dropdownContent}
+                        onClick={() => setDeleteItemId(item._id)}
+                      >
                         <MdDelete color="#e65050" size={20} />
                         Delete
                       </div>
@@ -160,13 +174,23 @@ export default function InvoiceTable({
                     <div className={styles.popupOverlay}>
                       <div className={styles.popup}>
                         <h3>
-                          Are you sure you want to delete {item?.recipientDetails.billTo.name}'s invoice?
+                          Delete {item.recipientDetails.billTo.name}'s Invoice?
                         </h3>
+                        <p>This action cannot be undone.</p>
                         <div className={styles.popupButtons}>
-                          <button className={styles.confirmButton} onClick={confirmDelete}>
+                          <button
+                            className={styles.confirmButton}
+                            onClick={() => {
+                              handleDelete(item._id);
+                              setDeleteItemId(null);
+                            }}
+                          >
                             Confirm
                           </button>
-                          <button className={styles.cancelButton} onClick={handleCancelDelete}>
+                          <button
+                            className={styles.cancelButton}
+                            onClick={() => setDeleteItemId(null)}
+                          >
                             Cancel
                           </button>
                         </div>
