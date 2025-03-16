@@ -3,50 +3,100 @@
     justify-content: center;
     align-items: center;
     min-height: 90vh;
-     background-color: #ffffff;
-    padding: 20px;
+    background-color: #ffffff;
+    padding: 2rem;
   }
   
   .card {
     background-color: #fff;
-    border-radius: 12px;
+    border-radius: 1rem;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     width: 100%;
-    max-width: 60%;
+    max-width: 55%;
     padding: 30px;
     box-sizing: border-box;
   }
-  
-  .title {
+
+  .header {
     text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 20px;
+    margin-bottom: 1.5rem;
   }
   
+  .title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+  
+  .subtitle {
+    color: #6b7280;
+  }
   .form {
     display: flex;
     flex-direction: column;
+    gap: 1.25rem;
+  }
+  .inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s;
   }
   
-  .input {
+  /* .input {
     padding: 12px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
+  } */
+
+  .input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  }
+
+  .passwordContainer {
+    position: relative;
+  }
+
+  .toggleButton {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 0.25rem;
+  }
+  .toggleButton:hover {
+    color: #475569;
   }
   
   .button {
+    width: 100%;
     background-color: var(--primary-bg-color);
     color: white;
     border: none;
-    padding: 12px;
-    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
     font-size: 18px;
+    font-weight: 500;
     cursor: pointer;
-    margin-top: 10px;
   }
+
   
   .button:hover {
     background-color:var(--primary-bg-color-hover);
@@ -54,6 +104,32 @@
   .button:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+  }
+
+  .divider {
+    position: relative;
+    margin: 0.5rem 0;
+  }
+  
+  .dividerText {
+    display: inline-block;
+    padding: 0 1rem;
+    background: white;
+    color: #64748b;
+    font-size: 0.875rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e2e8f0;
+    z-index: 0;
   }
   .text {
     margin: 20px 0px;
@@ -70,9 +146,9 @@
     text-decoration: underline;
   }
   .error{
-     color: red;
-     padding: 0px 5px;
-     font-size: 15px;
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
 
   }
   .saveInvoiceContainer{
@@ -105,12 +181,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.75rem;
   width: 100%;
   background-color: white;
   border: 1px solid #d1d5db;  /* gray-300 */
   color: #4b5563;  /* gray-700 */
   font-weight: 500;
-  padding: 0.5rem 1rem;  /* py-2 px-4 */
+  padding: 0.75rem 1rem;  /* py-2 px-4 */
   border-radius: 0.375rem;  /* rounded-md */
   cursor: pointer;
   outline: none;
