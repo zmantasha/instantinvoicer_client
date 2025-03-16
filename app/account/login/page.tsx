@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation'
 import {toast} from "react-hot-toast"
 
 import { setCookie } from 'cookies-next';
+import { useState } from 'react';
+import Spinner from '@/components/Spinner';
 // Define the shape of form values
 interface FormValues {
   email: string;
@@ -17,7 +19,8 @@ interface FormValues {
 }
 
 export default function LoginPage() {
-    const router = useRouter()
+  const [isLoading,setIsLoading]=useState(false)
+  const router = useRouter()
     
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -28,12 +31,13 @@ export default function LoginPage() {
     onSubmit: async(values,{resetForm}) => {
       try {
         // Handle form submission (e.g., API call)
+        setIsLoading(true)
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/login`,values,{withCredentials:true})
         if(response.data  && response.data.message=== "loginSuccessfull"){
           toast.success(response.data.message, {
             position: "bottom-right",
           })
-          resetForm()
+          
           
           // localStorage.setItem("accessToken",response.data.token)
           setCookie('accessToken', response.data.token);
@@ -49,6 +53,8 @@ export default function LoginPage() {
           position: "bottom-right",
         });
       }
+      }finally{
+        setIsLoading(true)
       }
     
     },
@@ -61,6 +67,10 @@ export default function LoginPage() {
       "_self"
     );
   }
+  if (isLoading) {
+    return <Spinner loading={isLoading} color="teal" />;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
