@@ -108,7 +108,7 @@
 
   .divider {
     position: relative;
-    margin: 0.5rem 0;
+    margin: 0.2rem 0;
   }
   
   .dividerText {
@@ -212,6 +212,11 @@
   color: #6366f1;  /* indigo-500 */
   fill: currentColor;
 }
+.nameGroup {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+}
 
 @media (max-width: 768px) {
   .container {
@@ -223,4 +228,18 @@
     padding: 30px;
     
   } 
+}
+@media (max-width: 640px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .card { 
+    max-width: 90%;
+    padding: 30px;
+    
+  }
+  .nameGroup {
+    grid-template-columns: 1fr;
+  }
 }
