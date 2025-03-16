@@ -24,15 +24,14 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <UserProvider>
-        <Toaster/>
-          {/* <ToastContainer /> */}
-          {shouldShowNavBar && <NavBar />}
-          <main>{children}</main>
-          {shouldShowFooter &&<Footer/>}
-        </UserProvider>
-      </body>
+       <body>
+          <UserProvider>
+            <Toaster />
+            {shouldShowNavBar && <NavBar />}
+            <main>{children}</main> {/* This pushes the footer down */}
+            {shouldShowFooter && <Footer />}
+          </UserProvider>
+        </body>
     </html>
   );
 }
