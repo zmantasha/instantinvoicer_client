@@ -8,6 +8,9 @@ import axios from 'axios';
 
 import { useRouter } from 'next/navigation'
 import {toast} from "react-hot-toast"
+import { useState } from 'react';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import Spinner from '@/components/Spinner';
 interface FormValues{
   firstName:string,
   lastName:string,
@@ -17,6 +20,9 @@ interface FormValues{
 }
 
 export default function SignUpPage() {
+  const [isLoading,setIsLoading]=useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter()
   const formik=useFormik<FormValues>({
        initialValues:{
@@ -29,12 +35,13 @@ export default function SignUpPage() {
        validationSchema:registerSchema,
        onSubmit:async(values,{ resetForm })=>{
         try {
+          setIsLoading(false)
           const response= await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/registration`,values, { withCredentials: true })
           if(response.data  && response.data.success===true){
             toast.success("register successfull",{
               position:"bottom-right"
             })
-            resetForm()
+            setIsLoading(true)
             router.push("/account/login")
           }
         } catch (error) {
@@ -47,8 +54,7 @@ export default function SignUpPage() {
               position:"bottom-right"
             });
           }
-        }
-      
+        }   
        }
   })
   const handleGoogleLogin =async()=>{
@@ -57,11 +63,19 @@ export default function SignUpPage() {
       "_self"
     );
   }
+  if (isLoading) {
+    return <Spinner loading={isLoading} color="teal" />;
+  }
     return (
         <div className={styles.container}>
         <div className={styles.card}>
-          <h1 className={styles.title}>SignUp</h1>
+          <div className={styles.header}>
+          <h1 className={styles.title}>Create Account</h1>
+          <p className={styles.subtitle}>Signup in to continue to <Link href="/" className={styles.link}> Instant Invoicer</Link></p>
+        </div>
           <form onSubmit={formik.handleSubmit} className={styles.form}>
+          <div className={styles.nameGroup}>
+          <div className={styles.inputGroup}>
             <input
               type="text"
               name="firstName"
@@ -74,7 +88,9 @@ export default function SignUpPage() {
              {formik.touched.firstName && formik.errors.firstName ? (
             <div className={styles.error}>{formik.errors.firstName}</div>
           ) : null}
+        </div>
 
+        <div className={styles.inputGroup}>
             <input
               type="text"
               name="lastName"
@@ -84,10 +100,14 @@ export default function SignUpPage() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
+          </div>
+        </div>
+            
              {/* {formik.touched.lastName && formik.errors.lastName ? (
             <div className={styles.error}>{formik.errors.lastName}</div>
           ) : null} */}
-
+            
+            <div className={styles.inputGroup}>
             <input
                type="email"
                name="email"
@@ -100,44 +120,77 @@ export default function SignUpPage() {
              {formik.touched.email && formik.errors.email ? (
             <div className={styles.error}>{formik.errors.email}</div>
           ) : null}
+          </div>
+          <div className={styles.nameGroup}>
+          <div className={styles.inputGroup}>
+          <div className={styles.passwordContainer}>
             <input
-             type="password"
+             type={showPassword ? "text" : "password"}
              name="password"
-             placeholder="Password"
+             placeholder="Create a password"
              className={styles.input}
              value={formik.values.password}
              onChange={formik.handleChange}
              onBlur={formik.handleBlur}
             />
+             <button 
+           type="button"
+           className={styles.toggleButton}
+           onClick={() => setShowPassword(!showPassword)}
+           aria-label={showPassword ? "Hide password" : "Show password"}>
+          {showPassword? <EyeOffIcon/>:<EyeIcon/>}
+          
+          </button>
+          </div>
              {formik.touched.password && formik.errors.password ? (
             <div className={styles.error}>{formik.errors.password}</div>
           ) : null}
+
+          </div>
+          
+          <div className={styles.inputGroup}>
+          <div className={styles.passwordContainer}>
             <input
-             type="password"
+             type={showConfirmPassword ? "text" : "password"}
              name="confirmPassword"
-             placeholder="Confirm Password"
+            placeholder="Confirm your password"
              className={styles.input}
              value={formik.values.confirmPassword}
              onChange={formik.handleChange}
              onBlur={formik.handleBlur}
             />
+             <button
+                type="button"
+                className={styles.toggleButton}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword? <EyeOffIcon/>:<EyeIcon/>}
+              </button>
+              </div>
              {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
             <div className={styles.error}>{formik.errors.confirmPassword}</div>
           ) : null}
-           <button 
-            type="submit" 
-            className={styles.button} 
-            disabled={formik.isSubmitting}
-          >
-             {formik.isSubmitting ? "Signing up..." : "Signup"}
+
+          </div>
+           </div>
+
+          <button type="submit" className={styles.button} disabled={formik.isSubmitting}>
+            {formik.isSubmitting ? "Creating account..." : "Sign Up"}
           </button>
-            <p className={styles.text}>
+
+
+          <div className={styles.divider}>
+            <span className={styles.dividerText}>OR</span>
+          </div>
+
+            {/* <p className={styles.text}>
               Don&apos;t have an account?{' '}
               <Link href="/account/login" className={styles.link}>
                 login
               </Link>
-            </p>
-          </form>
+            </p> */}
+          
           <button onClick={handleGoogleLogin} className={styles.googleButton}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className={styles.googleIcon}>
         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -145,8 +198,15 @@ export default function SignUpPage() {
         <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
         <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
       </svg>
-      <span>Login with Google</span>
+      <span>Continue with Google</span>
     </button>
+        <p className={styles.text}>
+                Already have an account?{" "}
+                <Link href="/account/login" className={styles.link}>
+                  Log in
+                </Link>
+              </p>
+          </form>
         </div>
       </div>
     );

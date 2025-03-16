@@ -33,7 +33,7 @@ export default function LoginPage() {
     onSubmit: async(values,{resetForm}) => {
       try {
         // Handle form submission (e.g., API call)
-        setIsLoading(true)
+        setIsLoading(false)
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/login`,values,{withCredentials:true})
         if(response.data  && response.data.message=== "loginSuccessfull"){
           toast.success(response.data.message, {
@@ -43,6 +43,7 @@ export default function LoginPage() {
           
           // localStorage.setItem("accessToken",response.data.token)
           setCookie('accessToken', response.data.token);
+          setIsLoading(true)
           router.replace("/user/invoicetamplate")
         }
       } catch (error) {
@@ -55,9 +56,7 @@ export default function LoginPage() {
           position: "bottom-right",
         });
       }
-      }finally{
-        setIsLoading(true)
-      } 
+      }
     },
   });
 
