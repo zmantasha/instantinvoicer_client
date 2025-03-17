@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FiUpload, FiTrash2, FiUser, FiHome, FiCamera } from "react-icons/fi";
 import Image from "next/image";
+import Spinner from "@/components/Spinner";
 
 interface FormValues {
   firstName: string;
@@ -23,11 +24,19 @@ interface FormValues {
 export default function MyAccount() {
   const { user, setUser, fetchUserProfile } = useUser();
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchUserProfile();
+  useEffect(() => {   
+    const fetchData = async () => {
+      setIsLoading(true);  // Set loading before fetching data
+      await fetchUserProfile();
+      setIsLoading(false); // Set loading to false after fetching
+    };
+    
+    fetchData();
   }, []);
+  
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -39,6 +48,7 @@ export default function MyAccount() {
     validationSchema: updateSchema,
     onSubmit: async (values) => {
       try {
+       
         const accessToken = Cookies.get("accessToken");
         const headers = {
           headers: {
@@ -110,6 +120,10 @@ export default function MyAccount() {
     }
     setDeletePopupVisible(false);
   };
+
+   if (isLoading) {
+      return <Spinner loading={isLoading} color="teal" />;
+    }
 
   return (
     <div className={styles.container}>
