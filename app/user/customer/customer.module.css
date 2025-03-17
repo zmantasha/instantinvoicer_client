@@ -53,9 +53,13 @@ table-layout: auto;
   font-size: 14px;
 }
 
-.customerTable tbody {
+.customerTable tbody tr{
   font-size: 14px;
   text-transform: capitalize;
+}
+.customerTable tbody tr td:nth-child(3) {
+  font-size: 14px;
+  text-transform: lowercase;
 }
 
 .customerTable tbody tr:nth-child(even) {
