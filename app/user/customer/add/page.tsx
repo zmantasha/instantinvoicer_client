@@ -6,6 +6,17 @@ import { Addcustomer } from "@/validation/schemas";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "../../../../components/ui/button";
+import {toast} from "react-hot-toast"
+import axios from "axios";
+import Cookies from "js-cookie";
+
+export interface contactInfo{
+    name:string;
+    email:string;
+    workPhone:string;
+    mobilePhone:string;
+    designation:string;
+}
 
 export default function AddCustomer(){
   // Formik validation schema
@@ -42,29 +53,44 @@ export default function AddCustomer(){
       currency: "USD",
       creditLimit: 0,
       notes: "",
-      contacts: [],
+      contacts: [] as contactInfo[],
       status: "active",
     },
     validationSchema:Addcustomer,
-    onSubmit: (values) => {
+    onSubmit: async(values) => {
       console.log("Form submitted:", values);
+      try {
+          const accessToken = Cookies.get("accessToken");
+            const headers = {
+                headers: {
+                Authorization: `Bearer ${accessToken}`,
+                },
+                withCredentials: true,
+            };
+        const response= await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer`,values,headers)
+        console.log(response) 
+
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to update profile. Please try again.");
+      }
       // Handle form submission (e.g., API call to save customer)
     },
   });
 
   // Add or remove contact persons dynamically
-//   const handleAddContact = () => {
-//     formik.setFieldValue("contacts", [
-//       ...formik.values.contacts,
-//       { name: "", email: "", workPhone: "", mobilePhone: "", designation: "" },
-//     ]);
-//   };
+  const handleAddContact = () => {
+    formik.setFieldValue("contacts", [
+      ...formik.values.contacts,
+      { name: "", email: "", workPhone: "", mobilePhone: "", designation: "" },
+    ]);
+  };
 
-//   const handleRemoveContact = (index) => {
-//     const contacts = [...formik.values.contacts];
-//     contacts.splice(index, 1);
-//     formik.setFieldValue("contacts", contacts);
-//   };
+  const handleRemoveContact = (index:any) => {
+    const contacts = [...formik.values.contacts];
+    contacts.splice(index, 1);
+    formik.setFieldValue("contacts", contacts);
+  };
 
   return (
     <div className={styles.container}>
@@ -394,7 +420,7 @@ export default function AddCustomer(){
           </div>
         )}
 
-        {/* Contact Persons
+        {/* Contact Persons */}
         {formik.values.customerType === "business" && (
           <div className={styles.section}>
             <h2>Contact Persons</h2>
@@ -405,13 +431,10 @@ export default function AddCustomer(){
                   <Input
                     type="text"
                     name={`contacts[${index}].name`}
-                    value={contact}
+                    value={contact.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
-                  {formik.touched.contacts?.[index]?.name && formik.errors.contacts?.[index]?.name ? (
-                    <div className={styles.error}>{formik.errors.contacts[index].name}</div>
-                  ) : null}
                 </div>
                 <div className={styles.formGroup}>
                   <Label>Email</Label>
@@ -422,9 +445,6 @@ export default function AddCustomer(){
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
-                  {formik.touched.contacts?.[index]?.email && formik.errors.contacts?.[index]?.email ? (
-                    <div className={styles.error}>{formik.errors.contacts[index].email}</div>
-                  ) : null}
                 </div>
                 <div className={styles.formGroup}>
                   <Label>Work Phone</Label>
@@ -469,7 +489,7 @@ export default function AddCustomer(){
               Add Contact
             </button>
           </div>
-        )} */}
+        )}
 
         {/* Status */}
         <div className={styles.section}>
