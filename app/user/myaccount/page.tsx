@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { FiUpload, FiTrash2, FiUser, FiHome, FiCamera } from "react-icons/fi";
 import Image from "next/image";
 import Spinner from "@/components/Spinner";
+import { AiOutlineLoading3Quarters } from "react-icons/ai"; 
 
 interface FormValues {
   firstName: string;
@@ -25,6 +26,7 @@ export default function MyAccount() {
   const { user, setUser, fetchUserProfile } = useUser();
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {   
@@ -75,7 +77,7 @@ export default function MyAccount() {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: "avatar" | "logo") => {
     const file = event.target.files?.[0];
     if (!file) return;
-
+    setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -90,12 +92,14 @@ export default function MyAccount() {
         },
         withCredentials: true,
       });
-
+      //  setIsUploading(false)
       toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
       fetchUserProfile();
     } catch (error) {
       console.error(error);
       toast.error(`Failed to update ${type}. Please try again.`);
+    }finally{
+      setIsUploading(false);
     }
   };
 
@@ -143,12 +147,13 @@ export default function MyAccount() {
             /> */}
             <Image src={user?.user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
             <label className={styles.avatarUpload}>
-              <FiCamera size={20} />
+             {isUploading?   <AiOutlineLoading3Quarters size={20} className="animate-spin text-blue-500" />: <FiCamera size={20} />}
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleFileUpload(e, "avatar")}
                 className={styles.hiddenInput}
+                disabled={isUploading}
               />
             </label>
           </div>
@@ -216,13 +221,22 @@ export default function MyAccount() {
           <div className={styles.fileUploadSection}>
             <Label>Company Logo</Label>
             <label className={styles.fileUploadLabel}>
+            {isUploading ?(
+            <>
+            <AiOutlineLoading3Quarters size={20} className="animate-spin text-blue-500" />
+            <span>Uploading...</span>
+            </>)
+              :(
+              <>
               <FiUpload className={styles.uploadIcon} />
               <span>Click to upload logo</span>
+              </>)}
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleFileUpload(e, "logo")}
                 className={styles.hiddenInput}
+                disabled={isUploading}
               />
             </label>
           </div>
