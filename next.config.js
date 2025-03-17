@@ -12,6 +12,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false, // Disable Strict Mode
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -23,3 +24,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
