@@ -2,8 +2,9 @@ import styles from "../../app/user/customer/customer.module.css"
 interface customers{
     _id:number;
     name:string;
+    companyName:string;
     email:string;
-    phone:string;
+    workPhone:string;
     status:string;
 }
 
@@ -12,7 +13,7 @@ interface customersTableProps{
 }
 
 export default function CustomerTable({customers}:customersTableProps){
-    const headers = ["Name", "Email", "Phone",  "Status",];
+    const headers = ["Name","Company Name", "Email", "Work Phone",  "Status",];
     return(
     <>
     <div className={styles.tableContainer}>
@@ -28,8 +29,9 @@ export default function CustomerTable({customers}:customersTableProps){
             {customers.map((customer, index) => (
               <tr key={customer._id} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                 <td className="p-3">{customer.name}</td>
+                <td className="p-3">{customer.companyName}</td>
                 <td className="p-3">{customer.email}</td>
-                <td className="p-3">{customer.phone}</td>
+                <td className="p-3">{customer?.workPhone}</td>
                 <td className="p-3">
                   <span className={`px-2 py-1 text-sm rounded-full ${customer.status === "Active" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"}`}>
                     {customer.status}
