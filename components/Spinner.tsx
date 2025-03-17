@@ -1,5 +1,6 @@
 import React from 'react';
-import HashLoader from "react-spinners/HashLoader";
+// import HashLoader from "react-spinners/HashLoader";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const Spinner = ({ loading = true, color = "blue" }: { loading?: boolean, color?: string }) => {
   const override: React.CSSProperties = {
@@ -12,15 +13,16 @@ const Spinner = ({ loading = true, color = "blue" }: { loading?: boolean, color?
     display: "flex",
     justifyContent: "center",  // Center horizontally
     alignItems: "center",      // Center vertically
-    height: "80vh",           // Full viewport height
+    height: "30vh",           // Full viewport height
   };
   return (
     <div style={spinnerWrapperStyles}>
-      <HashLoader
+      <PulseLoader
+
         color={color}
         loading={loading}
         cssOverride={override}
-        size={50}
+        size={10}
         aria-label="Loading Spinner"
         data-testid="loader"
       />
