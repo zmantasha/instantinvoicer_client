@@ -5,6 +5,7 @@ interface customers{
     companyName:string;
     email:string;
     workPhone:string;
+    customerType:string;
     status:string;
 }
 
@@ -13,7 +14,7 @@ interface customersTableProps{
 }
 
 export default function CustomerTable({customers}:customersTableProps){
-    const headers = ["Name","Company Name", "Email", "Work Phone",  "Status",];
+    const headers = ["Name","Company Name", "Email", "Work Phone", "Customer Type", "Status",];
     return(
     <>
     <div className={styles.tableContainer}>
@@ -32,6 +33,7 @@ export default function CustomerTable({customers}:customersTableProps){
                 <td className="p-3">{customer.companyName}</td>
                 <td className="p-3">{customer.email}</td>
                 <td className="p-3">{customer?.workPhone}</td>
+                <td className="p-3">{customer?.customerType}</td>
                 <td className="p-3">
                   <span className={`px-2 py-1 text-sm rounded-full ${customer.status === "active" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"}`}>
                     {customer.status}
