@@ -38,3 +38,43 @@ export const InvoiceItem =Yup.object({
   poNumber: Yup.string(),
   });
   
+  export const Addcustomer= Yup.object({
+      customerType: Yup.string().required("Customer type is required"),
+      firstName: Yup.string().required("Name is required"),
+      lastName: Yup.string(),
+      displayName: Yup.string().required("Display name is required"),
+      email: Yup.string().email("Invalid email").required("Email is required"),
+      workPhone: Yup.string(),
+      mobilePhone: Yup.string(),
+      billingAddress: Yup.object({
+        street1: Yup.string().required("Street 1 is required"),
+        street2: Yup.string(),
+        city: Yup.string().required("City is required"),
+        state: Yup.string().required("State is required"),
+        pinCode: Yup.string().required("Pin code is required"),
+        country: Yup.string().required("Country is required"),
+      }),
+      shippingAddress: Yup.object({
+        street1: Yup.string(),
+        street2: Yup.string(),
+        city: Yup.string(),
+        state: Yup.string(),
+        pinCode: Yup.string(),
+        country: Yup.string(),
+      }),
+      companyName: Yup.string(),
+      taxId: Yup.string(),
+      currency: Yup.string(),
+      creditLimit: Yup.number(),
+      notes: Yup.string(),
+      contacts: Yup.array().of(
+        Yup.object({
+          name: Yup.string().required("Contact name is required"),
+          email: Yup.string().email("Invalid email").required("Email is required"),
+          workPhone: Yup.string(),
+          mobilePhone: Yup.string(),
+          designation: Yup.string(),
+        })
+      ),
+      status: Yup.string().required("Status is required"),
+    });
