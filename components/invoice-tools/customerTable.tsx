@@ -1,7 +1,7 @@
 import styles from "../../app/user/customer/customer.module.css" 
 interface customers{
     _id:number;
-    name:string;
+    firstName:string;
     companyName:string;
     email:string;
     workPhone:string;
@@ -28,7 +28,7 @@ export default function CustomerTable({customers}:customersTableProps){
           <tbody>
             {customers.map((customer, index) => (
               <tr key={customer._id} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                <td className="p-3">{customer.name}</td>
+                <td className="p-3">{customer.firstName}</td>
                 <td className="p-3">{customer.companyName}</td>
                 <td className="p-3">{customer.email}</td>
                 <td className="p-3">{customer?.workPhone}</td>
