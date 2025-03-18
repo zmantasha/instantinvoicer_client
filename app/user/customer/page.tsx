@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import styles from "./customer.module.css"
-import CustomerLoader  from  "../../../components/invoice-tools/customerLoader" 
+import CustomerLoader  from  "../../../components/customer/customerLoader" 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Spinner from "@/components/Spinner";
