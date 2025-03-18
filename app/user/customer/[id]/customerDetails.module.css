@@ -1,6 +1,6 @@
 /* Container Layout */
 .container {
-    max-width: 1300px;
+    max-width: 1334px;
     margin: 0 auto;
     padding: 2rem;
     display: flex;
@@ -88,6 +88,102 @@
 .columnContent li:hover {
     background-color: #f3f4f6;
 }
+
+
+
+
+
+/* individualcustomerDetails */
+
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  .leftHeader{
+    display: flex;
+    align-items: center;
+    gap:1.5rem
+  }
+  
+  .customerInfo {
+    flex-grow: 1;
+  }
+  .customerInfo h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .email {
+    color: gray;
+    font-size: 14px;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-top: 10px;
+  }
+  
+  .tabButton {
+    padding: 8px 12px;
+    font-size: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: gray;
+  }
+  
+  .activeTab {
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+  }
+  
+  .tabContent {
+    margin-top: 15px;
+  }
+  .overview{
+    width: 50%;
+    
+  }
+  .contentHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+  }
+  .dropdowndown{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    /* padding-bottom: 0.5rem; */
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .details p {
+    margin: 5px 0;
+  }
+  
+  .noData {
+    color: gray;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .notFound {
+    padding: 20px;
+    text-align: center;
+    color: gray;
+  }
+  
 
 /* Responsive Design */
 @media (max-width: 1024px) {
