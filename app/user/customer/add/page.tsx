@@ -9,6 +9,9 @@ import { Button } from "../../../../components/ui/button";
 import {toast} from "react-hot-toast"
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useState } from "react";
+import Spinner from "@/components/Spinner";
+import { useRouter } from "next/navigation";
 
 export interface contactInfo{
     name:string;
@@ -18,48 +21,57 @@ export interface contactInfo{
     designation:string;
 }
 
+const initialCustomerData={
+  customerType: "",
+  firstName: "",
+  lastName: "",
+  displayName: "",
+  email: "",
+  workPhone: "",
+  mobilePhone: "",
+  billingAddress: {
+    street1: "",
+    street2: "",
+    city: "",
+    state: "",
+    pinCode: "",
+    country: "",
+  },
+  shippingAddress: {
+    street1: "",
+    street2: "",
+    city: "",
+    state: "",
+    pinCode: "",
+    country: "",
+  },
+  companyName: "",
+  taxId: "",
+  currency: "USD",
+  creditLimit: 0,
+  notes: "",
+  contacts: [] as contactInfo[],
+  status: "active",
+};
+
 export default function AddCustomer(){
-  // Formik validation schema
- 
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
 
   // Formik form setup
   const formik = useFormik({
-    initialValues: {
-      customerType: "",
-      firstName: "",
-      lastName: "",
-      displayName: "",
-      email: "",
-      workPhone: "",
-      mobilePhone: "",
-      billingAddress: {
-        street1: "",
-        street2: "",
-        city: "",
-        state: "",
-        pinCode: "",
-        country: "",
-      },
-      shippingAddress: {
-        street1: "",
-        street2: "",
-        city: "",
-        state: "",
-        pinCode: "",
-        country: "",
-      },
-      companyName: "",
-      taxId: "",
-      currency: "USD",
-      creditLimit: 0,
-      notes: "",
-      contacts: [] as contactInfo[],
-      status: "active",
-    },
+    initialValues:initialCustomerData, 
     validationSchema:Addcustomer,
     onSubmit: async(values) => {
-      console.log("Form submitted:", values);
+      // console.log("Form submitted:", values);
+      let customerData = { ...values };
+
+      // Remove taxId if customerType is "individual"
+      if (customerData.customerType === "individual") {
+        delete (customerData as any).taxId;
+      }
       try {
+         setIsLoading(false)
           const accessToken = Cookies.get("accessToken");
             const headers = {
                 headers: {
@@ -67,12 +79,22 @@ export default function AddCustomer(){
                 },
                 withCredentials: true,
             };
-        const response= await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer`,values,headers)
-        console.log(response) 
+        const response= await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer`,customerData,headers)
+        // console.log(response) 
+        setIsLoading(true)
+        router.replace("/user/customer")
 
       } catch (error) {
-        console.error(error);
-        toast.error("Failed to update profile. Please try again.");
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data?.message || error.message, {
+            position: "bottom-right",
+          });
+        } else {
+          toast.error('Something went wrong. Please try again.', {
+            position: "bottom-right",
+          });
+        }
+        console.error(error)
       }
       // Handle form submission (e.g., API call to save customer)
     },
@@ -91,6 +113,10 @@ export default function AddCustomer(){
     contacts.splice(index, 1);
     formik.setFieldValue("contacts", contacts);
   };
+
+  if (isLoading) {
+    return <Spinner loading={isLoading} color="gray" />;
+  }
 
   return (
     <div className={styles.container}>
