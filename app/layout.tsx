@@ -5,9 +5,11 @@ import { Inter } from 'next/font/google';
 import NavBar from '../components/navbar/index';
 import { UserProvider } from "../hooks/UserContext";
 import { ToastContainer } from "react-toastify";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Footer from '@/components/footer/footer';
 import {Toaster} from "react-hot-toast"
+import styles from "../app/user/customer/[id]/customerDetails.module.css"
+import CustomerList from '@/components/customer/CustomerList';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,18 +19,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname(); // Get the current path
-
+  const {id}= useParams()
   // Hide NavBar for all dynamic `share` routes like `/share/:id`
   const shouldShowNavBar = !pathname.startsWith("/share/");
   const shouldShowFooter = !pathname.startsWith("/account/");
-
+  const customerListSidebar= pathname.includes(`/customer/${id}`)
+  console.log("customer",customerListSidebar)
+  console.log("id",id)
   return (
     <html lang="en">
        <body>
           <UserProvider>
             <Toaster />
             {shouldShowNavBar && <NavBar />}
-            <main>{children}</main> {/* This pushes the footer down */}
+            {customerListSidebar   ? 
+            <div className={styles.container}>
+            {/* Customer List - Left Panel (Does NOT refresh on click) */}
+            <aside className={styles.customerList}>
+               <CustomerList/>
+            </aside>
+
+            {/* Customer Details - Right Panel (Updates when ID changes) */}
+            <main className={styles.customerDetails}>
+               {children}
+            </main>
+        </div>:<main>{children}</main>}
+            
             {shouldShowFooter && <Footer />}
           </UserProvider>
         </body>
