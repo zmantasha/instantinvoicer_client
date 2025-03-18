@@ -57,6 +57,14 @@ table-layout: auto;
   font-size: 14px;
   text-transform: capitalize;
 }
+.customerTable tbody tr td:nth-child(1) {
+  font-size: 14px;
+  color:var(--primary-bg-color);
+  cursor: pointer;
+}
+.customerTable tbody tr td:nth-child(1):hover {
+  text-decoration: underline;
+}
 .customerTable tbody tr td:nth-child(3) {
   font-size: 14px;
   text-transform: lowercase;
