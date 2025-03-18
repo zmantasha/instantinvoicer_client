@@ -1,4 +1,6 @@
+import Link from "next/link";
 import styles from "../../app/user/customer/customer.module.css" 
+import { useRouter } from "next/navigation";
 interface customers{
     _id:number;
     firstName:string;
@@ -13,8 +15,14 @@ interface customersTableProps{
     customers:customers[];
 }
 
+
 export default function CustomerTable({customers}:customersTableProps){
     const headers = ["Name","Company Name", "Email", "Work Phone", "Customer Type", "Status",];
+    const router = useRouter();
+
+  const handleRowClick = (id:any) => {
+    router.push(`/user/customer/${id}`);
+  };
     return(
     <>
     <div className={styles.tableContainer}>
@@ -29,7 +37,7 @@ export default function CustomerTable({customers}:customersTableProps){
           <tbody>
             {customers.map((customer, index) => (
               <tr key={customer._id} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                <td className="p-3 ">{customer.firstName}</td>
+               <td className="p-3" onClick={() => handleRowClick(customer._id)}>{customer.firstName}</td>
                 <td className="p-3">{customer.companyName}</td>
                 <td className="p-3">{customer.email}</td>
                 <td className="p-3">{customer?.workPhone}</td>
