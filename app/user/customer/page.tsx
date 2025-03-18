@@ -4,11 +4,18 @@ import { Button } from "@/components/ui/button";
 import styles from "./customer.module.css"
 import CustomerLoader  from  "../../../components/invoice-tools/customerLoader" 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Spinner from "@/components/Spinner";
 export default function Customer() {
-
+ const [isLoading, setIsLoading] = useState(false);
   const router= useRouter()
-  const handleNavigate=()=>{
+  const handleNavigate=()=>{  
+    setIsLoading(false)
     router.push("/user/customer/add")
+    setIsLoading(true)
+  }
+  if (isLoading) {
+    return <Spinner loading={isLoading} color="gray" />;
   }
   return (
     <div className={styles.myCustomerPage}>
