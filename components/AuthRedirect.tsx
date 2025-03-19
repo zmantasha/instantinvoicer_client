@@ -27,7 +27,7 @@ export default function AuthRedirect() {
 
   return (
     <main className="container mx-auto py-8 px-4">
-      {isAuthenticated === null ? <Spinner loading={true} color="teal" /> : null}
+      {isAuthenticated === null ? <Spinner loading={true} color="gray" /> : null}
     </main>
   );
 }

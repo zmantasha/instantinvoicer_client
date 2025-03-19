@@ -126,7 +126,7 @@ export default function MyAccount() {
   };
 
    if (isLoading) {
-      return <Spinner loading={isLoading} color="teal" />;
+      return <Spinner loading={isLoading} color="gray" />;
     }
 
   return (

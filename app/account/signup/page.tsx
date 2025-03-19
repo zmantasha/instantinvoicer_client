@@ -64,7 +64,7 @@ export default function SignUpPage() {
     );
   }
   if (isLoading) {
-    return <Spinner loading={isLoading} color="teal" />;
+    return <Spinner loading={isLoading} color="gray" />;
   }
     return (
         <div className={styles.container}>

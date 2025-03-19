@@ -49,7 +49,7 @@ export default function SharePage() {
 
   // If invoiceItem is null, show loading message
   if (!invoiceItem) {
-    return <Spinner loading={true} color="teal" />;
+    return <Spinner loading={true} color="gray" />;
   }
 
   return (

@@ -68,7 +68,7 @@ export default function LoginPage() {
     );
   }
   if (isLoading) {
-    return <Spinner loading={isLoading} color="teal" />;
+    return <Spinner loading={isLoading} color="gray" />;
   }
 
   return (

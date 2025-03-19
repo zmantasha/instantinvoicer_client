@@ -57,7 +57,7 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
   } = useInvoice(initialData);
 
    if (isLoading) {
-    return <Spinner loading={true} color="teal" />;
+    return <Spinner loading={true} color="gray" />;
   }
 
   return (
