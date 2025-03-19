@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Spinner from "../Spinner";
 import styles from "../../app/user/customer/[id]/customerDetails.module.css"; // Import CSS module
 import { Button } from "../ui/button";
-import { ChevronDown, ChevronUp, Edit, Phone, PhoneCall, Plus, Settings, Smartphone, X} from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, FileText, Phone, PhoneCall, Plus, Settings, Smartphone, Trash, X} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -18,7 +18,23 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
   const [addressToggle,setAddressToggle]= useState(true)
   const [otherToggle,setOtherToggle]= useState(true)
   const [contactToggle,setContactToggle]= useState(true)
+  const[toggleDropdown,setToggleDropdown]=useState(false)
   const router= useRouter()
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+ useEffect(() => {
+  const handleClickOutside = (event:MouseEvent) => {
+    if (dropdownRef.current && event.target instanceof Node && !dropdownRef.current.contains(event.target)) {
+      setToggleDropdown(false);
+  }
+  };
+  console.log("hello")
+  document.addEventListener("click", handleClickOutside);
+  return () => {
+      document.removeEventListener("click", handleClickOutside);
+  };
+}, [toggleDropdown]);
+
   // Fetch customer details when customerId changes
   useEffect(() => {
     if (!customerId) return;
@@ -51,6 +67,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
       </div>
     );
 
+    // Close dropdown when clicking outside
+
 
   return (
       <>
@@ -72,6 +90,47 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                  onClick={()=>handleNavigate("add")}>
                 <Plus /> New Transection
         </Button>
+
+        {/* more button */}
+        <Button variant="outline"
+                 className="text-black bg-gray-200  px-2 py-0 dropdownOptionMore" 
+                 onClick={()=>setToggleDropdown(!toggleDropdown)}>
+                 More
+                 {toggleDropdown ? (
+                    <ChevronUp className="text-black w-4 h-4" />
+                ) : (
+                    <ChevronDown className="text-black w-4 h-4" />
+                )}
+        </Button>
+
+        {/* Dropdown Menu */}
+        {toggleDropdown && (
+          <div ref={dropdownRef} className={styles.dropdownMenu}> 
+                <div className={styles.dropdown}>
+                    <ul>
+                        <li
+                            onClick={() => {
+                                console.log("Invoice clicked");
+                                setToggleDropdown(false);
+                            }}
+                        >
+                            <FileText className="w-4 h-4 mr-2 text-blue-600" />
+                            Invoice
+                        </li>
+                        <li
+                            className={styles.delete}
+                            onClick={() => {
+                                console.log("Delete clicked");
+                                setToggleDropdown(false);
+                            }}
+                        >
+                            <Trash className="w-4 h-4 mr-2" />
+                            Delete
+                        </li>
+                    </ul>
+                </div>
+                </div>
+            )}
 
         <X onClick={()=>router.push("/user/customer")}/>
           </div>       
@@ -191,10 +250,10 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           {customer.customerType==="business" ? (
             <>
             {customer?.contacts?.map((contact:any,index:any)=>(
-              <>
-             <div className={styles.addressHeader}>
+              <div key={index}>
+             <div  className={styles.addressHeader}>
              {/* billing Address */}
-              <div>
+              <div >
                 <p>Contacts:{index+1} </p> 
               </div> 
              </div>
@@ -204,7 +263,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
             {contact.workPhone && <p><strong>Work Phone</strong> {contact.workPhone}</p>}
             {contact.mobilePhone && <p><strong>Mobile Phone</strong> {contact.mobilePhone}</p>}
             {contact.designation && <p><strong>Designation</strong> {contact.designation}</p>}
-            </>
+            </div>
             ))}
       
 

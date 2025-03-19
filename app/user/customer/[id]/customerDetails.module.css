@@ -28,9 +28,7 @@
     background: white;
     padding: 1.5rem;
     border-radius: 0px 8px 8px 0px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
-    
-    
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);  
 }
 
 
@@ -231,6 +229,48 @@
     text-align: center;
     color: gray;
   }
+ 
+ 
+  .dropdownOptionMore{
+    position: relative;
+  }
+  .dropdownMenu {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 180px;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+}
+/* Dropdown List */
+.dropdown ul {
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  font-size: 14px;
+  color: #374151; /* text-gray-700 */
+}
+
+/* Dropdown Item */
+.dropdown li {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color: #f3f4f6; /* hover:bg-gray-100 */
+}
+
+/* Delete Item */
+.delete {
+  color: #dc2626; /* text-red-600 */
+}
   
 
 /* Responsive Design */
