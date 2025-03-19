@@ -39,8 +39,6 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
 
     fetchCustomerDetails();
   }, [customerId]);
-  console.log(customer)
-
   const handleNavigate=(type:string)=>{    
     router.push(`/user/customer/${type}`)
   }
@@ -64,7 +62,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         <div className={styles.leftHeader}>
         <Button variant="outline"
                  className="text-black bg-gray-200 hover:bg-gray-400 hover:text-white px-2 py-0" 
-                 onClick={()=>handleNavigate("add")}>
+                 onClick={()=>handleNavigate(`${customer._id}/edit`)}>
                 Edit
         </Button>
         <Button variant="outline"
@@ -196,6 +194,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
               </div> 
              </div>
             {contact.name &&<p><strong>Name</strong> {contact.name}</p>}
+            {/* in future fix capital issue (email) */}
             {contact.email &&<p><strong>Email</strong> {contact.email}</p>}
             {contact.workPhone && <p><strong>Work Phone</strong> {contact.workPhone}</p>}
             {contact.mobilePhone && <p><strong>Mobile Phone</strong> {contact.mobilePhone}</p>}
