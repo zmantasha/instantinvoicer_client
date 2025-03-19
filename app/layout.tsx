@@ -23,9 +23,7 @@ export default function RootLayout({
   // Hide NavBar for all dynamic `share` routes like `/share/:id`
   const shouldShowNavBar = !pathname.startsWith("/share/");
   const shouldShowFooter = !pathname.startsWith("/account/");
-  const customerListSidebar= pathname.includes(`/customer/${id}`)
-  console.log("customer",customerListSidebar)
-  console.log("id",id)
+  const customerListSidebar= pathname.includes(`/customer/${id}`) && !pathname.endsWith(`/customer/${id}/edit`);
   return (
     <html lang="en">
        <body>
