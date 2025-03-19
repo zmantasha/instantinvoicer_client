@@ -159,9 +159,24 @@
   .contentHeader{
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    /* align-items: center; */
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
+  }
+  .basicDetails{
+    color:#333;
+    font-size: 0.9rem;
+    margin-left: 1rem;
+
+  }
+  .basicDetails p:nth-child(1){
+    color:#171616;
+    font-size: 1rem;
+  }
+  .contactPhone{
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
   }
   .dropdowndown{
     display: flex;

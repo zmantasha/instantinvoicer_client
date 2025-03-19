@@ -4,7 +4,7 @@ import axios from "axios";
 import Spinner from "../Spinner";
 import styles from "../../app/user/customer/[id]/customerDetails.module.css"; // Import CSS module
 import { Button } from "../ui/button";
-import { ChevronDown, Edit, Plus, Settings, X} from "lucide-react";
+import { ChevronDown, Edit, Phone, PhoneCall, Plus, Settings, Smartphone, X} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -99,7 +99,12 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           <>
           
           <div className={styles.contentHeader}>
-          <p>{customer.firstName}</p>
+          <div className={styles.basicDetails}>
+          <p>{customer.firstName} {customer.lastName}</p>
+          <p>{customer.email}</p>
+          <p className={styles.contactPhone}><Phone className="text-[#333] w-4 h-4"/>{customer.workPhone}</p>
+          <p className={styles.contactPhone}><Smartphone className="text-[#333] w-4 h-4"/>{customer.mobilePhone}</p>
+          </div>
           <Settings className="text-gray-500 w-4 h-4" onClick={()=>handleNavigate("")}/>
           </div>
          
