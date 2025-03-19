@@ -79,7 +79,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
 
       {/* Tab Navigation */}
       <div className={styles.tabs}>
-        {["overview", "orders", "notes"].map((tab) => (
+        {["overview", "Transection", "notes"].map((tab) => (
           <button
             key={tab}
             className={`${styles.tabButton} ${
@@ -226,7 +226,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           </>
         )}
         </div>
-        {activeTab === "orders" && <p className={styles.noData}>No orders available.</p>}
+        {activeTab === "Transection" && <p className={styles.noData}>No Transection available.</p>}
         {activeTab === "notes" && <p className={styles.noData}>No notes added yet.</p>}
       </div>
       </>
