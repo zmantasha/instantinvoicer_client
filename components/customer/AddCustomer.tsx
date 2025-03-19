@@ -49,7 +49,6 @@ const initialCustomerData={
   taxId: "",
   currency: "USD",
   creditLimit: 0,
-  createdBy:"",
   notes: "",
   contacts: [] as contactInfo[],
   status: "active",
@@ -117,10 +116,12 @@ export default function AddCustomer({ paramsId }: { paramsId?:any }){
                 router.replace(`/user/customer/${paramsId}`)
             } else {
                 // If creating, send POST request
-               await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer`,customerData,headers)
+             const response=  await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer`,customerData,headers)
+             const customerId=response.data?.customer?._id
+            //  console.log(response.data.customer._id)
                 toast.success("Customer added successfully!");
                 setIsLoading(true)
-                router.replace("/user/customer")
+                router.replace(`/user/customer/${customerId}`)
             }
       } catch (error) {
         if (axios.isAxiosError(error)) {
