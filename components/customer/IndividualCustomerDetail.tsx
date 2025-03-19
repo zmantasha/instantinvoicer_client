@@ -65,6 +65,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                  onClick={()=>handleNavigate(`${customer._id}/edit`)}>
                 Edit
         </Button>
+
+        {/* update here redirection invoice tamplate */}
         <Button variant="outline"
                  className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white px-2 py-0" 
                  onClick={()=>handleNavigate("add")}>
