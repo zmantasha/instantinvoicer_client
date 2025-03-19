@@ -4,7 +4,7 @@ import axios from "axios";
 import Spinner from "../Spinner";
 import styles from "../../app/user/customer/[id]/customerDetails.module.css"; // Import CSS module
 import { Button } from "../ui/button";
-import { ChevronDown, Edit, Phone, PhoneCall, Plus, Settings, Smartphone, X} from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Phone, PhoneCall, Plus, Settings, Smartphone, X} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -110,7 +110,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
          
          <div className={styles.dropdowndown}>
          <p>Address</p>
-          <ChevronDown className="text-[#0c69cc]" onClick={()=>setAddressToggle(!addressToggle)}/>
+          {!addressToggle ?<ChevronDown className="text-[#0c69cc]" onClick={()=>setAddressToggle(!addressToggle)}/>:
+            <ChevronUp className="text-[#0c69cc]" onClick={()=>setAddressToggle(!addressToggle)}/>}
          </div>
         {addressToggle && (
           <>
@@ -155,7 +156,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         {/* other details */}
          <div className={styles.dropdowndown}>
          <p>Other Details</p>
-          <ChevronDown className="text-[#0c69cc]" onClick={()=>setOtherToggle(!otherToggle)}/>
+          {!otherToggle?<ChevronDown className="text-[#0c69cc]" onClick={()=>setOtherToggle(!otherToggle)}/>:
+            <ChevronUp className="text-[#0c69cc]" onClick={()=>setOtherToggle(!otherToggle)}/>}
          </div>
          {otherToggle && (
           <>
@@ -180,7 +182,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           {/* contact Info */}
          <div className={styles.dropdowndown}>
          <p>Contact Person</p>
-          <ChevronDown className="text-[#0c69cc]" onClick={()=>setContactToggle(!contactToggle)}/>
+          {!contactToggle?<ChevronDown className="text-[#0c69cc]" onClick={()=>setContactToggle(!contactToggle)}/>:
+            <ChevronUp className="text-[#0c69cc]" onClick={()=>setContactToggle(!contactToggle)}/>}
          </div>
          {contactToggle && (
            <>
