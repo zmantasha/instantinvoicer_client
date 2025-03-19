@@ -40,7 +40,7 @@ export default function RootLayout({
             </aside>
 
             {/* Customer Details - Right Panel (Updates when ID changes) */}
-            <main className={styles.customerDetails}>
+            <main >
                {children}
             </main>
         </div>:<main>{children}</main>}
