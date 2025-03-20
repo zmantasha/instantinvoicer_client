@@ -83,35 +83,49 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
 
   // Add the logo
   await addLogo();
+   
+  const columnWidth = (pageWidth - margin * 2) / 3;
+  const senderHeight = addAddressSection(
+   doc,
+   "From",
+   invoice.senderDetails.name,
+   invoice.senderDetails.address,
+   margin,
+   contentY,
+   columnWidth * 2 - 10 // Sender uses two columns' width
+ );
+ contentY += senderHeight +3;
   
-  // Add "From" section (below the logo)
-  doc.setFontSize(10);
-  doc.setTextColor(128, 128, 128);
-  doc.text("From:", margin, contentY);
-  doc.setTextColor(0, 0, 0);
-  doc.text(invoice.senderDetails.name, margin, contentY + 5);
+  // // Add "From" section (below the logo)
+  // doc.setFontSize(10);
+  // doc.setTextColor(128, 128, 128);
+  // doc.text("From:", margin, contentY);
+  // doc.setTextColor(0, 0, 0);
+  // doc.text(invoice.senderDetails.name, margin, contentY + 5);
   
-  // Address label
-  doc.setFontSize(10);
-  doc.setTextColor(128, 128, 128);
-  doc.text("Address:", margin, contentY + 12);
-  doc.setTextColor(0, 0, 0);
-  doc.text(invoice.senderDetails.address, margin, contentY + 17);
-  contentY += 25; // Move further down
+  // // Address label
+  // doc.setFontSize(10);
+  // doc.setTextColor(128, 128, 128);
+  // doc.text("Address:", margin, contentY + 12);
+  // doc.setTextColor(0, 0, 0);
+  // doc.text(invoice.senderDetails.address, margin, contentY + 17);
+  // contentY += 25; // Move further down
   
   // Invoice Number (right-aligned)
   if (invoice.senderDetails.logo) {
   doc.setFontSize(24);
+  doc.setTextColor(14, 54, 94);
   doc.text(invoice.invoiceDetails.number, pageWidth - margin, margin + 20, { align: "right" });
   }else{
     doc.setFontSize(24);
+    doc.setTextColor(14, 54, 94);
     doc.text(invoice.invoiceDetails.number, pageWidth - margin, margin + 10, { align: "right" });
   }
   // Recipient and Invoice Details Grid (3 columns)
-  const gridY = contentY + 18; // Adjust position
+  // const gridY = contentY + 18; // Adjust position
   
   // Bill To Column
-  const columnWidth = (pageWidth - margin * 2) / 3;
+  // const columnWidth = (pageWidth - margin * 2) / 3;
   const addressColumns = [
     {
       type: 'billTo',
@@ -130,6 +144,7 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
   // Invoice Details Box (right column)
   const detailsX = pageWidth - 80;
   const rightMargin = 15;
+  const gridY = contentY + 18;
   // Only include details that have values
   const detailsData = [
     invoice.invoiceDetails.date && {
@@ -161,14 +176,14 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
   if (detailsData.length > 0) {
     // Add gray background for details box
     doc.setFillColor(250, 250, 250);
-    doc.rect(detailsX - 5, detailsStartY - 5, 85-rightMargin, detailsBoxHeight, "F");
+    doc.rect(detailsX - 5, detailsStartY - 3, 85-rightMargin, detailsBoxHeight, "F");
 
     detailsData.forEach((detail, index) => {
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
-      doc.text(detail.label, detailsX, gridY + (index * 10));
+      doc.text(detail.label, detailsX, detailsStartY + (index * 10));
       doc.setTextColor(0, 0, 0);
-      doc.text(detail.value, pageWidth - margin, gridY + (index * 10), { align: "right" });
+      doc.text(detail.value, pageWidth - margin, detailsStartY + (index * 10), { align: "right" });
     });
   }
 
@@ -189,7 +204,7 @@ export async function generateInvoicePDF(invoice: Omit<InvoiceData, "_id">): Pro
     }
   });
   const detailsBoxContentHeight = detailsData.length * 10;
-contentY += Math.max(maxColumnHeight, detailsBoxContentHeight) + 15;
+contentY += Math.max(maxColumnHeight, detailsBoxContentHeight) + 10;
 
   // Items Table
   // const tableY = gridY + 60;

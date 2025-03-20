@@ -211,21 +211,32 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
 
       // Add the logo
       await addLogo();
-
+   
+     const columnWidth = (pageWidth - margin * 2) / 3;
+     const senderHeight = addAddressSection(
+      pdf,
+      "From",
+      invoiceData.senderDetails.name,
+      invoiceData.senderDetails.address,
+      margin,
+      contentY,
+      columnWidth * 2 - 10 // Sender uses two columns' width
+    );
+    contentY += senderHeight + 3;
       // Add "From" section (below the logo)
-      pdf.setFontSize(10);
-      pdf.setTextColor(128, 128, 128);
-      pdf.text("From:", margin, contentY);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(invoiceData.senderDetails.name, margin, contentY + 5);
+      // pdf.setFontSize(10);
+      // pdf.setTextColor(128, 128, 128);
+      // pdf.text("From:", margin, contentY);
+      // pdf.setTextColor(0, 0, 0);
+      // pdf.text(invoiceData.senderDetails.name, margin, contentY + 5);
 
-      // Address label
-      pdf.setFontSize(10);
-      pdf.setTextColor(128, 128, 128);
-      pdf.text("Address:", margin, contentY + 12);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(invoiceData.senderDetails.address, margin, contentY + 17);
-      contentY += 25; // Move further down
+      // // Address label
+      // pdf.setFontSize(10);
+      // pdf.setTextColor(128, 128, 128);
+      // pdf.text("Address:", margin, contentY + 12);
+      // pdf.setTextColor(0, 0, 0);
+      // pdf.text(invoiceData.senderDetails.address, margin, contentY + 17);
+      // contentY += 25; // Move further down
 
       // Invoice Number (right-aligned)
       if (invoiceData.senderDetails.logo) {
@@ -241,7 +252,7 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
       // Recipient and Invoice Details Grid (3 columns)
        // Adjust position
 // Calculate column dimensions
-              const columnWidth = (pageWidth - margin * 2) / 3;
+              // const columnWidth = (pageWidth - margin * 2) / 3;
               const addressColumns = [
                 {
                   type: 'billTo',
@@ -302,7 +313,7 @@ export default function PDFGenerator({ invoiceData, fileName }: PDFGeneratorProp
       if (detailsData.length > 0) {
         // Add gray background for details box
         pdf.setFillColor(250, 250, 250);
-        pdf.rect(detailsX - 5, detailsStartY - 5, 85 - rightMargin, detailsBoxHeight, "F");
+        pdf.rect(detailsX - 5, detailsStartY -3, 85 - rightMargin, detailsBoxHeight, "F");
       
         detailsData.forEach((detail, index) => {
           pdf.setFontSize(8);
@@ -334,7 +345,7 @@ addressColumns.forEach(col => {
   }
 });
 const detailsBoxContentHeight = detailsData.length * 10;
-contentY += Math.max(maxColumnHeight, detailsBoxContentHeight) + 15;
+contentY += Math.max(maxColumnHeight, detailsBoxContentHeight) + 10;
 
 const tableStartY = contentY ;
 
