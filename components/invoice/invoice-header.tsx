@@ -52,8 +52,8 @@ const InvoiceHeader = memo(({
   formTouched,
   formik
 }: InvoiceHeaderProps) => {
-  const addressLength = 100;
-  const nameLength = 100;
+  const addressLength = 500;
+  const nameLength = 200;
   const [senderCharactersLeft, setSenderCharactersLeft] = useState(addressLength);
   const [billAddressCharactersLeft, setBillAddressCharactersLeft] = useState(addressLength);
   const [shipAddressCharactersLeft, setShipAddressCharactersLeft] = useState(addressLength);
