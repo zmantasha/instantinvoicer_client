@@ -160,24 +160,20 @@ export function useInvoice(initialData?: InvoiceData) {
     return Yup.object({
       senderDetails: Yup.object({
         name: Yup.string()
-          .max(100, "Sender Name must be at most 50 characters")
           .required("Business name is required"),
         address: Yup.string()
-          .max(100, "Sender Address must be at most 60 characters")
           .required("Business address is required"),
       }),
       recipientDetails: Yup.object({
         billTo: Yup.object({
           name: Yup.string()
-            .max(100, "Billing Name must be at most 50 characters")
             .required("Recipient name is required"),
           address: Yup.string()
-            .max(100, "Billing Address must be at most 60 characters")
             .required("Billing address is required"),
         }),
         shipTo: Yup.object({
-          name: Yup.string().max(100, "Shipping Name must be at most 50 characters"),
-          address: Yup.string().max(100, "Shipping Address must be at most 60 characters"),
+          name: Yup.string(),
+          address: Yup.string(),
         }),
       }),
       invoiceDetails: Yup.object({
@@ -328,49 +324,6 @@ export function useInvoice(initialData?: InvoiceData) {
     },
   });
 
-  // useEffect(() => {
-  //   if (user?.user._id && !initialData) {
-  //     generateInvoiceNumber();
-  //   }
-  // }, [user, initialData]);
- 
-  
-
-  // const generateInvoiceNumber = useCallback(async () => {
-  //   if (!user?.user._id) return;
-
-  //   try {
-  //     const response = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
-  //     );
-  //     const invoices = response.data;
-      
-  //     let newInvoiceNumber = "INV-0001";
-      
-
-  //     if (invoices?.length > 0) {
-  //       const latestInvoice = invoices[invoices.length - 1];
-  //       if (latestInvoice.invoiceDetails?.number) {
-  //         const lastNumber = parseInt(
-  //           latestInvoice.invoiceDetails.number.replace("INV-", ""),
-  //           10
-  //         );
-  //         newInvoiceNumber = `INV-${String(lastNumber + 1).padStart(4, "0")}`;
-          
-  //       }
-  //     }
-  //     const invoicenumber= invoices.filter((item:any) => item.invoiceDetails.number == newInvoiceNumber)
-  //         console.log(invoicenumber);
-
-  //     formik.setFieldValue("invoiceDetails.number", newInvoiceNumber||invoices.invoiceDetails.number);
-  //     formik.setFieldValue("senderDetails.name", user.user.firstName || invoices.senderDetails.firstName);
-  //     formik.setFieldValue("senderDetails.address", user.user.address || invoices.senderDetails.address);
-  //     formik.setFieldValue("senderDetails.logo", user.user.logo || invoices.senderDetails.logo);
-  //   } catch (error) {
-  //     console.error("Error fetching invoices:", error);
-  //   }
-  // }, [user?.user._id, formik.setFieldValue]);
-
   const generateInvoiceNumber = useCallback(async () => {
     if (!user?.user._id) return;
   
@@ -408,7 +361,7 @@ export function useInvoice(initialData?: InvoiceData) {
         
         formik.setFieldValue(
           "senderDetails.logo",
-          user?.user?.logo || invoices?.senderDetails?.logo || "/default-logo.png"
+          user?.user?.logo || invoices?.senderDetails?.logo || ""
         );
         
       }
