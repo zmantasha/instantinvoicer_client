@@ -90,10 +90,10 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                  onClick={()=>handleNavigate("add")}>
                 <Plus /> New Transection
         </Button>
-
+        <div className={styles.dropdownContainer}>
         {/* more button */}
         <Button variant="outline"
-                 className="text-black bg-gray-200  px-2 py-0 dropdownOptionMore" 
+                 className=" text-black bg-gray-200  px-2 py-0 " 
                  onClick={()=>setToggleDropdown(!toggleDropdown)}>
                  More
                  {toggleDropdown ? (
@@ -106,7 +106,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         {/* Dropdown Menu */}
         {toggleDropdown && (
           <div ref={dropdownRef} className={styles.dropdownMenu}> 
-                <div className={styles.dropdown}>
+           <div className={styles.dropdownArrow}></div>
+                {/* <div className={styles.dropdown}> */}
                     <ul>
                         <li
                             onClick={() => {
@@ -128,10 +129,10 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                             Delete
                         </li>
                     </ul>
-                </div>
+                {/* </div> */}
                 </div>
             )}
-
+         </div>
         <X onClick={()=>router.push("/user/customer")}/>
           </div>       
       </div>

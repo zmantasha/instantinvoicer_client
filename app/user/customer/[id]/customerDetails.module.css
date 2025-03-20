@@ -109,8 +109,13 @@
   .leftHeader{
     display: flex;
     align-items: center;
-    gap:1.5rem
+    flex-wrap: wrap;
+    gap:1.5rem;
+    position: relative;
+    
   }
+
+ 
   
   .customerInfo {
     flex-grow: 1;
@@ -230,14 +235,15 @@
     color: gray;
   }
  
- 
-  .dropdownOptionMore{
-    position: relative;
+  .dropdownContainer{
+    position:relative;
+    display: inline-block;
   }
   .dropdownMenu {
     position: absolute;
-    top: calc(100% + 5px);
-    right: 0;
+    top: calc(100% + 10px); /* Moves dropdown above button */
+    left: 50%;
+    transform: translateX(-50%);
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -246,8 +252,21 @@
     padding: 8px 0;
     transition: all 0.3s ease;
 }
+.dropdownArrow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -7px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #fff; /* Correct arrow direction */
+  border-bottom-color: #fff;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.15)); /* Shadow effect */
+}
 /* Dropdown List */
-.dropdown ul {
+.dropdownMenu ul {
   list-style: none;
   padding: 8px 0;
   margin: 0;
@@ -256,14 +275,14 @@
 }
 
 /* Dropdown Item */
-.dropdown li {
+.dropdownMenu li {
   display: flex;
   align-items: center;
   padding: 10px 16px;
   cursor: pointer;
 }
 
-.dropdown li:hover {
+.dropdownMenu li:hover {
   background-color: #f3f4f6; /* hover:bg-gray-100 */
 }
 
@@ -288,5 +307,50 @@
       width: 100%;
       
     }
+   
     
+}
+@media (max-width: 600px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+    .customerList {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    .overview{
+      width: 100%;
+      
+    }
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .dropdownMenu {
+      position: absolute;
+      top: calc(100% + 10px); /* Moves dropdown above button */
+      left: 50%;
+      transform: translateX(-30%);
+  }
+  .dropdownArrow {
+    position: absolute;
+    left: 40%;
+    transform: translateX(-50%);
+}
+.leftHeader {
+  justify-content: center; /* Center align items */
+}
+
+.leftHeader > *{  /* Apply to all direct children (buttons, divs, etc.) */
+  width: calc(50% - 0.75rem); /* Ensure two elements per row */
+  text-align: center;
+}
+
+
 }
