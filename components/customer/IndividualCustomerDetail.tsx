@@ -31,8 +31,15 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
   const router= useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const updateAddressLocally = (updatedAddress:any) => {
+    setCustomer((prev:any) => ({
+      ...prev,
+      [editSection === "billing" ? "billingAddress" : "shippingAddress"]: updatedAddress,
+    }));
+  };
+
   const EditAddressMemoize = useMemo(() => {
-    return <EditAddress modalOpen={modalOpen} setModalOpen={setModalOpen} editSection={editSection} />;
+    return <EditAddress modalOpen={modalOpen} setModalOpen={setModalOpen} editSection={editSection} updateAddressLocally={updateAddressLocally}/>;
   }, [modalOpen, editSection]);
  useEffect(() => {
   const handleClickOutside = (event:MouseEvent) => {

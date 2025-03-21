@@ -13,6 +13,7 @@ interface Props {
   modalOpen: boolean;
   setModalOpen: (value: boolean) => void;
   editSection:"billing" | "shipping" | null; // Specify possible values
+  updateAddressLocally:any
 }
 
 // Default structure for addresses
@@ -25,7 +26,7 @@ const initialCustomerData = {
     country: "",
 };
 
-export default function EditAddress({ modalOpen, setModalOpen, editSection }: Props) {
+export default function EditAddress({ modalOpen, setModalOpen, editSection,updateAddressLocally }: Props) {
   const [customerData, setCustomerData] = useState(initialCustomerData);
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -80,6 +81,7 @@ export default function EditAddress({ modalOpen, setModalOpen, editSection }: Pr
             };
              await axios.put(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${id}`, updatedCustomerData, headers);       
             toast.success("Address updated successfully!");
+            updateAddressLocally(values)
             setModalOpen(false); 
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -96,9 +98,15 @@ export default function EditAddress({ modalOpen, setModalOpen, editSection }: Pr
       
     },
   });
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    // setCustomerData(initialCustomerData); // Reset form fields
+    formik.resetForm(); // Reset Formik state
+  };
   
   return (
-    <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+    <Modal open={modalOpen} onClose={handleCloseModal}>
       <h2 className="text-lg font-semibold mb-3">
         Edit {editSection === "billing" ? "Billing" : "Shipping"} Address
       </h2>
