@@ -6,6 +6,7 @@ import { useUser } from "@/hooks/UserContext";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import styles from "../../app/user/myinvoice/myinvoice.module.css";
+import Cookies from "js-cookie";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export default function InvoiceLoader() {
@@ -51,8 +52,15 @@ export default function InvoiceLoader() {
 
   const handleDelete = async (id: string) => {
     try {
+      const accessToken = Cookies.get("accessToken");
+        const headers = {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        };
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`,headers
       );
       fetchInvoice();
     } catch (error) {
