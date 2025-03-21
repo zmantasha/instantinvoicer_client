@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import Spinner from "../Spinner";
 import styles from "../../app/user/customer/[id]/customerDetails.module.css"; // Import CSS module
@@ -8,6 +8,10 @@ import { ChevronDown, ChevronUp, Edit, FileText, Phone, PhoneCall, Plus, Setting
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { FiTrash2 } from "react-icons/fi";
+import { Modal } from "../ui/modal";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import EditAddress from "./EditAddress";
 
 interface Props {
   customerId: string;
@@ -21,10 +25,15 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
   const [otherToggle,setOtherToggle]= useState(true)
   const [contactToggle,setContactToggle]= useState(true)
   const[toggleDropdown,setToggleDropdown]=useState(false)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editSection, setEditSection] = useState<"billing" | "shipping" | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const router= useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const EditAddressMemoize = useMemo(() => {
+    return <EditAddress modalOpen={modalOpen} setModalOpen={setModalOpen} editSection={editSection} />;
+  }, [modalOpen, editSection]);
  useEffect(() => {
   const handleClickOutside = (event:MouseEvent) => {
     if (dropdownRef.current && event.target instanceof Node && !dropdownRef.current.contains(event.target)) {
@@ -37,6 +46,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
       document.removeEventListener("click", handleClickOutside);
   };
 }, [toggleDropdown]);
+
 
   // Fetch customer details when customerId changes
   useEffect(() => {
@@ -70,6 +80,13 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
       </div>
     );
 
+    // modal section
+    const openModal = (section: "billing" | "shipping") => {
+      setEditSection(section);
+      // setFormData(customer[`${section}Address`]); // Load data into form
+      setModalOpen(true)
+    };
+
     // Close dropdown when clicking outside
     const handleDelete = async (id: string) => {
       try {
@@ -100,6 +117,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
       setDeleteItemId(null);
     };
 
+ 
   return (
       <>
       <div className={styles.header}>
@@ -188,21 +206,6 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                 </div>
               </div>
             </div>
-                          // <div className={styles.popupOverlay}>
-                          //   <div className={styles.popup}>
-                          //     <h3>
-                          //       Are you sure you want to delete {customer ?.customer?.firstName .customer.lastName }'s as a customer and invoices?
-                          //     </h3>
-                          //     <div className={styles.popupButtons}>
-                          //       <Button className={styles.confirmButton} onClick={confirmDelete}>
-                          //         Confirm
-                          //       </button>
-                          //       <button className={styles.cancelButton} onClick={handleCancelDelete}>
-                          //         Cancel
-                          //       </button>
-                          //     </div>
-                          //   </div>
-                          // </div>
            )}
 
       {/* Tab Navigation */}
@@ -249,7 +252,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
            <p>Billing Address:</p> 
          </div>
           {/* edit icon */}
-          <Edit className="text-gray-500 w-4 h-4"/>
+          <Edit className="text-gray-500 w-4 h-4" onClick={()=>openModal("billing")}/>
          </div>
          {/* billing details */}
          <div className={styles.details}>
@@ -266,7 +269,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
            <p>Shipping Address:</p> 
          </div>
           {/* Edit icon  */}
-          <Edit className="text-gray-500 w-4 h-4"/>
+          <Edit className="text-gray-500 w-4 h-4" onClick={()=>openModal("shipping")}/>
          </div>
 
           {/* billing details */}
@@ -345,14 +348,6 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
 
          </>
          )}
-
-{/* 
-          <div className={styles.details}>
-            <p><strong>Company:</strong> {customer.company}</p>
-            <p><strong>Phone:</strong> {customer.phone}</p>
-            <p><strong>Customer Type:</strong> {customer.type}</p>
-            <p><strong>Status:</strong> {customer.status}</p>
-          </div> */}
           
           </>
         )}
@@ -360,6 +355,52 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         {activeTab === "Transection" && <p className={styles.noData}>No Transection available.</p>}
         {activeTab === "notes" && <p className={styles.noData}>No notes added yet.</p>}
       </div>
+
+      {EditAddressMemoize}
+      {/* <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <h2 className="text-lg font-semibold mb-3">
+          Edit {editSection === "billing" ? "Billing" : "Shipping"} Address
+        </h2>
+        <div className="space-y-4">
+        <div className="grid  gap-2 items-center">
+        <Label>Street1</Label>
+        <Input 
+       
+        placeholder="Enter Your Address 1"
+        />
+
+        <Label>Street2</Label>
+        <Input 
+       
+        placeholder="Enter Your Address 1"
+        />
+
+        <Label>City</Label>
+        <Input
+        
+        placeholder="Enter Your Address 1"
+        />
+
+        <Label>State</Label>
+        <Input 
+       
+        placeholder="Enter Your Address 1"
+        />
+
+        <Label>PinCode</Label>
+        <Input
+      
+        placeholder="Enter Your Address 1"
+        />
+
+        <Label>Country</Label>
+        <Input
+        
+        placeholder="Enter Your Address 1"
+        />
+        </div>
+        </div>
+      </Modal> */}
       </>
   );
 }
