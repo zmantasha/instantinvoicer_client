@@ -6,6 +6,8 @@ import styles from "../../app/user/customer/[id]/customerDetails.module.css"; //
 import { Button } from "../ui/button";
 import { ChevronDown, ChevronUp, Edit, FileText, Phone, PhoneCall, Plus, Settings, Smartphone, Trash, X} from "lucide-react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { FiTrash2 } from "react-icons/fi";
 
 interface Props {
   customerId: string;
@@ -19,6 +21,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
   const [otherToggle,setOtherToggle]= useState(true)
   const [contactToggle,setContactToggle]= useState(true)
   const[toggleDropdown,setToggleDropdown]=useState(false)
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const router= useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +71,34 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
     );
 
     // Close dropdown when clicking outside
+    const handleDelete = async (id: string) => {
+      try {
+        const accessToken = Cookies.get("accessToken");
+          const headers = {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          };
+        await axios.delete(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${id}`,headers
+        );
+       handleNavigate("/")
+      } catch (error) {
+        console.error("Failed to delete invoice:", error);
+      }
+    };
 
+    const confirmDelete = () => {
+      if (deleteItemId) {
+        handleDelete(deleteItemId);
+        setDeleteItemId(null);
+      }
+    };
+  
+    const handleCancelDelete = () => {
+      setDeleteItemId(null);
+    };
 
   return (
       <>
@@ -103,6 +133,8 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                 )}
         </Button>
 
+
+
         {/* Dropdown Menu */}
         {toggleDropdown && (
           <div ref={dropdownRef} className={styles.dropdownMenu}> 
@@ -111,7 +143,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                     <ul>
                         <li
                             onClick={() => {
-                                console.log("Invoice clicked");
+                                handleNavigate("add")
                                 setToggleDropdown(false);
                             }}
                         >
@@ -121,7 +153,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                         <li
                             className={styles.delete}
                             onClick={() => {
-                                console.log("Delete clicked");
+                             setDeleteItemId(customer._id)
                                 setToggleDropdown(false);
                             }}
                         >
@@ -136,6 +168,42 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         <X onClick={()=>router.push("/user/customer")}/>
           </div>       
       </div>
+
+       {deleteItemId === customer._id && (
+              <div className={styles.modalOverlay}>
+              <div className={styles.confirmationModal}>
+                <FiTrash2 size={32} className={styles.modalIcon} />
+                <h3>Delete Account</h3>
+                <p>
+                  Warning: Deleting this customer account will also remove all associated invoices.  
+                  This action is irreversible. Are you sure you want to proceed?
+                </p>
+                <div className={styles.modalActions}>
+                  <Button variant="secondary" onClick={handleCancelDelete}>
+                    Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={confirmDelete}>
+                    Confirm Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+                          // <div className={styles.popupOverlay}>
+                          //   <div className={styles.popup}>
+                          //     <h3>
+                          //       Are you sure you want to delete {customer ?.customer?.firstName .customer.lastName }'s as a customer and invoices?
+                          //     </h3>
+                          //     <div className={styles.popupButtons}>
+                          //       <Button className={styles.confirmButton} onClick={confirmDelete}>
+                          //         Confirm
+                          //       </button>
+                          //       <button className={styles.cancelButton} onClick={handleCancelDelete}>
+                          //         Cancel
+                          //       </button>
+                          //     </div>
+                          //   </div>
+                          // </div>
+           )}
 
       {/* Tab Navigation */}
       <div className={styles.tabs}>

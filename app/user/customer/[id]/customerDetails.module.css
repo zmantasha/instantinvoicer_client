@@ -290,7 +290,47 @@
 .delete {
   color: #dc2626; /* text-red-600 */
 }
-  
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirmationModal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.modalIcon {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.confirmationModal h3 {
+  margin-bottom: 0.5rem;
+}
+
+.confirmationModal p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
 
 /* Responsive Design */
 @media (max-width: 1024px) {
