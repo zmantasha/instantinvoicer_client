@@ -143,7 +143,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         <Button variant="outline"
                  className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white px-2 py-0" 
                  onClick={()=>handleNavigate("add")}>
-                <Plus /> New Transection
+                <Plus /> New Transaction
         </Button>
         <div className={styles.dropdownContainer}>
         {/* more button */}
@@ -168,12 +168,13 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                     <ul>
                         <li
                             onClick={() => {
-                                handleNavigate("add")
+                              router.push("/user/invoicetamplate")
+                                // handleNavigate("add")
                                 setToggleDropdown(false);
                             }}
                         >
                             <FileText className="w-4 h-4 mr-2 text-blue-600" />
-                            Invoice
+                           New Invoice
                         </li>
                         <li
                             className={styles.delete}
@@ -217,7 +218,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
 
       {/* Tab Navigation */}
       <div className={styles.tabs}>
-        {["overview", "Transection", "notes"].map((tab) => (
+        {["overview", "Transaction", "notes"].map((tab) => (
           <button
             key={tab}
             className={`${styles.tabButton} ${
