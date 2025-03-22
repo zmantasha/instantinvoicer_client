@@ -18,7 +18,7 @@ const NavBar: FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { user, fetchUserProfile } = useUser();
+  const { user,setUser, fetchUserProfile } = useUser();
   const dropdownRef = useRef<HTMLDivElement | null>(null);  // Type ref here
   const checkLoginStatus = () => {
     const isloggedinCookie = Cookies.get("accessToken");
@@ -65,6 +65,7 @@ const NavBar: FC = () => {
         Cookies.remove("accessToken");
         toast.success("Successfully logged out.", { position: "bottom-right" });
         router.replace("/account/login");
+        setUser(null)
         setShowDropdown(null);
         setShowMobileMenu(false);
       }
