@@ -81,3 +81,7 @@ table-layout: auto;
 .customerTable td {
   white-space: normal;
 }
+.invoiceContainer {
+  padding: 20px 0px;
+
+}
