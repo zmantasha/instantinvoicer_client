@@ -12,6 +12,7 @@ import { Modal } from "../ui/modal";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import EditAddress from "./EditAddress";
+import InvoiceLoader from "../invoice-tools/InvoiceLoader";
 
 interface Props {
   customerId: string;
@@ -360,55 +361,15 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           </>
         )}
         </div>
-        {activeTab === "Transection" && <p className={styles.noData}>No Transection available.</p>}
+        {activeTab === "Transaction" ? 
+        <div className={styles.invoiceContainer}>
+            <InvoiceLoader customerId={customer._id} />
+          </div>: <p className={styles.noData}>No Transection available.</p>}
         {activeTab === "notes" && <p className={styles.noData}>No notes added yet.</p>}
       </div>
 
       {EditAddressMemoize}
-      {/* <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-      <h2 className="text-lg font-semibold mb-3">
-          Edit {editSection === "billing" ? "Billing" : "Shipping"} Address
-        </h2>
-        <div className="space-y-4">
-        <div className="grid  gap-2 items-center">
-        <Label>Street1</Label>
-        <Input 
-       
-        placeholder="Enter Your Address 1"
-        />
-
-        <Label>Street2</Label>
-        <Input 
-       
-        placeholder="Enter Your Address 1"
-        />
-
-        <Label>City</Label>
-        <Input
-        
-        placeholder="Enter Your Address 1"
-        />
-
-        <Label>State</Label>
-        <Input 
-       
-        placeholder="Enter Your Address 1"
-        />
-
-        <Label>PinCode</Label>
-        <Input
-      
-        placeholder="Enter Your Address 1"
-        />
-
-        <Label>Country</Label>
-        <Input
-        
-        placeholder="Enter Your Address 1"
-        />
-        </div>
-        </div>
-      </Modal> */}
+     
       </>
   );
 }
