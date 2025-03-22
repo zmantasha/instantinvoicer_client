@@ -9,7 +9,8 @@ import styles from "../../app/user/myinvoice/myinvoice.module.css";
 import Cookies from "js-cookie";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-export default function InvoiceLoader() {
+export default function InvoiceLoader({customerId}:{customerId?:any}) {
+  console.log("customer:", customerId)
   const { user } = useUser();
   const router = useRouter();
   const [invoiceItem, setInvoiceItem] = useState<any[]>([]);
@@ -25,17 +26,26 @@ export default function InvoiceLoader() {
 
     try {
       setIsLoading(true);
+      if(customerId){
+        const response =await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${customerId}`)
+        console.log(response)
+        setInvoiceItem(response.data.invoices||[]); // Extract invoices from the response
+        setTotalItems(response.data.invoices.length||0);
+      }
+      else{
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
       );
       setInvoiceItem(response.data || []);
       setTotalItems(response.data.length || 0);
+    }
+     
     } catch (error) {
       console.error("Failed to fetch invoices:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [user?.user?._id, setInvoiceItem]);
+  }, [user?.user?._id, setInvoiceItem,customerId]);
 
   useEffect(() => {
     fetchInvoice();
