@@ -101,6 +101,7 @@ export default function EditAddress({ modalOpen, setModalOpen, editSection,updat
 
   const handleCloseModal = () => {
     setModalOpen(false);
+    setCustomerData(initialCustomerData)
     // setCustomerData(initialCustomerData); // Reset form fields
     formik.resetForm(); // Reset Formik state
   };
