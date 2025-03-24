@@ -9,6 +9,7 @@ import React, { memo, useEffect, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useUser } from "@/hooks/UserContext";
 
 interface InvoiceHeaderProps {
   senderDetails: {
@@ -60,7 +61,11 @@ const InvoiceHeader = memo(({
   const [senderNameCharactersLeft, setNameSenderCharactersLeft] = useState(nameLength);
   const [billToCharactersLeft, setBillToCharactersLeft] = useState(nameLength);
   const [shipToCharactersLeft, setShipToCharactersLeft] = useState(nameLength);
-
+  const [search, setSearch] = useState("");
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); 
+  const { user } = useUser();
   useEffect(() => {
     const address = formik.values.senderDetails.address || "";
     setSenderCharactersLeft(addressLength - address.length);
@@ -134,6 +139,17 @@ const InvoiceHeader = memo(({
     });
   };
 
+  // const getAllSearch = async () => {
+  //   try {
+  //     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/search?displayName=${search}&&firstName=${search}`);
+  //     console.log(response)
+      
+  //     // setUser(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -176,6 +192,44 @@ const InvoiceHeader = memo(({
   const removeLogo = () => {
     onUpdateSender({ ...senderDetails, logo: "" });
   };
+
+  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearch(query);
+  
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/search?displayName=${query}&firstName=${query}`
+      );
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        if (response.data[0].createdBy == user.user._id) {
+          setCustomers(response.data||[]);
+        } else {
+          setCustomers([]);
+          setShowDropdown(true);
+        }
+      } else {
+        setCustomers([]);
+        setShowDropdown(false);
+      }
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      setCustomers([]);
+      setShowDropdown(false);
+    }
+    setLoading(false);
+    
+  };
+  const handleSelectCustomer = (customer: any) => {
+    onUpdateRecipient({
+      ...recipientDetails,
+      billTo: { name: customer.displayName, address: customer.address },
+    });
+    setSearch(customer.displayName);
+    setShowDropdown(false);
+  };
+  console.log(customers)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -259,15 +313,32 @@ const InvoiceHeader = memo(({
             <Label>Bill To</Label>
             <Input
               maxLength={nameLength}
-              value={formik.values.recipientDetails.billTo.name}
-              onChange={handleBillToNameChange}
-              placeholder="Who is this to?"
+              // value={formik.values.recipientDetails.billTo.name}
+              value={search}
+              // onChange={handleBillToNameChange}
+              onChange={handleSearchChange}
+              // placeholder="Who is this to?"
+              placeholder="Search Customer..."
             />
             <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
             <FormError 
               message={formErrors.recipientDetails?.billTo?.name}
               className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
             />
+              {loading && <p>Loading...</p>}
+              {showDropdown && customers.length > 0 && (
+                <ul className="absolute bg-white border rounded shadow-md">
+                  {customers?.map((customer:any,index) => {
+                   return  <li
+                      key={customer.id||index}
+                      className="p-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => handleSelectCustomer(customer)}
+                    >
+                      {customer.displayName}
+                    </li>
+})}
+                </ul>
+              )}
             <Textarea
               maxLength={addressLength}
               value={formik.values.recipientDetails.billTo.address}
