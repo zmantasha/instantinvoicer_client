@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 
 const initialInvoiceData: Omit<InvoiceData, '_id'> = {
   userId: "",
+  customerId:"",
   senderDetails: {
     logo: "",
     name: "",
@@ -25,6 +26,7 @@ const initialInvoiceData: Omit<InvoiceData, '_id'> = {
   },
   recipientDetails: {
     billTo: {
+      id: "",
       name: "",
       address: "",
     },
@@ -281,6 +283,7 @@ export function useInvoice(initialData?: InvoiceData) {
         let finalValues = {
           ...values,
           userId: user?.user?._id,
+          customerId: values.recipientDetails.billTo.id, 
           totals: calculatedTotals,
         };
 
