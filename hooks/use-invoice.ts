@@ -558,13 +558,13 @@ export function useInvoice(initialData?: InvoiceData) {
 
 
 
-      const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
-        const subtotal = calculateSubtotal(formik.values.items);
-        const tax = calculateTax(subtotal, totals.taxRate,totals.taxType);
-    const discount = calculateDiscount(subtotal, totals.discountType);
-    const shipping = calculateShipping(subtotal, totals.shipping, totals.shippingType);
-    const total = calculateTotal(subtotal, tax, discount, shipping);
-    const balanceDue = total - totals.amountPaid;
+const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
+  const subtotal = calculateSubtotal(formik.values.items);
+  const tax = calculateTax(subtotal, totals.taxRate,totals.taxType);
+  const discount = calculateDiscount(subtotal, totals.discountType);
+  const shipping = calculateShipping(subtotal, totals.shipping, totals.shippingType);
+  const total = calculateTotal(subtotal, tax, discount, shipping);
+  const balanceDue = total - totals.amountPaid;
 
     formik.setFieldValue("totals", {
       ...totals,
