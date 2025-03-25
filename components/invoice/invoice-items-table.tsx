@@ -177,7 +177,6 @@ const removeHeader = (index: number) => {
       
       if (!hasAskedAboutRate && items.length > 1) {
         const index = items.findIndex(item => item.id === id);
-        console.log("index",index);
         const inputElement = inputRefs.current[index];
         if (inputElement) {
           const rect = inputElement.getBoundingClientRect();

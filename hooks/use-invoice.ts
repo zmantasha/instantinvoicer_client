@@ -310,10 +310,10 @@ export function useInvoice(initialData?: InvoiceData) {
           }
         }
       } catch (error) {
-        console.error("Operation failed:", error);
+        // console.error("Operation failed:", error);
         toast.error(
           axios.isAxiosError(error)
-            ? error.response?.data?.message || error.message
+            ? error.response?.data?.message ||error.response?.data?.error|| error.message
             : 'Something went wrong. Please try again.', {
             position: "bottom-right",
           }
