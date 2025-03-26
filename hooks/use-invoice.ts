@@ -145,6 +145,7 @@ export function useInvoice(initialData?: InvoiceData) {
       ...initialData,
       invoiceDetails: {
         ...initialData.invoiceDetails,
+        // customerId:initialData.recipientDetails.billTo.id,
         number: initialData.invoiceDetails.number,
         date: new Date(initialData.invoiceDetails.date).toISOString().split('T')[0],
         dueDate: initialData.invoiceDetails.dueDate
@@ -232,7 +233,7 @@ export function useInvoice(initialData?: InvoiceData) {
         if (Object.keys(errors).length > 0) {
           formik.setTouched({
             senderDetails: { name: true, address: true },
-            recipientDetails: { billTo: { name: true, address: true } },
+            recipientDetails: { billTo: {id:true, name: true, address: true } },
             invoiceDetails: { number: true, date: true, dueDate: true },
             items: formik.values.items.map(() => ({ data: {}, quantity: true, rate: true })),
           }, true);
@@ -286,6 +287,7 @@ export function useInvoice(initialData?: InvoiceData) {
           customerId: values.recipientDetails.billTo.id, 
           totals: calculatedTotals,
         };
+       
 
         if (isEditing) {
           finalValues = {
@@ -330,6 +332,7 @@ export function useInvoice(initialData?: InvoiceData) {
       }
     },
   });
+  
 
   // useEffect(() => {
   //   if (user?.user._id && !initialData) {

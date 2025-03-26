@@ -11,8 +11,8 @@ interface props{
 
 export default function AddCustomerModal({modalOpen,setModalOpen,handleSelectCustomer}:props){
    const pathname = usePathname();
-   const customerInvoicePath=pathname.split("/")[2]
-   console.log(pathname.split("/")[2])
+   const customerInvoicePath=pathname.split("/").slice(2).join("/")
+   console.log(pathname.split("/").slice(2).join("/"))
     const handleCloseModal=()=>{
         setModalOpen(false)
     }

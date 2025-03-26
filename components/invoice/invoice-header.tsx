@@ -20,10 +20,12 @@ interface InvoiceHeaderProps {
   };
   recipientDetails: {
     billTo: {
+      id:string;
       name: string;
       address: string;
     };
     shipTo: {
+      id:string;
       name: string;
       address: string;
     };
@@ -92,6 +94,8 @@ const InvoiceHeader = memo(({
     const name = formik.values.recipientDetails.billTo.name || "";
     setBillToCharactersLeft(nameLength - name.length);
   }, [formik.values.recipientDetails.billTo.name]);
+
+  
 
   useEffect(() => {
     const name = formik.values.recipientDetails.shipTo.name || "";
@@ -283,17 +287,23 @@ const handleSelectCustomer = (customer: any) => {
   setSearch(customer.displayName);
   setShowDropdown(false);
 };
-const handleBillToManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const value = e.target.value;
-  onUpdateRecipient({
-    ...recipientDetails,
-    billTo: { 
-      ...recipientDetails.billTo,
-      name: value,
-      id: "" // Clear ID when manually editing
-    },
-  });
-};
+
+// const handleBillToManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   const value = e.target.value;
+//   // Only clear ID if it's a new manual input
+//   const shouldClearId =recipientDetails.billTo.id !== "" && recipientDetails.billTo.name !== value;
+
+//   console.log(recipientDetails.billTo.id)
+//   onUpdateRecipient({
+//     ...recipientDetails,
+//     billTo: { 
+//       ...recipientDetails.billTo,
+//       name: value,
+//       id: shouldClearId ? "" : recipientDetails.billTo.id, // Clear ID when manually editing
+//     },
+//   });
+// };
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -378,14 +388,15 @@ const handleBillToManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     <div className="relative">
       <Input
         maxLength={nameLength}
-        value={search}
+        value={search||formik.values.recipientDetails.billTo.name}
         onChange={(e) => {
           handleSearchChange(e); // For searching customers
           handleBillToNameChange(e);
-          handleBillToManualInput(e) // For updating billTo.name
+          // handleBillToManualInput(e) // For updating billTo.name
         }}
         placeholder="Search customer..."
         onFocus={() => setShowDropdown(true)}
+        // readOnly={!!formik.values.recipientDetails.billTo.id}
       />
         <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
       {/* {loading && (
