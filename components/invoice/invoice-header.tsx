@@ -283,6 +283,17 @@ const handleSelectCustomer = (customer: any) => {
   setSearch(customer.displayName);
   setShowDropdown(false);
 };
+const handleBillToManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  onUpdateRecipient({
+    ...recipientDetails,
+    billTo: { 
+      ...recipientDetails.billTo,
+      name: value,
+      id: "" // Clear ID when manually editing
+    },
+  });
+};
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -370,7 +381,8 @@ const handleSelectCustomer = (customer: any) => {
         value={search}
         onChange={(e) => {
           handleSearchChange(e); // For searching customers
-          handleBillToNameChange(e); // For updating billTo.name
+          handleBillToNameChange(e);
+          handleBillToManualInput(e) // For updating billTo.name
         }}
         placeholder="Search customer..."
         onFocus={() => setShowDropdown(true)}
