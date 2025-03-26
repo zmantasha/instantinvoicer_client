@@ -392,11 +392,11 @@ const handleSelectCustomer = (customer: any) => {
         onChange={(e) => {
           handleSearchChange(e); // For searching customers
           handleBillToNameChange(e);
-          // handleBillToManualInput(e) // For updating billTo.name
+          // handleBillToManualInput(e) // For updating billTo.
         }}
         placeholder="Search customer..."
-        onFocus={() => setShowDropdown(true)}
-        // readOnly={!!formik.values.recipientDetails.billTo.id}
+        onFocus={() => !!formik.values.recipientDetails.billTo.id? setShowDropdown(false):setShowDropdown(true)}
+       readOnly={!!formik.values.recipientDetails.billTo.id}
       />
         <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
       {/* {loading && (
