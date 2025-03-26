@@ -53,10 +53,16 @@ const initialCustomerData={
   contacts: [] as contactInfo[],
   status: "active",
 };
+interface props{
+  paramsId?: any;
+  customerInvoicePath?: string;
+  setModalOpen:(value:boolean)=>void;
+  handleSelectCustomer: (customer: any) => void;
+}
 
 
 
-export default function AddCustomer({ paramsId, customerInvoicePath,setModalOpen }: { paramsId?: any; customerInvoicePath?: string,setModalOpen:(value:boolean)=>void }){
+export default function AddCustomer({ paramsId, customerInvoicePath,setModalOpen,handleSelectCustomer }: props ){
   const [customerData,setCustomerData]= useState(initialCustomerData)
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
@@ -117,12 +123,14 @@ export default function AddCustomer({ paramsId, customerInvoicePath,setModalOpen
                 // If creating, send POST request
              const response=  await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer`,customerData,headers)
              const customerId=response.data?.customer?._id
+             const customer=response.data?.customer
             //  console.log(response.data.customer._id)
                 toast.success("Customer added successfully!");
                 setIsLoading(true)
                 if(customerInvoicePath){
                   console.log("customerInvoicePath")
                   setModalOpen(false)
+                  handleSelectCustomer(customer)
                   router.replace(`/user/${customerInvoicePath}`)
                 }else{
                 router.replace(`/user/customer/${customerId}`)
