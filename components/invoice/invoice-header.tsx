@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useUser } from "@/hooks/UserContext";
+import AddCustomerModal from "../customer/AddCustomerModal";
 
 interface InvoiceHeaderProps {
   senderDetails: {
@@ -61,6 +62,7 @@ const InvoiceHeader = memo(({
   const [senderNameCharactersLeft, setNameSenderCharactersLeft] = useState(nameLength);
   const [billToCharactersLeft, setBillToCharactersLeft] = useState(nameLength);
   const [shipToCharactersLeft, setShipToCharactersLeft] = useState(nameLength);
+  const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -417,7 +419,10 @@ const handleSelectCustomer = (customer: any) => {
 
     <button
       className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-      // onClick={() => handleAddCustomer()} // Function to add a new customer
+      onClick={() => {
+        setModalOpen(true);
+        setShowDropdown(false); // Close dropdown when opening modal
+      }}
     >
       Add Customer
     </button>
@@ -429,6 +434,8 @@ const handleSelectCustomer = (customer: any) => {
       message={formErrors.recipientDetails?.billTo?.name}
       className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
     />
+
+    <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen}/>
   </div>
   
   <Textarea
