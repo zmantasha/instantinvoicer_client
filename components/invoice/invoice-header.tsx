@@ -275,6 +275,7 @@ const handleSelectCustomer = (customer: any) => {
   onUpdateRecipient({
     ...recipientDetails,
     billTo: { 
+      id: customer._id,
       name: customer.displayName || recipientDetails.billTo.name, 
       address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
     },
@@ -409,7 +410,7 @@ const handleSelectCustomer = (customer: any) => {
             onClick={() => handleSelectCustomer(customer)}
           >
             <div className="font-medium">{customer.displayName}</div>
-            <div className="text-gray-500 text-xs">{customer.address1}</div>
+            <div className="text-gray-500 text-xs">{customer.email}</div>
           </li>
         ))}
       </ul>
@@ -435,7 +436,7 @@ const handleSelectCustomer = (customer: any) => {
       className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
     />
 
-    <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen}/>
+    <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen} handleSelectCustomer={handleSelectCustomer}/>
   </div>
   
   <Textarea
