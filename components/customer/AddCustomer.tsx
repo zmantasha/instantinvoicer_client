@@ -11,7 +11,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
-import { useRouter } from "next/navigation";
+import {useRouter } from "next/navigation";
 
 export interface contactInfo{
     name:string;
@@ -56,11 +56,10 @@ const initialCustomerData={
 
 
 
-export default function AddCustomer({ paramsId }: { paramsId?:any }){
+export default function AddCustomer({ paramsId, customerInvoicePath,setModalOpen }: { paramsId?: any; customerInvoicePath?: string,setModalOpen:(value:boolean)=>void }){
   const [customerData,setCustomerData]= useState(initialCustomerData)
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
-
     // Fetch customer data when editing
     useEffect(() => {
         if (paramsId) {
@@ -121,7 +120,13 @@ export default function AddCustomer({ paramsId }: { paramsId?:any }){
             //  console.log(response.data.customer._id)
                 toast.success("Customer added successfully!");
                 setIsLoading(true)
+                if(customerInvoicePath){
+                  console.log("customerInvoicePath")
+                  setModalOpen(false)
+                  router.replace(`/user/${customerInvoicePath}`)
+                }else{
                 router.replace(`/user/customer/${customerId}`)
+                }
             }
       } catch (error) {
         if (axios.isAxiosError(error)) {
