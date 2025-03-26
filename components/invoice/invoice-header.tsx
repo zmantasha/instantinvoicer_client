@@ -242,6 +242,7 @@ const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   
   if (query.length < 2) {
     setCustomers([]);
+    setShowDropdown(false);
     return;
   }
 
@@ -257,10 +258,12 @@ const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     );
     console.log(response.data)
     setCustomers(response.data);
-    setShowDropdown(response.data.length > 0);
+    // setShowDropdown(response.data.length > 0);
+    setShowDropdown(true);
   } catch (error) {
     console.error("Error fetching customers:", error);
     setCustomers([]);
+    setShowDropdown(true);
   }
   setLoading(false);
 };
@@ -370,7 +373,7 @@ const handleSelectCustomer = (customer: any) => {
         onFocus={() => setShowDropdown(true)}
       />
         <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
-      {loading && (
+      {/* {loading && (
         <div className="absolute top-10 left-0 right-0 bg-white p-2 text-sm">
           Searching...
         </div>
@@ -390,7 +393,37 @@ const handleSelectCustomer = (customer: any) => {
             </li>
           ))}
         </ul>
-      )}
+      )} */}
+{showDropdown && (
+  <div className="absolute top-12 left-0 right-0 border rounded-lg shadow-md p-4 w-100 bg-white z-50">
+    {loading && <div className="text-sm text-gray-500">Searching...</div>}
+
+    {customers.length > 0 ? (
+      <ul className="space-y-2">
+        {customers.map((customer: any) => (
+          <li
+            key={customer._id}
+            className="p-2 border rounded-md hover:bg-gray-100 cursor-pointer"
+            onClick={() => handleSelectCustomer(customer)}
+          >
+            <div className="font-medium">{customer.displayName}</div>
+            <div className="text-gray-500 text-xs">{customer.address1}</div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div className="text-gray-500 text-center py-4">No customer found</div>
+    )}
+
+    <button
+      className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+      // onClick={() => handleAddCustomer()} // Function to add a new customer
+    >
+      Add Customer
+    </button>
+  </div>
+)}
+
     </div>
     <FormError
       message={formErrors.recipientDetails?.billTo?.name}
