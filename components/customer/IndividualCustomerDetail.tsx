@@ -143,7 +143,9 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         {/* update here redirection invoice tamplate */}
         <Button variant="outline"
                  className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white px-2 py-0" 
-                 onClick={()=>handleNavigate("add")}>
+                //  in future work on this
+                //  onClick={()=>router.push(`/user/invoicetamplate/${customer._id}/new`)}>
+                 onClick={()=>router.push(`/user/invoicetamplate`)}>
                 <Plus /> New Transaction
         </Button>
         <div className={styles.dropdownContainer}>
