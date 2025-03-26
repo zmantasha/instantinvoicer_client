@@ -283,6 +283,10 @@ const handleSelectCustomer = (customer: any) => {
       name: customer.displayName || recipientDetails.billTo.name, 
       address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
     },
+    // shipTo: { 
+    //   name: customer.displayName || recipientDetails.billTo.name, 
+    //   address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
+    // },
   });
   setSearch(customer.displayName);
   setShowDropdown(false);
