@@ -331,7 +331,8 @@ export function useInvoice(initialData?: InvoiceData) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
       );
-      const invoices = response.data;
+      console.log(response.data.data)
+      const invoices = response.data.data||[];
   
       let newInvoiceNumber = "INV-0001";
   
