@@ -25,7 +25,6 @@ interface InvoiceHeaderProps {
       address: string;
     };
     shipTo: {
-      id:string;
       name: string;
       address: string;
     };
