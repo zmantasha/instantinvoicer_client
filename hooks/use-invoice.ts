@@ -598,7 +598,7 @@ const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
     formik.setTouched(
       {
         senderDetails: { name: true, address: true },
-        recipientDetails: { billTo: { name: true, address: true } },
+        recipientDetails: { billTo: {id:true, name: true, address: true } },
         invoiceDetails: { number: true, date: true, dueDate: true },
         items: formik.values.items.map((item) => ({
           data: Object.keys(item.data).reduce(
