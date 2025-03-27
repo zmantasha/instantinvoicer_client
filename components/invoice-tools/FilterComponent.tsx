@@ -56,7 +56,7 @@ return (
     </div>
 
     {/* Advanced Filter Button */}
-    <Popover>
+    {/* <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" className="gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -64,13 +64,13 @@ return (
           </svg>
           Advanced Filters
         </Button>
-      </PopoverTrigger>
+      </PopoverTrigger> */}
       
       {/* Advanced Filter Content */}
-      <PopoverContent className="w-80 p-6 bg-white rounded-xl shadow-lg">
-        <div className="grid gap-4">
+      {/* <PopoverContent className="w-80 p-6 bg-white rounded-xl shadow-lg">
+        <div className="grid gap-4"> */}
           {/* Status Filter */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
             <Select onValueChange={setSelectedStatus}>
               <SelectTrigger>
@@ -82,10 +82,10 @@ return (
                 <SelectItem value="draft">Draft</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
           {/* Date Range Filter */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
             <Popover open={openDatePicker} onOpenChange={setOpenDatePicker}>
               <PopoverTrigger asChild>
@@ -95,8 +95,8 @@ return (
                     "w-full justify-start text-left font-normal",
                     !dateRange.start && "text-muted-foreground"
                   )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                > */}
+                  {/* <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateRange.start ? (
                     dateRange.end ? (
                       <>
@@ -109,8 +109,8 @@ return (
                   ) : (
                     <span>Pick a date range</span>
                   )}
-                </Button>
-              </PopoverTrigger>
+                </Button> */}
+              {/* </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="range"
@@ -123,11 +123,11 @@ return (
                 }
                 />
               </PopoverContent>
-            </Popover>
-          </div>
+            </Popover> */}
+          {/* </div> */}
 
           {/* Quick Date Presets */}
-          <div className="grid grid-cols-3 gap-2">
+          {/* <div className="grid grid-cols-3 gap-2">
             {[10, 20, 30].map((days) => (
               <Button
                 key={days}
@@ -143,17 +143,17 @@ return (
                 Last {days} days
               </Button>
             ))}
-          </div>
+          </div> */}
 
           {/* Currency Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+          {/* <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label> */}
             {/* <Input
               placeholder="USD, EUR, etc."
               value={selectedCurrency}
               onChange={(e) => setSelectedCurrency(e.target.value)}
             /> */}
-            <Select onValueChange={setSelectedCurrency}>
+            {/* <Select onValueChange={setSelectedCurrency}>
               <SelectTrigger>
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
@@ -165,10 +165,10 @@ return (
                 <SelectItem value="JPY">JPY</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
           {/* Amount Range */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Min Amount</label>
               <Input
@@ -193,10 +193,10 @@ return (
                 }))}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mt-4">
+          {/* <div className="flex gap-2 mt-4">
             <Button
               variant="outline"
               className="flex-1"
@@ -212,11 +212,11 @@ return (
             <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
               Apply Filters
             </Button>
-          </div>
+          </div> */}
         </div>
-      </PopoverContent>
+      {/* </PopoverContent>
     </Popover>
-  </div>
+  </div> */}
 
   {/* Active Filters Display */}
   <div className="flex flex-wrap gap-2 px-4">

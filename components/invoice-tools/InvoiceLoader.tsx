@@ -209,6 +209,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import styles from "../../app/user/myinvoice/myinvoice.module.css";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import FilterComponent from "./FilterComponent";
 
 export default function InvoiceLoader() {
   const { user } = useUser();
@@ -305,6 +306,7 @@ export default function InvoiceLoader() {
 
   return (
     <>
+    <FilterComponent/>
       {invoiceItem.length > 0 ? (
         <>
           <InvoiceTable
