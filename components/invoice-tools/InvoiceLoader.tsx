@@ -1,3 +1,205 @@
+// import { useEffect, useState, useCallback } from "react";
+// import axios from "axios";
+// import Spinner from "@/components/Spinner";
+// import InvoiceTable from "./InvoiceTable";
+// import { useUser } from "@/hooks/UserContext";
+// import { useRouter } from "next/navigation";
+// import { Button } from "../ui/button";
+// import styles from "../../app/user/myinvoice/myinvoice.module.css";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+
+// export default function InvoiceLoader() {
+//   const { user } = useUser();
+//   const router = useRouter();
+//   const [invoiceItem, setInvoiceItem] = useState<any[]>([]);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [limit, setLimit] = useState(5);
+//   const [totalItems, setTotalItems] = useState(0);
+
+//   const totalPages = totalItems > 0 ? Math.ceil(totalItems / limit) : 1;
+
+//   const fetchInvoice = useCallback(async () => {
+//     if (!user?.user?._id) return;
+
+//     try {
+//       setIsLoading(true);
+//       const response = await axios.get(
+//         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
+//       );
+//       setInvoiceItem(response.data || []);
+//       setTotalItems(response.data.length || 0);
+//     } catch (error) {
+//       console.error("Failed to fetch invoices:", error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   }, [user?.user?._id, setInvoiceItem]);
+
+//   useEffect(() => {
+//     fetchInvoice();
+//   }, [fetchInvoice]);
+
+//   useEffect(() => {
+//     setCurrentPage(1);
+//   }, [totalItems, limit]);
+
+//   const paginatedData = invoiceItem.slice(
+//     (currentPage - 1) * limit,
+//     currentPage * limit
+//   );
+
+//   const handleDelete = async (id: string) => {
+//     try {
+//       await axios.delete(
+//         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`
+//       );
+//       fetchInvoice();
+//     } catch (error) {
+//       console.error("Failed to delete invoice:", error);
+//     }
+//   };
+
+//   const renderPageNumbers = () => {
+//     const pageNumbers: (number | string)[] = [];
+//     const maxPagesToShow = 5;
+//     let startPage, endPage;
+
+//     if (totalPages <= maxPagesToShow) {
+//       startPage = 1;
+//       endPage = totalPages;
+//     } else {
+//       const maxPagesBeforeCurrent = Math.floor(maxPagesToShow / 2);
+//       const maxPagesAfterCurrent = Math.ceil(maxPagesToShow / 2) - 1;
+
+//       if (currentPage <= maxPagesBeforeCurrent) {
+//         startPage = 1;
+//         endPage = maxPagesToShow;
+//       } else if (currentPage + maxPagesAfterCurrent >= totalPages) {
+//         startPage = totalPages - maxPagesToShow + 1;
+//         endPage = totalPages;
+//       } else {
+//         startPage = currentPage - maxPagesBeforeCurrent;
+//         endPage = currentPage + maxPagesAfterCurrent;
+//       }
+//     }
+
+//     for (let i = startPage; i <= endPage; i++) {
+//       pageNumbers.push(i);
+//     }
+
+//     if (startPage > 1) {
+//       pageNumbers.unshift(1, "...");
+//     }
+//     if (endPage < totalPages) {
+//       pageNumbers.push("...", totalPages);
+//     }
+
+//     return pageNumbers;
+//   };
+
+//   if (isLoading) {
+//     return <Spinner loading={isLoading} color="teal" />;
+//   }
+
+//   return (
+//     <>
+//       {paginatedData.length > 0 ? (
+//         <>
+//           <InvoiceTable
+//             invoiceItem={paginatedData}
+//             handleNavigation={(url: string) => router.push(url)}
+//             handleDelete={handleDelete}
+//             currentPage={currentPage}
+//             limit={limit}
+//             refreshData={fetchInvoice}
+//           />
+
+//           <div className={styles.paginationBox}>
+//             <div className={styles.LeftSide}>
+//               <div className={styles.totalpage}>
+//                 Page {currentPage} of {totalPages}
+//               </div>
+
+//               <div className={styles.selectionLimit}>
+//                 {/* <select
+//                   onChange={(e) => {
+//                     setLimit(Number(e.target.value));
+//                     setCurrentPage(1);
+//                   }}
+//                   value={limit}
+//                 >
+//                   <option value={5}>5</option>
+//                   <option value={10}>10</option>
+//                   <option value={15}>15</option>
+//                 </select> */}
+
+//                     <Select
+//                     value={String(limit)} // Ensure value is a string
+//                     onValueChange={(value) => {
+//                         setLimit(Number(value));
+//                         setCurrentPage(1);
+//                     }}
+//                     >
+//                 <SelectTrigger>
+//                     <SelectValue placeholder="Select limit" />
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                     <SelectItem value="5">5</SelectItem>
+//                     <SelectItem value="10">10</SelectItem>
+//                     <SelectItem value="15">15</SelectItem>
+//                 </SelectContent>
+//                 </Select>
+
+//               </div>
+//             </div>
+
+//             <div className={styles.rightPage}>
+//               <Button
+//                 className={styles.previous}
+//                 disabled={currentPage === 1}
+//                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+//               >
+//                 Previous
+//               </Button>
+//               {renderPageNumbers().map((page, index) =>
+//                 page === "..." ? (
+//                   <span key={index} className={styles.dots}>
+//                     ...
+//                   </span>
+//                 ) : (
+//                   <button
+//                     key={index}
+//                     className={
+//                       currentPage === page ? styles.active : styles.pagenumber
+//                     }
+//                     onClick={() =>
+//                       typeof page === "number" && setCurrentPage(page)
+//                     }
+//                   >
+//                     {page}
+//                   </button>
+//                 )
+//               )}
+//               <Button
+//                 className={styles.nextbutton}
+//                 disabled={currentPage === totalPages}
+//                 onClick={() =>
+//                   setCurrentPage((p) => (p < totalPages ? p + 1 : p))
+//                 }
+//               >
+//                 Next
+//               </Button>
+//             </div>
+//           </div>
+//         </>
+//       ) : (
+//         <p className="text-center py-8">No invoices found</p>
+//       )}
+//     </>
+//   );
+// }
+
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Spinner from "@/components/Spinner";
@@ -25,16 +227,20 @@ export default function InvoiceLoader() {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`,
+        {
+          params: { page: currentPage, limit },
+        }
       );
-      setInvoiceItem(response.data || []);
-      setTotalItems(response.data.length || 0);
+
+      setInvoiceItem(response.data.data || []);
+      setTotalItems(response.data.total || 0);
     } catch (error) {
       console.error("Failed to fetch invoices:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [user?.user?._id, setInvoiceItem]);
+  }, [user?.user?._id, currentPage, limit]);
 
   useEffect(() => {
     fetchInvoice();
@@ -43,11 +249,6 @@ export default function InvoiceLoader() {
   useEffect(() => {
     setCurrentPage(1);
   }, [totalItems, limit]);
-
-  const paginatedData = invoiceItem.slice(
-    (currentPage - 1) * limit,
-    currentPage * limit
-  );
 
   const handleDelete = async (id: string) => {
     try {
@@ -104,10 +305,10 @@ export default function InvoiceLoader() {
 
   return (
     <>
-      {paginatedData.length > 0 ? (
+      {invoiceItem.length > 0 ? (
         <>
           <InvoiceTable
-            invoiceItem={paginatedData}
+            invoiceItem={invoiceItem}
             handleNavigation={(url: string) => router.push(url)}
             handleDelete={handleDelete}
             currentPage={currentPage}
@@ -122,35 +323,22 @@ export default function InvoiceLoader() {
               </div>
 
               <div className={styles.selectionLimit}>
-                {/* <select
-                  onChange={(e) => {
-                    setLimit(Number(e.target.value));
+                <Select
+                  value={String(limit)}
+                  onValueChange={(value) => {
+                    setLimit(Number(value));
                     setCurrentPage(1);
                   }}
-                  value={limit}
                 >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={15}>15</option>
-                </select> */}
-
-                    <Select
-                    value={String(limit)} // Ensure value is a string
-                    onValueChange={(value) => {
-                        setLimit(Number(value));
-                        setCurrentPage(1);
-                    }}
-                    >
-                <SelectTrigger>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select limit" />
-                </SelectTrigger>
-                <SelectContent>
+                  </SelectTrigger>
+                  <SelectContent>
                     <SelectItem value="5">5</SelectItem>
                     <SelectItem value="10">10</SelectItem>
                     <SelectItem value="15">15</SelectItem>
-                </SelectContent>
+                  </SelectContent>
                 </Select>
-
               </div>
             </div>
 
@@ -199,3 +387,4 @@ export default function InvoiceLoader() {
     </>
   );
 }
+
