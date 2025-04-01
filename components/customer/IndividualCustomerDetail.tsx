@@ -125,6 +125,13 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
       setDeleteItemId(null);
     };
 
+    const handleNavigation = () => {
+      const path = customer?._id
+        ? `/user/invoicetamplate/${customer._id}/new`
+        : `/user/invoicetamplate`;
+      router.push(path);
+    };
+
  
   return (
       <>
@@ -141,12 +148,21 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
         </Button>
 
         {/* update here redirection invoice tamplate */}
-        <Button variant="outline"
+        {/* <Button variant="outline"
                  className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white px-2 py-0" 
                 //  in future work on this
                 //  onClick={()=>router.push(`/user/invoicetamplate/${customer._id}/new`)}>
                  onClick={()=>router.push(`/user/invoicetamplate`)}>
                 <Plus /> New Transaction
+        </Button> */}
+
+        <Button
+          variant="outline"
+          className="text-white bg-[#0c69cc] hover:bg-[#0f7fe6] hover:text-white px-2 py-0"
+          // onClick={() => router.push(`/user/invoicetamplate?customerId=${customer._id}&customerName=${encodeURIComponent(customer.displayName)}`)}
+          onClick={handleNavigation}
+        >
+          <Plus /> New Transaction
         </Button>
         <div className={styles.dropdownContainer}>
         {/* more button */}

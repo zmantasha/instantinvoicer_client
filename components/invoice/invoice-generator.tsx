@@ -14,13 +14,13 @@ import axios from "axios";
 import { InvoiceData } from "../../types/invoice";
 import Spinner from "../Spinner";
 
-export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) {
+export default function InvoiceGenerator({ invoiceId,invoiceAction,invoiceActionCustomer }: { invoiceId?: string,invoiceAction?:string,invoiceActionCustomer?:string }) {
   const [isLoading, setIsLoading] = useState(!!invoiceId);
   const [initialData, setInitialData] = useState<InvoiceData | undefined>(undefined);
-
+  // console.log("h",invoiceId)
   useEffect(() => {
     const fetchInvoiceData = async () => {
-      if (invoiceId) {
+      if (invoiceId && invoiceId != "editInvoice") {
         try {
           const response = await axios.get<InvoiceData>(
             `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${invoiceId}`,
@@ -30,7 +30,7 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
         } catch (error) {
           console.error("Failed to fetch invoice:", error);
         } finally {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
     };
@@ -98,7 +98,7 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
           onClick={() => saveInvoice()}
           disabled={formik.isSubmitting} // Disable when submitting
         >
-        {formik.isSubmitting ? "Saving..." : invoiceId ? "Update Invoice" : "Save Invoice"}
+        {formik.isSubmitting ? "Saving..." : invoiceId&&invoiceAction=="editInvoice" ? "Update Invoice" : "Save Invoice"}
       </Button>
         </div>
       </div>
@@ -115,6 +115,8 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
           onUpdateRecipient={updateRecipientDetails}
           onUpdateInvoice={updateInvoiceDetails}
           formErrors={formErrors}
+          invoiceId={invoiceId}
+          invoiceAction={invoiceActionCustomer}
           formTouched={formTouched}
           formik={formik}
         />

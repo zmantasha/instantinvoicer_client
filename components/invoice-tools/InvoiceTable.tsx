@@ -69,7 +69,7 @@ export default function InvoiceTable({
 
   const handleEditInvoice = (id: string) => {
     setIsLoading(true)
-    router.push(`/user/editInvoice/${id}`);
+    router.push(`/user/invoicetamplate/${id}/editInvoice`);
     setIsLoading(false)
   };
 

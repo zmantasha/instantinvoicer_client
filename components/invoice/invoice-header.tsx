@@ -5,12 +5,13 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Textarea } from "../../components/ui/textarea";
 import { FormError } from "../../components/ui/form-error";
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useUser } from "@/hooks/UserContext";
 import AddCustomerModal from "../customer/AddCustomerModal";
+import { useParams } from "next/navigation";
 
 interface InvoiceHeaderProps {
   senderDetails: {
@@ -36,6 +37,8 @@ interface InvoiceHeaderProps {
     paymentTerms: string;
     poNumber: string;
   };
+  invoiceId?:string;
+  invoiceAction?:string;
   onUpdateSender: (details: any) => void;
   onUpdateRecipient: (details: any) => void;
   onUpdateInvoice: (details: any) => void;
@@ -48,6 +51,8 @@ const InvoiceHeader = memo(({
   senderDetails,
   recipientDetails,
   invoiceDetails,
+  invoiceId,
+  invoiceAction,
   onUpdateSender,
   onUpdateRecipient,
   onUpdateInvoice,
@@ -69,6 +74,11 @@ const InvoiceHeader = memo(({
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false); 
   const { user } = useUser();
+  // const params= useParams()
+  // console.log(params.id)
+
+
+
   useEffect(() => {
     const address = formik.values.senderDetails.address || "";
     setSenderCharactersLeft(addressLength - address.length);
@@ -241,6 +251,37 @@ const InvoiceHeader = memo(({
   // };
   // console.log(customers)
   // Uncomment and modify the customer search handler
+ 
+  useEffect(() => {
+    if (invoiceId ){
+      setLoading(true);
+      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${invoiceId}`)
+        .then((response) => {
+          const customer = response.data;
+          if (customer) {
+            onUpdateRecipient({
+              ...recipientDetails,
+              billTo: {
+                id: customer._id,
+                name: customer.displayName || recipientDetails.billTo.name,
+                address: [customer.billingAddress.street1, customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
+              },
+              shipTo: {
+                name: customer.displayName || recipientDetails.shipTo.name,
+                address: [customer.shippingAddress.street1, customer.shippingAddress.city, customer.shippingAddress.country].filter(Boolean).join('\n')
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching customer data:', error);
+          toast.error('Failed to fetch customer data');
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [invoiceId,invoiceAction]);
+  
+
 const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const query = e.target.value;
   setSearch(query);
@@ -290,6 +331,10 @@ const handleSelectCustomer = (customer: any) => {
   setSearch(customer.displayName);
   setShowDropdown(false);
 };
+
+const AddCustomerMemoize=useMemo(()=>{
+  return <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen} handleSelectCustomer={handleSelectCustomer}/>
+},[modalOpen])
 
 // const handleBillToManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 //   const value = e.target.value;
@@ -461,8 +506,8 @@ const handleSelectCustomer = (customer: any) => {
       message={formErrors.recipientDetails?.billTo?.name}
       className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
     />
-
-    <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen} handleSelectCustomer={handleSelectCustomer}/>
+     {AddCustomerMemoize}
+    {/* <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen} handleSelectCustomer={handleSelectCustomer}/> */}
   </div>
   
   <Textarea
