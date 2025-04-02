@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import InvoiceGenerator from "@/components/invoice/invoice-generator";
 import { useParams, usePathname } from "next/navigation";
@@ -10,8 +10,8 @@ export default function EditInvoice(){
     // Memoize the invoiceId to prevent unnecessary recalculations
     const memoizedInvoiceId = useMemo(() => id, [id]);
     const pathname=usePathname()
-  const invoiceAction=pathname.split("/")[4]
-  console.log(invoiceAction)
+     const invoiceAction=pathname.split("/")[4]
+    // console.log(invoiceAction)
 
     return (
         <>

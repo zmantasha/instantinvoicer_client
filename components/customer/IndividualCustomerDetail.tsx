@@ -187,7 +187,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                     <ul>
                         <li
                             onClick={() => {
-                              router.push("/user/invoicetamplate")
+                              handleNavigation()
                                 // handleNavigate("add")
                                 setToggleDropdown(false);
                             }}

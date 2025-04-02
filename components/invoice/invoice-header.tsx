@@ -37,7 +37,7 @@ interface InvoiceHeaderProps {
     paymentTerms: string;
     poNumber: string;
   };
-  invoiceId?:string;
+  customerId?:string;
   invoiceAction?:string;
   onUpdateSender: (details: any) => void;
   onUpdateRecipient: (details: any) => void;
@@ -51,7 +51,7 @@ const InvoiceHeader = memo(({
   senderDetails,
   recipientDetails,
   invoiceDetails,
-  invoiceId,
+  customerId,
   invoiceAction,
   onUpdateSender,
   onUpdateRecipient,
@@ -253,9 +253,9 @@ const InvoiceHeader = memo(({
   // Uncomment and modify the customer search handler
  
   useEffect(() => {
-    if (invoiceId ){
+    if (customerId ){
       setLoading(true);
-      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${invoiceId}`)
+      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${customerId}`)
         .then((response) => {
           const customer = response.data;
           if (customer) {
@@ -279,7 +279,7 @@ const InvoiceHeader = memo(({
         })
         .finally(() => setLoading(false));
     }
-  }, [invoiceId,invoiceAction]);
+  }, [customerId]);
   
 
 const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,6 +323,7 @@ const handleSelectCustomer = (customer: any) => {
       name: customer.displayName || recipientDetails.billTo.name, 
       address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
     },
+    
     // shipTo: { 
     //   name: customer.displayName || recipientDetails.billTo.name, 
     //   address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
