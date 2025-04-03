@@ -9,19 +9,21 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  role: 'user' | 'admin';
 }
 
 interface UserContextType {
-  user: any | null;
+  user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   fetchUserProfile: () => void;
+  isAdmin: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Create a provider component
 export const UserProvider = ({ children }:{children: React.ReactNode}) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   // Fetch the user profile
   const fetchUserProfile = async () => {
@@ -45,8 +47,10 @@ export const UserProvider = ({ children }:{children: React.ReactNode}) => {
     fetchUserProfile();
   }, []);
 
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <UserContext.Provider value={{ user, setUser, fetchUserProfile }}>
+    <UserContext.Provider value={{ user, setUser, fetchUserProfile, isAdmin }}>
       {children}
     </UserContext.Provider>
   );
