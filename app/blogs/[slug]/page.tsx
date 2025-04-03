@@ -26,7 +26,9 @@ interface Blog {
     name: string;
   };
   author: {
-    name: string;
+    _id: string;
+    firstName: string;
+    lastName: string;
     email: string;
   };
   activity: {
@@ -101,7 +103,9 @@ const BlogPost = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{blog.title}</h1>
             <p className="text-xl md:text-2xl mb-8">{blog.description}</p>
             <div className="flex items-center justify-center gap-4">
-              <span>By {blog.author?.name || 'Anonymous'}</span>
+              <div className="text-sm text-gray-500">
+                By {blog.author?.firstName} {blog.author?.lastName}
+              </div>
               <span>•</span>
               <span>{blog.activity.total_reads} reads</span>
             </div>

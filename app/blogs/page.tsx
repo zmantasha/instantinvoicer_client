@@ -14,7 +14,9 @@ interface Blog {
   tags: string[];
   category: string;
   author: {
-    name: string;
+    _id: string;
+    firstName: string;
+    lastName: string;
     email: string;
   };
   activity: {
@@ -113,8 +115,10 @@ const BlogsPage = () => {
                     </span>
                   ))}
                 </div>
+                <div className="text-sm text-gray-500">
+                  By {blog.author?.firstName} {blog.author?.lastName}
+                </div>
                 <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>By {blog.author?.name || 'Anonymous'}</span>
                   <span>{blog.activity.total_reads} reads</span>
                 </div>
               </div>
