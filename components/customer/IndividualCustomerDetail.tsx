@@ -193,7 +193,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                             }}
                         >
                             <FileText className="w-4 h-4 mr-2 text-blue-600" />
-                           New Invoice
+                            {customer.status==="active" ?"Mark as Active":"Mark as Inactive"}
                         </li>
                         <li
                             className={styles.delete}
@@ -263,7 +263,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           <p className={styles.contactPhone}><Phone className="text-[#333] w-4 h-4"/>{customer.workPhone}</p>
           <p className={styles.contactPhone}><Smartphone className="text-[#333] w-4 h-4"/>{customer.mobilePhone}</p>
           </div>
-          <Settings className="text-gray-500 w-4 h-4" onClick={()=>handleNavigate("")}/>
+          {/* <Settings className="text-gray-500 w-4 h-4" onClick={()=>handleNavigate("")}/> */}
           </div>
          
          <div className={styles.dropdowndown}>
