@@ -281,22 +281,23 @@ interface InvoiceItem {
           </div>
   
           {/* Totals Section */}
-          <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
+          <div className="mt-10 flex flex-col lg:flex-row gap-6">
+            {/* fix(ui): Prevent subtotal section from expanding with long notes/terms */}
+          <div className="flex-1 min-w-0">
               {invoiceItem.notes && (
                 <div className="mb-4">
                   <p className="text-gray-600 font-bold">Notes</p>
-                  <p className="text-gray-800">{invoiceItem.notes}</p>
+                  <p className="text-gray-800 whitespace-pre-line">{invoiceItem.notes}</p>
                 </div>
               )}
               {invoiceItem.terms && (
                 <div>
                   <p className="text-gray-600 font-bold">Terms</p>
-                  <p className="text-gray-800">{invoiceItem.terms}</p>
+                  <p className="text-gray-800 whitespace-pre-line">{invoiceItem.terms}</p>
                 </div>
               )}
             </div>
-            <div className="bg-gray-50 p-4 shadow-sm rounded">
+            <div className="bg-gray-50 p-4 shadow-sm rounded w-[600px] h-fit">
               <div className="flex justify-between py-1">
                 <p className="text-gray-600">Subtotal</p>
                 <p>
