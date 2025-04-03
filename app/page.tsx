@@ -1,5 +1,6 @@
 "use client";
 
+import BlogSection from "@/components/BlogSection";
 import Link from "next/link";
 
 export default function Home() {
@@ -63,41 +64,7 @@ export default function Home() {
 
 
       {/* Blog Section */}
-      <section className="mt-12">
-        <h2 className="text-3xl font-bold mb-6">Latest Blog Posts</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Blog 1 */}
-          <div className="p-6 border rounded-lg shadow-md hover:shadow-lg transition text-left">
-            <h3 className="text-xl font-semibold mb-2">How to Create a Professional Invoice</h3>
-            <p className="text-gray-600 mb-4">
-              Learn the key elements of a professional invoice and how to structure it.
-            </p>
-            <a href="#" className="text-blue-600 font-medium hover:underline">
-              Read More →
-            </a>
-          </div>
-          {/* Blog 2 */}
-          <div className="p-6 border rounded-lg shadow-md hover:shadow-lg transition text-left">
-            <h3 className="text-xl font-semibold mb-2">Top 5 Invoice Mistakes to Avoid</h3>
-            <p className="text-gray-600 mb-4">
-              Avoid common mistakes that can delay payments and frustrate clients.
-            </p>
-            <a href="#" className="text-blue-600 font-medium hover:underline">
-              Read More →
-            </a>
-          </div>
-          {/* Blog 3 */}
-          <div className="p-6 border rounded-lg shadow-md hover:shadow-lg transition text-left">
-            <h3 className="text-xl font-semibold mb-2">Why Digital Invoicing is the Future</h3>
-            <p className="text-gray-600 mb-4">
-              Discover the benefits of digital invoices and how they improve cash flow.
-            </p>
-            <a href="#" className="text-blue-600 font-medium hover:underline">
-              Read More →
-            </a>
-          </div>
-        </div>
-      </section>
+      <BlogSection/>
     </main>
   );
 }
