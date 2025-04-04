@@ -12,6 +12,10 @@ interface Blog {
   description: string;
   content: string[];
   tags: string[];
+  category: {
+    _id: string;
+    name: string;
+  } | string;
   author: {
     _id: string;
     firstName: string;
@@ -37,7 +41,10 @@ const BlogSection = () => {
   const fetchBlogs = async () => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/`);
-      setBlogs(response.data.data.blogs);
+      if (response.data && response.data.data) {
+        const blogsData = response.data.data.blogs || response.data.data;
+        setBlogs(Array.isArray(blogsData) ? blogsData : []);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching blogs:', error);
@@ -54,33 +61,41 @@ const BlogSection = () => {
   return (
     <section className="py-12 px-4 max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold text-center mb-8">Latest Blogs</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedBlogs.map((blog) => (
-          <div key={blog._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="relative h-48">
-              <Image
-                src={blog.banner || '/placeholder-blog.jpg'}
-                alt={blog.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="text-xl font-semibold mb-2">{blog.title}</h3>
-              <p className="text-gray-600 mb-4 line-clamp-2">{blog.description}</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {blog.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-1 bg-gray-100 rounded-full text-sm">
-                    {tag}
-                  </span>
-                ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {displayedBlogs.map((blog) => {
+          // Safely handle category name
+          const categoryName = typeof blog.category === 'string' 
+            ? blog.category 
+            : blog.category?.name || 'Uncategorized';
+
+          return (
+            <div key={blog._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative h-48">
+                <Image
+                  src={blog.banner || '/placeholder-blog.jpg'}
+                  alt={blog.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-              <div className="text-sm text-gray-500">
-                By {blog.author?.firstName} {blog.author?.lastName}
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2">{blog.title}</h3>
+                <p className="text-gray-600 mb-4 line-clamp-2">{blog.description}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {blog.tags.map((tag) => (
+                    <span key={tag} className="px-2 py-1 bg-gray-100 rounded-full text-sm">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-sm text-gray-500">
+                  <div>Category: {categoryName}</div>
+                  <div>By {blog.author?.firstName} {blog.author?.lastName}</div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       
       {blogs.length > 2 && !showAll && (
