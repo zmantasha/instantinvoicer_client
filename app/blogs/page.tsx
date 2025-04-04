@@ -12,7 +12,10 @@ interface Blog {
   description: string;
   content: string[];
   tags: string[];
-  category: string;
+  category: {
+    _id: string;
+    name: string;
+  } | string;
   author: {
     _id: string;
     firstName: string;
@@ -39,13 +42,22 @@ const BlogsPage = () => {
   const fetchBlogs = async () => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/`);
-      const fetchedBlogs = response.data.data.blogs;
-      setBlogs(fetchedBlogs);
-      
-      // Extract unique categories
-      const uniqueCategories = Array.from(new Set(fetchedBlogs.map((blog: Blog) => blog.category)));
-      setCategories(uniqueCategories as string[]);
-      
+      if (response.data && response.data.data) {
+        const blogsData = response.data.data.blogs || response.data.data;
+        const fetchedBlogs = Array.isArray(blogsData) ? blogsData : [];
+        setBlogs(fetchedBlogs);
+        
+        // Extract unique categories
+        const uniqueCategories = Array.from(new Set(
+          fetchedBlogs.map((blog: Blog) => {
+            if (typeof blog.category === 'string') {
+              return blog.category;
+            }
+            return blog.category?.name || 'Uncategorized';
+          })
+        ));
+        setCategories(uniqueCategories as string[]);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching blogs:', error);
@@ -55,7 +67,12 @@ const BlogsPage = () => {
 
   const filteredBlogs = selectedCategory === 'all' 
     ? blogs 
-    : blogs.filter(blog => blog.category === selectedCategory);
+    : blogs.filter(blog => {
+        if (typeof blog.category === 'string') {
+          return blog.category === selectedCategory;
+        }
+        return blog.category?.name === selectedCategory;
+      });
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-[400px]">Loading...</div>;
@@ -94,37 +111,43 @@ const BlogsPage = () => {
 
       {/* Blogs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredBlogs.map((blog) => (
-          <Link href={`/blogs/${blog.slug}`} key={blog._id}>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative h-48">
-                <Image
-                  src={blog.banner || '/placeholder-blog.jpg'}
-                  alt={blog.title}
-                  fill
-                  className="object-cover"
-                />
+        {filteredBlogs.map((blog) => {
+          // Safely handle category name
+          const categoryName = typeof blog.category === 'string' 
+            ? blog.category 
+            : blog.category?.name || 'Uncategorized';
+
+          return (
+            <Link href={`/blogs/${blog.slug}`} key={blog._id}>
+              <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="relative h-48">
+                  <Image
+                    src={blog.banner || '/placeholder-blog.jpg'}
+                    alt={blog.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-2">{blog.title}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-2">{blog.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {blog.tags.map((tag) => (
+                      <span key={tag} className="px-2 py-1 bg-gray-100 rounded-full text-sm">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    <div>Category: {categoryName}</div>
+                    <div>By {blog.author?.firstName} {blog.author?.lastName}</div>
+                    <div>{blog.activity.total_reads} reads</div>
+                  </div>
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-xl font-semibold mb-2">{blog.title}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">{blog.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {blog.tags.map((tag) => (
-                    <span key={tag} className="px-2 py-1 bg-gray-100 rounded-full text-sm">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-500">
-                  By {blog.author?.firstName} {blog.author?.lastName}
-                </div>
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>{blog.activity.total_reads} reads</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
