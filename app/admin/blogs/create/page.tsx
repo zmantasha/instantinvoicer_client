@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/UserContext';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
+import { slugify } from '@/utils/slugify';
 
 // Dynamically import the rich text editor to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -27,6 +29,8 @@ const BlogEditor = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Array<{ _id: string; name: string }>>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -40,6 +44,7 @@ const BlogEditor = () => {
   const [metaDescription, setMetaDescription] = useState('');
   const [selectedSchema, setSelectedSchema] = useState<'none' | 'faq'>('none');
   const [faqQuestions, setFaqQuestions] = useState<Array<{ question: string; answer: string }>>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -51,10 +56,19 @@ const BlogEditor = () => {
 
   const fetchCategories = async () => {
     try {
+      setCategoriesLoading(true);
+      setCategoriesError(null);
       const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/category/`);
-      setCategories(response.data.data.categories);
+      if (response.data.success && Array.isArray(response.data.data)) {
+        setCategories(response.data.data);
+      } else {
+        throw new Error('Invalid categories data format');
+      }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategoriesError('Failed to load categories. Please try again later.');
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
@@ -95,11 +109,17 @@ const BlogEditor = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken) {
+        throw new Error('No access token found');
+      }
+
       // Upload banner image if exists
-      let bannerUrl = '';
-      if (banner) {
+      let bannerUrl = banner;
+      if (banner instanceof File) {
         const formData = new FormData();
         formData.append('image', banner);
         const uploadResponse = await axios.post(
@@ -108,39 +128,82 @@ const BlogEditor = () => {
           {
             headers: {
               'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${accessToken}`,
             },
+            withCredentials: true
           }
         );
         bannerUrl = uploadResponse.data.data.url;
       }
 
-      // Prepare blog data
-      const blogData = {
-        title,
-        description,
-        content,
-        tags,
-        category: selectedCategory,
-        status,
-        banner: bannerUrl,
-        meta_title: metaTitle,
-        meta_description: metaDescription,
-      };
-
-      // Add FAQ schema if selected
-      if (selectedSchema === 'faq' && faqQuestions.length > 0) {
-        blogData.content.push({
-          type: 'faq',
-          questions: faqQuestions,
-        });
+      // Generate a unique slug by appending timestamp if needed
+      let finalSlug = slugify(title);
+      try {
+        // First try with the original slug
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/create`,
+          {
+            blog_id: `B${Date.now().toString().slice(-4)}`,
+            title,
+            slug: finalSlug,
+            description,
+            content,
+            tags,
+            category: selectedCategory,
+            status,
+            banner: bannerUrl,
+            meta_title: metaTitle,
+            meta_description: metaDescription,
+            schema: selectedSchema === 'faq' ? faqQuestions : undefined
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true
+          }
+        );
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.data?.message?.includes('already exists')) {
+          // If slug exists, append timestamp
+          finalSlug = `${slugify(title)}-${Date.now()}`;
+          // Try again with the new slug
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/create`,
+            {
+              blog_id: `B${Date.now().toString().slice(-4)}`,
+              title,
+              slug: finalSlug,
+              description,
+              content,
+              tags,
+              category: selectedCategory,
+              status,
+              banner: bannerUrl,
+              meta_title: metaTitle,
+              meta_description: metaDescription,
+              schema: selectedSchema === 'faq' ? faqQuestions : undefined
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+              withCredentials: true
+            }
+          );
+        } else {
+          throw error;
+        }
       }
-
-      // Create blog
-      await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/`, blogData);
 
       router.push('/admin/blogs');
     } catch (error) {
       console.error('Error creating blog:', error);
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.message || 'Failed to create blog');
+      } else {
+        setError('Failed to create blog');
+      }
     } finally {
       setLoading(false);
     }
@@ -166,21 +229,32 @@ const BlogEditor = () => {
                 />
               </div>
 
+              {/* Category Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                {categoriesLoading ? (
+                  <div className="w-full px-4 py-2 border rounded-md bg-gray-100 animate-pulse">
+                    Loading categories...
+                  </div>
+                ) : categoriesError ? (
+                  <div className="w-full px-4 py-2 border rounded-md bg-red-50 text-red-600">
+                    {categoriesError}
+                  </div>
+                ) : (
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div>
