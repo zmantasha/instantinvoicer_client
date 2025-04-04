@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/UserContext';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
 
 // Dynamically import the rich text editor to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -26,7 +27,7 @@ interface Blog {
   _id: string;
   title: string;
   description: string;
-  content: ContentSection[];
+  content: string | ContentSection[];
   tags: string[];
   category: string;
   status: 'draft' | 'published';
@@ -35,16 +36,22 @@ interface Blog {
   meta_description: string;
 }
 
-const BlogEditor = ({ params }: { params: { id: string } }) => {
+interface Category {
+  _id: string;
+  name: string;
+}
+
+const EditBlog = ({ params }: { params: { id: string } }) => {
   const { user, isAdmin } = useUser();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState<Array<{ _id: string; name: string }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [content, setContent] = useState<ContentSection[]>([]);
+  const [content, setContent] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
@@ -55,59 +62,183 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
   const [selectedSchema, setSelectedSchema] = useState<'none' | 'faq'>('none');
   const [faqQuestions, setFaqQuestions] = useState<Array<{ question: string; answer: string }>>([]);
 
-  useEffect(() => {
-    if (!isAdmin) {
-      router.push('/');
-      return;
+  const validateToken = () => {
+    const accessToken = Cookies.get('accessToken');
+    if (!accessToken) {
+      router.push('/admin/login');
+      return false;
     }
-    fetchCategories();
-    fetchBlog();
-  }, [isAdmin, router, params.id]);
+    return true;
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializePage = async () => {
+      if (!validateToken()) return;
+      
+      if (!isAdmin) {
+        router.push('/');
+        return;
+      }
+
+      try {
+        await fetchCategories();
+        await fetchBlog();
+      } catch (error) {
+        console.error('Error initializing page:', error);
+        setError('Failed to initialize page');
+      }
+    };
+
+    if (isMounted) {
+      initializePage();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAdmin, router]);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/category/`);
-      setCategories(response.data.data.categories);
+      const accessToken = Cookies.get('accessToken');
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/category/`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          timeout: 10000,
+          validateStatus: (status) => status < 500
+        }
+      );
+
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
+      if (response.data?.data?.categories && Array.isArray(response.data.data.categories)) {
+        setCategories(response.data.data.categories);
+      } else {
+        setCategories([]);
+      }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      handleApiError(error);
+      setCategories([]);
     }
   };
 
   const fetchBlog = async () => {
+    if (!validateToken()) return;
+
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${params.id}`);
-      const blog: Blog = response.data.data.blog;
+      const accessToken = Cookies.get('accessToken');
+      console.log('Fetching blog with ID:', params.id);
+      console.log('Using access token:', accessToken ? 'Present' : 'Missing');
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${params.id}`,
+        {
+          // headers: {
+          //   Authorization: `Bearer ${accessToken}`,
+          // },
+          timeout: 10000,
+          validateStatus: (status) => status < 500
+        }
+      );
+
+      console.log('Server response:', response);
+
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
+      if (response.status >= 400) {
+        console.error('Server error response:', response.data);
+        setError(`Server error: ${response.data?.message || 'Unknown error'}`);
+        return;
+      }
+
+      const blog = response.data?.data;
+      if (!blog) {
+        console.error('No blog data in response:', response.data);
+        setError('Blog not found');
+        return;
+      }
+
+      console.log('Blog data received:', blog);
+
+      setTitle(blog.title || '');
+      setDescription(blog.description || '');
       
-      setTitle(blog.title);
-      setDescription(blog.description);
-      setContent(blog.content);
-      setTags(blog.tags);
-      setSelectedCategory(blog.category);
-      setStatus(blog.status);
-      setBannerPreview(blog.banner);
+      // Handle content based on its type
+      if (typeof blog.content === 'string') {
+        setContent(blog.content);
+      } else if (Array.isArray(blog.content)) {
+        setContent(JSON.stringify(blog.content));
+      } else {
+        console.error('Unexpected content type:', typeof blog.content);
+        setContent('');
+      }
+
+      setTags(blog.tags || []);
+      setSelectedCategory(blog.category || '');
+      setStatus(blog.status || 'draft');
+      setBannerPreview(blog.banner || '');
       setMetaTitle(blog.meta_title || '');
       setMetaDescription(blog.meta_description || '');
 
       // Check for FAQ schema
-      const faqSection = blog.content.find(section => section.type === 'faq');
-      if (faqSection && faqSection.questions) {
-        setSelectedSchema('faq');
-        setFaqQuestions(faqSection.questions);
+      if (Array.isArray(blog.content)) {
+        const faqSection = blog.content.find((section: ContentSection) => section.type === 'faq');
+        if (faqSection && faqSection.questions) {
+          setSelectedSchema('faq');
+          setFaqQuestions(faqSection.questions);
+        }
       }
     } catch (error) {
       console.error('Error fetching blog:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+        setError(`Error: ${error.response?.data?.message || error.message}`);
+      } else {
+        setError('An unexpected error occurred');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUnauthorized = () => {
+    Cookies.remove('accessToken');
+    router.push('/admin/login');
+  };
+
+  const handleApiError = (error: any) => {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      setError(error.response?.data?.message || 'An error occurred');
+    } else {
+      setError('An unexpected error occurred');
     }
   };
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       setBanner(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBannerPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setBannerPreview(URL.createObjectURL(file));
     }
   };
 
@@ -135,63 +266,49 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    if (!validateToken()) return;
 
     try {
-      // Upload banner image if exists
-      let bannerUrl = bannerPreview;
+      const accessToken = Cookies.get('accessToken');
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('content', content);
+      formData.append('tags', JSON.stringify(tags));
+      formData.append('category', selectedCategory);
+      formData.append('status', status);
+      formData.append('meta_title', metaTitle);
+      formData.append('meta_description', metaDescription);
       if (banner) {
-        const formData = new FormData();
-        formData.append('image', banner);
-        const uploadResponse = await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/upload/`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        bannerUrl = uploadResponse.data.data.url;
+        formData.append('banner', banner);
       }
 
-      // Prepare blog data
-      const blogData = {
-        title,
-        description,
-        content,
-        tags,
-        category: selectedCategory,
-        status,
-        banner: bannerUrl,
-        meta_title: metaTitle,
-        meta_description: metaDescription,
-      };
-
-      // Add FAQ schema if selected
-      if (selectedSchema === 'faq' && faqQuestions.length > 0) {
-        const existingFaqIndex = blogData.content.findIndex(section => section.type === 'faq');
-        if (existingFaqIndex !== -1) {
-          blogData.content[existingFaqIndex] = {
-            type: 'faq',
-            questions: faqQuestions,
-          };
-        } else {
-          blogData.content.push({
-            type: 'faq',
-            questions: faqQuestions,
-          });
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${params.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+          timeout: 10000,
+          validateStatus: (status) => status < 500
         }
+      );
+
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
       }
 
-      // Update blog
-      await axios.put(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${params.id}`, blogData);
-
-      router.push('/admin/blogs');
+      setSuccess('Blog updated successfully!');
+      setTimeout(() => {
+        setSuccess(null);
+        router.push('/admin/blogs');
+      }, 2000);
     } catch (error) {
       console.error('Error updating blog:', error);
-    } finally {
-      setSaving(false);
+      handleApiError(error);
     }
   };
 
@@ -204,6 +321,18 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold mb-8">Edit Blog</h1>
+
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-md">
+              {success}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Information */}
@@ -228,7 +357,7 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
                   required
                 >
                   <option value="">Select a category</option>
-                  {categories.map((category) => (
+                  {categories && categories.map((category) => (
                     <option key={category._id} value={category._id}>
                       {category.name}
                     </option>
@@ -250,12 +379,6 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerChange}
-                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
                 {bannerPreview && (
                   <div className="mt-2 relative h-32 w-full">
                     <Image
@@ -266,6 +389,12 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
                     />
                   </div>
                 )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBannerChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
 
@@ -315,14 +444,8 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
               <ReactQuill
-                value={content.map(section => section.text || '').join('\n')}
-                onChange={(value: string) => {
-                  const sections = value.split('\n').map(text => ({
-                    type: 'paragraph' as const,
-                    text,
-                  }));
-                  setContent(sections);
-                }}
+                value={content}
+                onChange={setContent}
                 className="h-96 mb-12"
               />
             </div>
@@ -404,10 +527,9 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
               </button>
               <button
                 type="submit"
-                disabled={saving}
                 className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {saving ? 'Saving...' : 'Save Changes'}
+                Update Blog
               </button>
             </div>
           </form>
@@ -417,4 +539,4 @@ const BlogEditor = ({ params }: { params: { id: string } }) => {
   );
 };
 
-export default BlogEditor; 
+export default EditBlog; 

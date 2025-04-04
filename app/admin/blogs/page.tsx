@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@/hooks/UserContext';
 import { useRouter } from 'next/navigation';
+import DOMPurify from 'dompurify';
 
 interface Blog {
   _id: string;

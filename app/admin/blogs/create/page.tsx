@@ -12,13 +12,27 @@ import { slugify } from '@/utils/slugify';
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
 
-interface ContentSection {
-  type: 'heading' | 'paragraph' | 'image' | 'faq';
-  text?: string;
-  id?: string;
-  src?: string;
-  alt?: string;
-  questions?: Array<{
+interface Blog {
+  _id: string;
+  title: string;
+  slug: string;
+  banner: string;
+  description: string;
+  content: string; // Changed to string to handle HTML content
+  tags: string[];
+  category: {
+    _id: string;
+    name: string;
+  } | string;
+  author: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  } | string;
+  status: 'draft' | 'published';
+  meta_title?: string;
+  meta_description?: string;
+  schema?: Array<{
     question: string;
     answer: string;
   }>;
@@ -34,7 +48,7 @@ const BlogEditor = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [content, setContent] = useState<ContentSection[]>([]);
+  const [content, setContent] = useState<string>(''); // Changed to string to handle HTML content
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
@@ -45,6 +59,9 @@ const BlogEditor = () => {
   const [selectedSchema, setSelectedSchema] = useState<'none' | 'faq'>('none');
   const [faqQuestions, setFaqQuestions] = useState<Array<{ question: string; answer: string }>>([]);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [selectedAuthor, setSelectedAuthor] = useState('');
+  const [authors, setAuthors] = useState<Array<{ _id: string; firstName: string; lastName: string }>>([]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -53,6 +70,32 @@ const BlogEditor = () => {
     }
     fetchCategories();
   }, [isAdmin, router]);
+
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      try {
+        const accessToken = Cookies.get('accessToken');
+        if (!accessToken) return;
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/authors`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            }
+          }
+        );
+
+        if (response.data && response.data.data && response.data.data.authors) {
+          setAuthors(response.data.data.authors);
+        }
+      } catch (error) {
+        console.error('Error fetching authors:', error);
+      }
+    };
+
+    fetchAuthors();
+  }, []);
 
   const fetchCategories = async () => {
     try {
@@ -108,106 +151,91 @@ const BlogEditor = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
     try {
       const accessToken = Cookies.get('accessToken');
       if (!accessToken) {
-        throw new Error('No access token found');
+        setError('Authentication required');
+        return;
       }
 
-      // Upload banner image if exists
-      let bannerUrl = banner;
-      if (banner instanceof File) {
-        const formData = new FormData();
-        formData.append('image', banner);
-        const uploadResponse = await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/upload/`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            withCredentials: true
-          }
-        );
-        bannerUrl = uploadResponse.data.data.url;
-      }
+      // Create blog data with all fields
+      const blogData = {
+        title,
+        description,
+        content: content, // ReactQuill content is already in HTML format
+        tags: tags,
+        category: selectedCategory,
+        author: selectedAuthor,
+        status,
+        banner: bannerPreview,
+        meta_title: metaTitle,
+        meta_description: metaDescription,
+        schema: selectedSchema === 'faq' ? faqQuestions : undefined
+      };
 
-      // Generate a unique slug by appending timestamp if needed
-      let finalSlug = slugify(title);
-      try {
-        // First try with the original slug
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/create`,
-          {
-            blog_id: `B${Date.now().toString().slice(-4)}`,
-            title,
-            slug: finalSlug,
-            description,
-            content,
-            tags,
-            category: selectedCategory,
-            status,
-            banner: bannerUrl,
-            meta_title: metaTitle,
-            meta_description: metaDescription,
-            schema: selectedSchema === 'faq' ? faqQuestions : undefined
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            withCredentials: true
+      console.log('Submitting blog data:', blogData); // Add this for debugging
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/create`,
+        blogData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           }
-        );
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.data?.message?.includes('already exists')) {
-          // If slug exists, append timestamp
-          finalSlug = `${slugify(title)}-${Date.now()}`;
-          // Try again with the new slug
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/create`,
-            {
-              blog_id: `B${Date.now().toString().slice(-4)}`,
-              title,
-              slug: finalSlug,
-              description,
-              content,
-              tags,
-              category: selectedCategory,
-              status,
-              banner: bannerUrl,
-              meta_title: metaTitle,
-              meta_description: metaDescription,
-              schema: selectedSchema === 'faq' ? faqQuestions : undefined
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-              withCredentials: true
-            }
-          );
-        } else {
-          throw error;
         }
-      }
+      );
 
-      router.push('/admin/blogs');
+      console.log('Server response:', response.data); // Add this for debugging
+
+      if (response.data && response.data.data && response.data.data.blog) {
+        setSuccess('Blog created successfully!');
+        setTimeout(() => {
+          router.push('/admin/blogs');
+        }, 2000);
+      } else {
+        throw new Error('Invalid response format from server');
+      }
     } catch (error) {
       console.error('Error creating blog:', error);
       if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.message || 'Failed to create blog');
+        if (error.response?.status === 401) {
+          setError('Authentication failed. Please login again.');
+        } else if (error.response?.status === 400) {
+          setError(error.response.data.error || 'Invalid blog data');
+        } else {
+          setError('Failed to create blog. Please try again.');
+        }
       } else {
-        setError('Failed to create blog');
+        setError('Network error. Please check your connection.');
       }
-    } finally {
-      setLoading(false);
     }
   };
+
+  // Update the toolbar options for the editor
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['link', 'image', 'video'],
+      ['clean']
+    ],
+    clipboard: {
+      matchVisual: false,
+    }
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet',
+    'indent',
+    'align',
+    'link', 'image', 'video'
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -288,6 +316,24 @@ const BlogEditor = () => {
                   </div>
                 )}
               </div>
+
+              {/* Author Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
+                <select
+                  value={selectedAuthor}
+                  onChange={(e) => setSelectedAuthor(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Select an author</option>
+                  {authors.map((author) => (
+                    <option key={author._id} value={author._id}>
+                      {author.firstName} {author.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Description */}
@@ -336,15 +382,12 @@ const BlogEditor = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
               <ReactQuill
-                value={content.map(section => section.text || '').join('\n')}
-                onChange={(value) => {
-                  const sections = value.split('\n').map(text => ({
-                    type: 'paragraph' as const,
-                    text,
-                  }));
-                  setContent(sections);
-                }}
+                value={content}
+                onChange={setContent}
+                modules={modules}
+                formats={formats}
                 className="h-96 mb-12"
+                theme="snow"
               />
             </div>
 
