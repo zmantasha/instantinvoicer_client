@@ -1,5 +1,3 @@
-
-
 "use client"
 import Link from 'next/link';
 import styles from './login.module.css';
@@ -8,8 +6,8 @@ import {loginSchema} from "../../../validation/schemas"
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import {toast} from "react-hot-toast"
+import Cookies from 'js-cookie';
 
-import { setCookie } from 'cookies-next';
 // Define the shape of form values
 interface FormValues {
   email: string;
@@ -27,7 +25,6 @@ export default function LoginPage() {
     validationSchema:loginSchema,
     onSubmit: async(values,{resetForm}) => {
       try {
-        // Handle form submission (e.g., API call)
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/login`,values,{withCredentials:true})
         if(response.data  && response.data.message=== "loginSuccessfull"){
           toast.success(response.data.message, {
@@ -35,22 +32,30 @@ export default function LoginPage() {
           })
           resetForm()
           
-          // localStorage.setItem("accessToken",response.data.token)
-          setCookie('accessToken', response.data.token);
-          router.replace("/user/invoicetamplate")
+          // Set cookie with proper options
+          Cookies.set('accessToken', response.data.token, {
+            expires: new Date(new Date().getTime() + 60 * 60 * 1000), // 1 hour
+            path: '/',
+            secure: true,
+            sameSite: 'None'
+          });
+
+          // Check if user is admin and redirect accordingly
+          const isAdmin = response.data.user?.roles?.includes('admin');
+          const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
+          router.replace(redirectPath);
         }
       } catch (error) {
-       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || error.message|| 'login failed', {
-          position: "bottom-right",
-        });
-      } else {
-        toast.error('Something went wrong. Please try again.', {
-          position: "bottom-right",
-        });
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data?.message || error.message|| 'login failed', {
+            position: "bottom-right",
+          });
+        } else {
+          toast.error('Something went wrong. Please try again.', {
+            position: "bottom-right",
+          });
+        }
       }
-      }
-    
     },
   });
 

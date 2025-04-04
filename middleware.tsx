@@ -3,10 +3,10 @@ import type { NextRequest } from 'next/server';
 import axios from 'axios';
 
 const authPaths = ['/account/login', '/account/signup'];
+const protectedPaths = ['/user', '/admin', '/account'];
 
 export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
-
   const path = request.nextUrl.pathname;
 
   try {
@@ -18,15 +18,30 @@ export default async function middleware(request: NextRequest) {
         },
       });
 
+      const user = response.data.user;
+      const isAdmin = user?.roles?.includes('admin');
 
-      // If the user is already authenticated and tries to access auth paths, redirect
+      // If the user is already authenticated and tries to access auth paths, redirect based on role
       if (authPaths.includes(path)) {
+        const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
+        return NextResponse.redirect(new URL(redirectPath, request.url));
+      }
+
+      // Protect admin routes
+      if (path.startsWith('/admin') && !isAdmin) {
         return NextResponse.redirect(new URL('/user/myinvoice', request.url));
       }
+
+      // Protect user routes
+      if (path.startsWith('/user') && isAdmin) {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+
+      // Allow access to protected paths
+      return NextResponse.next();
     } else {
-      // No token available
-      console.log('No token found');
-      if (!authPaths.includes(path)) {
+      // No token available, redirect to login if trying to access protected paths
+      if (protectedPaths.some(protectedPath => path.startsWith(protectedPath))) {
         return NextResponse.redirect(new URL('/account/login', request.url));
       }
     }
@@ -45,5 +60,10 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/user/:path*', '/account/login', '/account/signup'],
+  matcher: [
+    '/user/:path*',
+    '/admin/:path*',
+    '/account/:path*',
+    '/user/invoicetamplate', // Add the typo path to ensure it's caught
+  ],
 };

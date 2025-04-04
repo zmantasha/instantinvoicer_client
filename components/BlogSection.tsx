@@ -68,14 +68,23 @@ const BlogSection = () => {
             ? blog.category 
             : blog.category?.name || 'Uncategorized';
 
+          // Handle banner image
+          const bannerUrl = blog.banner 
+            ? blog.banner.startsWith('http') 
+              ? blog.banner 
+              : `${process.env.NEXT_PUBLIC_SERVER}${blog.banner}`
+            : '/placeholder-blog.jpg';
+
           return (
             <div key={blog._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src={blog.banner || '/placeholder-blog.jpg'}
+                  src={bannerUrl}
                   alt={blog.title}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={true}
                 />
               </div>
               <div className="p-4">
@@ -102,7 +111,7 @@ const BlogSection = () => {
         <div className="text-center mt-8">
           <Link
             href="/blogs"
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-[#0c69cc] text-white rounded-md hover:bg-[#0c69cc]/90 transition-colors"
           >
             More Blogs
           </Link>
