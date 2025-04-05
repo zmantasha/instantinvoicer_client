@@ -9,6 +9,9 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  address:string;
+  logo:string;
+  avatar:string;
   roles: string[];
   is_verified: boolean;
   createdAt: string;

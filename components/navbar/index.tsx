@@ -192,19 +192,19 @@ const NavBar: FC = () => {
               {isLoggedin && (
                 <div className={styles.dropdownContainer}>
                   <div  className={styles.linkProfile} onClick={toggleDropdown}>
-                    {user?.user ? `${user?.user?.firstName} ${user?.user?.lastName}` : <></>}
+                    {user ? `${user?.firstName} ${user?.lastName}` : <></>}
                     <ChevronDown className="w-4 h-4 ml-2"/>
                   </div>
                   {showDropdown && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
                       <div className={styles.dropdownProfile}>
-                        <div className={styles.avatar}>{user?.user?.avatar ?<Image src={user?.user?.avatar } alt="Profile" width={50} height={50} className={styles.profileImage} />:<Image src={"/default.avif" } alt="Profile" width={50} height={50} className={styles.profileImage} />}</div>
+                        <div className={styles.avatar}>{user?.avatar ?<Image src={user?.avatar } alt="Profile" width={50} height={50} className={styles.profileImage} />:<Image src={"/default.avif" } alt="Profile" width={50} height={50} className={styles.profileImage} />}</div>
                         <div>
                           <p className={styles.dropdownProfileName}>
-                            {user && user?.user?.firstName}
+                            {user && user?.firstName}
                           </p>
                           <p className={styles.dropdownProfileEmail}>
-                            {user && user?.user?.email}
+                            {user && user?.email}
                           </p>
                         </div>
                       </div>

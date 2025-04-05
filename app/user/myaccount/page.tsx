@@ -25,15 +25,16 @@ export default function MyAccount() {
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const router = useRouter();
 
+  console.log("users",user)
   useEffect(() => {
     fetchUserProfile();
   }, []);
 
   const formik = useFormik<FormValues>({
     initialValues: {
-      firstName: user?.user?.firstName || "",
-      lastName: user?.user?.lastName || "",
-      address: user?.user?.address || "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      address: user?.address || "",
     },
     enableReinitialize: true,
     validationSchema: updateSchema,
@@ -48,7 +49,7 @@ export default function MyAccount() {
         };
 
         await axios.put(
-          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${user?.user?._id}`,
+          `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${user?._id}`,
           values,
           headers
         );
@@ -71,7 +72,7 @@ export default function MyAccount() {
       formData.append("file", file);
       const accessToken = Cookies.get("accessToken");
       
-      const uploadUrl = `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${type}/${user?.user?._id}`;
+      const uploadUrl = `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${type}/${user?._id}`;
 
       await axios.put(uploadUrl, formData, {
         headers: {
@@ -92,7 +93,7 @@ export default function MyAccount() {
   const handleDelete = async () => {
     try {
       const accessToken = Cookies.get("accessToken");
-      const deleteUrl = `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${user?.user?._id}`;
+      const deleteUrl = `${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me/${user?._id}`;
       const response = await axios.delete(deleteUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -127,7 +128,7 @@ export default function MyAccount() {
               alt="Avatar" 
               className={styles.avatar}
             /> */}
-            <Image src={user?.user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
+            <Image src={user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
             <label className={styles.avatarUpload}>
               <FiCamera size={20} />
               <input
@@ -139,12 +140,12 @@ export default function MyAccount() {
             </label>
           </div>
           <div className={styles.avatarInfo}>
-            <h2>{user?.user?.firstName} {user?.user?.lastName}</h2>
-            <p className={styles.userEmail}>{user?.user?.email}</p>
+            <h2>{user?.firstName} {user?.lastName}</h2>
+            <p className={styles.userEmail}>{user?.email}</p>
           </div>
           </div>
           <div className={styles.logoWrapper}>
-            {user?.user?.logo ?<Image src = {user?.user?.logo  ||"/default.avif"} alt="Avatar" width={150} height={100} className={styles.logo}/> : ""}
+            {user?.logo ?<Image src = {user?.logo  ||"/default.avif"} alt="Avatar" width={150} height={100} className={styles.logo}/> : ""}
           </div>
         </div>
 
