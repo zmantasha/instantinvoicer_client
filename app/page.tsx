@@ -299,7 +299,7 @@ export default function Home() {
                     className="relative z-10 bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-all cursor-pointer w-full sm:w-auto"
                   >
                     Learn More
-                  </button>
+        </button>
                 </motion.div>
               </div>
               <div className="mt-8 flex items-center gap-4">
@@ -459,8 +459,8 @@ export default function Home() {
               </button>
             </motion.div>
           </motion.div>
-        </div>
-      </section>
+  </div>
+</section>
 
       {/* Blog Section */}
       <BlogSection />

@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useUser } from '@/hooks/UserContext';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { FiPlus, FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { format } from 'date-fns';
+import { toast } from 'react-hot-toast';
 
 interface DashboardStats {
   totalBlogs: number;
@@ -58,20 +61,23 @@ export default function AdminDashboard() {
       ]);
 
       // Safely handle the data and set stats
-      const blogs = blogsResponse?.data?.data?.blogs || [];
+      const allBlogs = blogsResponse?.data?.data?.blogs || [];
       const users = usersResponse?.data?.data || [];
       const categories = categoriesResponse?.data?.data?.categories || [];
 
+      // Filter blogs to show only admin's blogs
+      const adminBlogs = allBlogs.filter((blog: any) => blog.author?._id === user?._id);
+
       setStats({
-        totalBlogs: blogs.length,
-        publishedBlogs: blogs.filter((blog: any) => blog.status === 'published').length,
-        draftBlogs: blogs.filter((blog: any) => blog.status === 'draft').length,
+        totalBlogs: adminBlogs.length,
+        publishedBlogs: adminBlogs.filter((blog: any) => blog.status === 'published').length,
+        draftBlogs: adminBlogs.filter((blog: any) => blog.status === 'draft').length,
         totalUsers: users.length,
         totalCategories: categories.length
       });
 
       // Set the data for the tables
-      setBlogs(blogs);
+      setBlogs(adminBlogs);
       setUsers(users);
       setCategories(categories);
 
@@ -88,6 +94,43 @@ export default function AdminDashboard() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (blogId: string) => {
+    if (!confirm('Are you sure you want to delete this blog?')) return;
+
+    try {
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken) {
+        router.push('/account/login');
+        return;
+      }
+
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${blogId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      // Update the blogs state by filtering out the deleted blog
+      setBlogs(prevBlogs => prevBlogs.filter(blog => blog._id !== blogId));
+      
+      // Update the stats
+      setStats(prevStats => ({
+        ...prevStats,
+        totalBlogs: prevStats.totalBlogs - 1,
+        publishedBlogs: prevStats.publishedBlogs - (blogs.find(blog => blog._id === blogId)?.status === 'published' ? 1 : 0),
+        draftBlogs: prevStats.draftBlogs - (blogs.find(blog => blog._id === blogId)?.status === 'draft' ? 1 : 0)
+      }));
+
+      toast.success('Blog deleted successfully');
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+      toast.error('Failed to delete blog');
     }
   };
 
@@ -172,6 +215,109 @@ export default function AdminDashboard() {
                 <p className="text-sm text-purple-700">View and manage user accounts</p>
               </div>
             </Link>
+          </div>
+        </div>
+
+        {/* Blog Table */}
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Your Blogs</h2>
+              <Link
+                href="/admin/blogs/create"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
+              >
+                <FiPlus className="w-4 h-4" />
+                Create New Blog
+              </Link>
+            </div>
+            {blogs.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 mb-4">You haven't created any blogs yet.</p>
+                <Link
+                  href="/admin/blogs/create"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Create your first blog
+                </Link>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Title
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Category
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Created
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {blogs.map((blog) => (
+                      <tr key={blog._id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {blog.title}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {blog.category?.name || 'Uncategorized'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              blog.status === 'published'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
+                            {blog.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {format(new Date(blog.createdAt), 'MMM d, yyyy')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-3">
+                            <Link
+                              href={`/admin/blogs/${blog.slug}`}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              <FiEye className="w-5 h-5" />
+                            </Link>
+                            <Link
+                              href={`/admin/blogs/edit/${blog.slug}`}
+                              className="text-indigo-600 hover:text-indigo-900"
+                            >
+                              <FiEdit2 className="w-5 h-5" />
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(blog._id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              <FiTrash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
 

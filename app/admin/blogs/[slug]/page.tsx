@@ -12,7 +12,7 @@ import { FiEdit2, FiArrowLeft, FiEye, FiTrash2 } from 'react-icons/fi';
 interface Blog {
   _id: string;
   title: string;
-  content: string|any;
+  content: string;
   banner: string;
   status: string;
   slug: string;
@@ -28,7 +28,7 @@ interface Blog {
   updatedAt: string;
 }
 
-export default function BlogDetail({ params }: { params: { id: string } }) {
+export default function BlogDetail({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ export default function BlogDetail({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchBlog();
-  }, [params.id]);
+  }, [params.slug]);
 
   const fetchBlog = async () => {
     try {
@@ -51,7 +51,7 @@ export default function BlogDetail({ params }: { params: { id: string } }) {
       }
 
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/slug/${params.id}`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/slug/${params.slug}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -195,30 +195,13 @@ export default function BlogDetail({ params }: { params: { id: string } }) {
 
             {/* Blog Content */}
             <div className="prose max-w-none prose-lg">
-              <div  dangerouslySetInnerHTML={{ 
-                      __html: typeof blog.content === 'string' 
-                        ? blog.content 
-                        : Array.isArray(blog.content)
-                          ? blog.content.map((section:any) => {
-                              if (typeof section === 'string') {
-                                return section;
-                              } else if (typeof section === 'object' && section !== null) {
-                                if (section.type === 'paragraph' && section.text) {
-                                  return `<p>${section.text}</p>`;
-                                } else if (section.type === 'heading' && section.text) {
-                                  return `<h2>${section.text}</h2>`;
-                                }
-                              }
-                              return '';
-                            }).join('')
-                          : JSON.stringify(blog.content)
-                    }}  />
+              <div dangerouslySetInnerHTML={{ __html: blog.content }} />
             </div>
 
             {/* Action Buttons */}
             <div className="mt-8 flex justify-end space-x-4">
               <Link
-                href={`/admin/blogs/edit/${blog._id}`}
+                href={`/admin/blogs/edit/${blog.slug}`}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
               >
                 <FiEdit2 className="w-4 h-4" />

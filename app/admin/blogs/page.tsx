@@ -140,6 +140,7 @@ const AdminBlogs = () => {
     const matchesStatus = statusFilter === 'all' || blog.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+  console.log("filter",filteredBlogs)
 
   const handleDelete = async (blogId: string) => {
     if (!confirm('Are you sure you want to delete this blog?')) return;
@@ -221,7 +222,7 @@ const AdminBlogs = () => {
 
                 // Safely handle author name
                 const authorName = typeof blog.author === 'string'
-                  ? blog.author
+                  ? blog?.author
                   : `${blog.author?.firstName || ''} ${blog.author?.lastName || ''}`.trim() || 'Unknown Author';
 
                 const status = blog.status || 'draft';

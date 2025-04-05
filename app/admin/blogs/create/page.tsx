@@ -85,9 +85,9 @@ const BlogEditor = () => {
             }
           }
         );
-
-        if (response.data && response.data.data && response.data.data.authors) {
-          setAuthors(response.data.data.authors);
+  console.log("response",response.data.authors)
+        if (response.data && response.data && response.data.authors) {
+          setAuthors(response.data.authors);
         }
       } catch (error) {
         console.error('Error fetching authors:', error);
@@ -152,9 +152,17 @@ const BlogEditor = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setLoading(true);
+      setError(null);
+      
       const accessToken = Cookies.get('accessToken');
       if (!accessToken) {
         setError('Authentication required');
+        return;
+      }
+
+      if (!title || !description || !content || !selectedCategory) {
+        setError('Please fill in all required fields');
         return;
       }
 
@@ -162,18 +170,15 @@ const BlogEditor = () => {
       const blogData = {
         title,
         description,
-        content: content, // ReactQuill content is already in HTML format
-        tags: tags,
+        content,
+        tags,
         category: selectedCategory,
-        author: selectedAuthor,
         status,
-        banner: bannerPreview,
-        meta_title: metaTitle,
-        meta_description: metaDescription,
+        banner: bannerPreview || '',
+        meta_title: metaTitle || title,
+        meta_description: metaDescription || description,
         schema: selectedSchema === 'faq' ? faqQuestions : undefined
       };
-
-      console.log('Submitting blog data:', blogData); // Add this for debugging
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/create`,
@@ -186,29 +191,23 @@ const BlogEditor = () => {
         }
       );
 
-      console.log('Server response:', response.data); // Add this for debugging
-
-      if (response.data && response.data.data && response.data.data.blog) {
+      if (response.data && response.data.success) {
         setSuccess('Blog created successfully!');
         setTimeout(() => {
           router.push('/admin/blogs');
         }, 2000);
       } else {
-        throw new Error('Invalid response format from server');
+        throw new Error(response.data.message || 'Failed to create blog');
       }
     } catch (error) {
       console.error('Error creating blog:', error);
       if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          setError('Authentication failed. Please login again.');
-        } else if (error.response?.status === 400) {
-          setError(error.response.data.error || 'Invalid blog data');
-        } else {
-          setError('Failed to create blog. Please try again.');
-        }
+        setError(error.response?.data?.message || 'Failed to create blog. Please try again.');
       } else {
         setError('Network error. Please check your connection.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 

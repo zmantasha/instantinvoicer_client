@@ -203,7 +203,7 @@ const NavBar: FC = () => {
               {isLoggedin && (
                 <div className={styles.dropdownContainer}>
                   <div  className={styles.linkProfile} onClick={toggleDropdown}>
-                    {user ? `${user?.firstName} ${user?.lastName}` : <></>}
+                    {user ? `${user?.firstName}  ${user?.lastName?user?.lastName:""}` : <></>}
                     <ChevronDown className="w-4 h-4 ml-2"/>
                   </div>
                   {showDropdown && (

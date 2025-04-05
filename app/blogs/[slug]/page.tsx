@@ -20,7 +20,7 @@ interface Blog {
   slug: string;
   banner: string;
   description: string;
-  content: string; // Changed to string to handle HTML content
+  content: string|any; // Changed to string to handle HTML content
   tags: string[];
   category: {
     _id: string;
@@ -52,13 +52,13 @@ const BlogPost = () => {
   const fetchBlog = async () => {
     try {
       // Get all blogs without authentication
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/slug/${params.slug}`)
       
       // Find the blog with matching slug
-      const foundBlog = response.data.data.blogs.find((b: Blog) => b.slug === params.slug);
-      if (foundBlog) {
-        setBlog(foundBlog);
-      }
+      // const foundBlog = response.data.data.blogs.find((b: Blog) => b.slug === params.slug);
+       if (response.data && response.data.data) {
+        setBlog(response.data.data);
+       }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching blog:', error);
