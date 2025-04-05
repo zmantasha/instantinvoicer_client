@@ -119,8 +119,8 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
         return;
       }
 
-      if (response.data?.data?.categories && Array.isArray(response.data.data.categories)) {
-        setCategories(response.data.data.categories);
+      if (response.data?.data && Array.isArray(response.data.data)) {
+        setCategories(response.data.data);
       } else {
         setCategories([]);
       }
