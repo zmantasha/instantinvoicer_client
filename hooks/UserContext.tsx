@@ -76,7 +76,6 @@ export const UserProvider = ({ children }:{children: React.ReactNode}) => {
   // Check if user has admin role in the roles array
   const isAdmin = Boolean(user?.roles?.includes('admin'));
   console.log("Current user state:", { user, isAdmin, loading, roles: user?.roles });
-
   return (
     <UserContext.Provider value={{ user, setUser, fetchUserProfile, isAdmin, loading }}>
       {children}

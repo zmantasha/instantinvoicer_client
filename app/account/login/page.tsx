@@ -2,11 +2,12 @@
 import Link from 'next/link';
 import styles from './login.module.css';
 import { useFormik } from 'formik';
-import {loginSchema} from "../../../validation/schemas"
+import * as Yup from 'yup';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import {toast} from "react-hot-toast"
 import Cookies from 'js-cookie';
+import { useEffect } from 'react';
 
 // Define the shape of form values
 interface FormValues {
@@ -14,15 +15,47 @@ interface FormValues {
   password: string;
 }
 
+// Define validation schema
+const loginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters'),
+});
+
 export default function LoginPage() {
     const router = useRouter()
     
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = Cookies.get('accessToken');
+    if (token) {
+      // Verify token and redirect if valid
+      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(response => {
+        const isAdmin = response.data.user?.roles?.includes('admin');
+        const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
+        router.replace(redirectPath);
+      })
+      .catch(() => {
+        // If token is invalid, clear it
+        Cookies.remove('accessToken');
+      });
+    }
+  }, [router]);
+
   const formik = useFormik<FormValues>({
     initialValues: {
       email: '',
       password: '',
     },
-    validationSchema:loginSchema,
+    validationSchema: loginSchema,
     onSubmit: async(values,{resetForm}) => {
       try {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/login`,values,{withCredentials:true})

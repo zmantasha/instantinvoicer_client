@@ -116,7 +116,7 @@ const NavBar: FC = () => {
         <div className={styles.leftContainer}>
         <h3
           className={styles.logo}
-          onClick={() => handleNavigation(isLoggedin ? "/user/myinvoice" : "/")}
+          onClick={() => handleNavigation(isLoggedin ? "/" : "/")}
         >
           instantinvoicer.com
         </h3>
@@ -137,6 +137,17 @@ const NavBar: FC = () => {
                     onClick={() => setShowMobileMenu(false)}
                   >
                     My Invoices
+                  </Link>
+                </li>
+                <li className={styles.menuItem}>
+                  <Link
+                    href="/blogs"
+                    className={`${styles.link} ${
+                      pathname === "/blogs" ? styles.active : ""
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    Blogs
                   </Link>
                 </li>
                 {/* <li className={styles.menuItem}>

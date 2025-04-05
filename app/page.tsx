@@ -6,7 +6,7 @@ import { ArrowRight, CheckCircle2, Clock, FileText, Share2, Zap, X } from "lucid
 import BlogSection from "@/components/BlogSection";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -22,6 +22,31 @@ export default function Home() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is logged in on component mount
+  useEffect(() => {
+    const token = Cookies.get('accessToken');
+    if (token) {
+      // Fetch user profile to check role
+      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(response => {
+        setIsLoggedIn(true);
+        setIsAdmin(response.data.user?.roles?.includes('admin'));
+      })
+      .catch(() => {
+        // If token is invalid, clear it
+        Cookies.remove('accessToken');
+        setIsLoggedIn(false);
+        setIsAdmin(false);
+      });
+    }
+  }, []);
 
   const scrollToFeatures = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,7 +58,13 @@ export default function Home() {
 
   const handleGetStarted = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowAuthModal(true);
+    if (isLoggedIn) {
+      // Redirect based on role
+      const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
+      router.push(redirectPath);
+    } else {
+      setShowAuthModal(true);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,7 +125,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Auth Modal */}
-      {showAuthModal && (
+      {showAuthModal && !isLoggedIn && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -254,7 +285,7 @@ export default function Home() {
                     onClick={handleGetStarted}
                     className="relative z-10 bg-white text-[#0c69cc] font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-2 cursor-pointer w-full sm:w-auto"
                   >
-                    Get Started Free
+                    {isLoggedIn ? (isAdmin ? 'Go to Dashboard' : 'Go to Invoices') : 'Get Started Free'}
                     <ArrowRight className="w-5 h-5" />
                   </button>
                 </motion.div>
@@ -424,7 +455,7 @@ export default function Home() {
                 onClick={handleGetStarted}
                 className="relative z-10 bg-white text-[#0c69cc] font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer"
               >
-                Start Creating Invoices
+                {isLoggedIn ? (isAdmin ? 'Go to Dashboard' : 'Go to Invoices') : 'Start Creating Invoices'}
               </button>
             </motion.div>
           </motion.div>

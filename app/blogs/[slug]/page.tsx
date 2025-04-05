@@ -128,7 +128,7 @@ const BlogPost = () => {
                       __html: typeof blog.content === 'string' 
                         ? blog.content 
                         : Array.isArray(blog.content)
-                          ? blog.content.map(section => {
+                          ? blog.content.map((section:any) => {
                               if (typeof section === 'string') {
                                 return section;
                               } else if (typeof section === 'object' && section !== null) {

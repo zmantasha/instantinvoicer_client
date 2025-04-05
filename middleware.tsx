@@ -3,11 +3,16 @@ import type { NextRequest } from 'next/server';
 import axios from 'axios';
 
 const authPaths = ['/account/login', '/account/signup'];
-const protectedPaths = ['/user', '/admin', '/account'];
+const protectedPaths = ['/user', '/admin'];
 
 export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const path = request.nextUrl.pathname;
+
+  // Always allow access to auth paths
+  if (authPaths.includes(path)) {
+    return NextResponse.next();
+  }
 
   try {
     if (token) {
@@ -21,12 +26,6 @@ export default async function middleware(request: NextRequest) {
       const user = response.data.user;
       const isAdmin = user?.roles?.includes('admin');
 
-      // If the user is already authenticated and tries to access auth paths, redirect based on role
-      if (authPaths.includes(path)) {
-        const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
-        return NextResponse.redirect(new URL(redirectPath, request.url));
-      }
-
       // Protect admin routes
       if (path.startsWith('/admin') && !isAdmin) {
         return NextResponse.redirect(new URL('/user/myinvoice', request.url));
@@ -37,7 +36,6 @@ export default async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/admin', request.url));
       }
 
-      // Allow access to protected paths
       return NextResponse.next();
     } else {
       // No token available, redirect to login if trying to access protected paths
@@ -63,7 +61,7 @@ export const config = {
   matcher: [
     '/user/:path*',
     '/admin/:path*',
-    '/account/:path*',
-    '/user/invoicetamplate', // Add the typo path to ensure it's caught
+    '/account/login',
+    '/account/signup',
   ],
 };
