@@ -166,6 +166,12 @@ const BlogEditor = () => {
         return;
       }
 
+      // Generate slug from title
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+
       // Create blog data with all fields
       const blogData = {
         title,
@@ -177,7 +183,8 @@ const BlogEditor = () => {
         banner: bannerPreview || '',
         meta_title: metaTitle || title,
         meta_description: metaDescription || description,
-        schema: selectedSchema === 'faq' ? faqQuestions : undefined
+        schema: selectedSchema === 'faq' ? faqQuestions : undefined,
+        slug
       };
 
       const response = await axios.post(

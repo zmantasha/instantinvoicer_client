@@ -142,9 +142,9 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${params.id}`,
         {
-          // headers: {
-          //   Authorization: `Bearer ${accessToken}`,
-          // },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
           timeout: 10000,
           validateStatus: (status) => status < 500
         }
@@ -186,7 +186,8 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
       }
 
       setTags(blog.tags || []);
-      setSelectedCategory(blog.category || '');
+      // Set category ID from the blog's category object
+      setSelectedCategory(blog.category?._id || blog.category || '');
       setStatus(blog.status || 'draft');
       setBannerPreview(blog.banner || '');
       setMetaTitle(blog.meta_title || '');
@@ -200,6 +201,8 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
           setFaqQuestions(faqSection.questions);
         }
       }
+
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching blog:', error);
       if (axios.isAxiosError(error)) {
@@ -212,7 +215,6 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
       } else {
         setError('An unexpected error occurred');
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -269,8 +271,20 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
     if (!validateToken()) return;
 
     try {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+
       const accessToken = Cookies.get('accessToken');
+      if (!accessToken) {
+        setError('Authentication required');
+        router.push('/admin/login');
+        return;
+      }
+
       const formData = new FormData();
+      
+      // Append all required fields
       formData.append('title', title);
       formData.append('description', description);
       formData.append('content', content);
@@ -279,8 +293,15 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
       formData.append('status', status);
       formData.append('meta_title', metaTitle);
       formData.append('meta_description', metaDescription);
-      if (banner) {
+      
+      // Only append banner if it's a new file
+      if (banner instanceof File) {
         formData.append('banner', banner);
+      }
+
+      // If FAQ schema is selected, append it
+      if (selectedSchema === 'faq' && faqQuestions.length > 0) {
+        formData.append('schema', JSON.stringify(faqQuestions));
       }
 
       const response = await axios.put(
@@ -301,6 +322,19 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
         return;
       }
 
+      if (response.status === 403) {
+        setError('You do not have permission to update this blog');
+        return;
+      }
+
+      if (response.status >= 400) {
+        throw new Error(response.data?.message || 'Failed to update blog');
+      }
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Failed to update blog');
+      }
+
       setSuccess('Blog updated successfully!');
       setTimeout(() => {
         setSuccess(null);
@@ -308,7 +342,17 @@ const EditBlog = ({ params }: { params: { id: string } }) => {
       }, 2000);
     } catch (error) {
       console.error('Error updating blog:', error);
-      handleApiError(error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          handleUnauthorized();
+          return;
+        }
+        setError(error.response?.data?.message || error.message);
+      } else {
+        setError('An unexpected error occurred while updating the blog');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
