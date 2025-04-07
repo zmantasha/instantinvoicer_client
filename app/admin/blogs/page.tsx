@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@/hooks/UserContext';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 import DOMPurify from 'dompurify';
 
 interface Blog {
@@ -146,7 +147,15 @@ const AdminBlogs = () => {
     if (!confirm('Are you sure you want to delete this blog?')) return;
     
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${blogId}`);
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken) return;
+      await axios.delete(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/blog/${blogId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
       setBlogs(blogs.filter(blog => blog._id !== blogId));
     } catch (error) {
       console.error('Error deleting blog:', error);
