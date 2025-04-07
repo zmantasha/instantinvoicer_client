@@ -20,7 +20,8 @@ export default function RootLayout({
 
   // Hide NavBar for all dynamic `share` routes like `/share/:id`
   const shouldShowNavBar = !pathname.startsWith("/share/");
-  const shouldShowFooter = !pathname.startsWith("/account/");
+  // Hide footer for account pages and admin pages
+  const shouldShowFooter = !pathname.startsWith("/account/") && !pathname.startsWith("/admin");
 
   return (
     <html lang="en">
@@ -30,7 +31,7 @@ export default function RootLayout({
           {/* <ToastContainer /> */}
           {shouldShowNavBar && <NavBar />}
           <main>{children}</main>
-          {shouldShowFooter &&<Footer/>}
+          {shouldShowFooter && <Footer/>}
         </UserProvider>
       </body>
     </html>

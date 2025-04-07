@@ -43,9 +43,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
+      <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-10">
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-4 border-b">
@@ -53,7 +53,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -94,10 +94,15 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Main Content */}
-      <div className="pl-64">
-        <main className="py-6">
+      <div className="pl-64 flex-1 flex flex-col min-h-screen">
+        <main className="flex-1 py-6 px-4 md:px-6 lg:px-8 overflow-y-auto">
           {children}
         </main>
+        
+        {/* Admin Footer */}
+        <footer className="bg-white border-t py-4 px-6 text-center text-sm text-gray-500">
+          <p>© {new Date().getFullYear()} Instant Invoicer Admin Panel</p>
+        </footer>
       </div>
     </div>
   );

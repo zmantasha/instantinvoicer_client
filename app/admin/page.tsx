@@ -139,36 +139,36 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.firstName}!</h1>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Welcome back, {user?.firstName}!</h1>
           <p className="mt-2 text-gray-600">Here's what's happening with your blog platform.</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h3 className="text-lg font-medium text-gray-900">Total Blogs</h3>
             <p className="mt-2 text-3xl font-bold text-blue-600">{stats.totalBlogs}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h3 className="text-lg font-medium text-gray-900">Published Blogs</h3>
             <p className="mt-2 text-3xl font-bold text-green-600">{stats.publishedBlogs}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h3 className="text-lg font-medium text-gray-900">Draft Blogs</h3>
             <p className="mt-2 text-3xl font-bold text-yellow-600">{stats.draftBlogs}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h3 className="text-lg font-medium text-gray-900">Total Users</h3>
             <p className="mt-2 text-3xl font-bold text-purple-600">{stats.totalUsers}</p>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6 md:mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
