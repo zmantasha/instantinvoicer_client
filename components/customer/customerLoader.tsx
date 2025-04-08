@@ -19,8 +19,6 @@ export default function CustomerLoader(){
           const response = await axios.get(
             `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/userId/${user.user._id}`
           );
-          
-          console.log(response)
           setCustomers(response.data || []);
           
         }catch (error) {

@@ -48,7 +48,6 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
       setToggleDropdown(false);
   }
   };
-  console.log("hello")
   document.addEventListener("click", handleClickOutside);
   return () => {
       document.removeEventListener("click", handleClickOutside);
@@ -187,7 +186,7 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
                     <ul>
                         <li
                             onClick={() => {
-                              handleNavigation()
+                              // handleNavigation()
                                 // handleNavigate("add")
                                 setToggleDropdown(false);
                             }}

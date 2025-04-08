@@ -302,7 +302,6 @@ const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         }
       }
     );
-    console.log(response.data)
     setCustomers(response.data);
     // setShowDropdown(response.data.length > 0);
     setShowDropdown(true);
@@ -323,6 +322,10 @@ const handleSelectCustomer = (customer: any) => {
       name: customer.displayName || recipientDetails.billTo.name, 
       address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
     },
+    shipTo: {
+      name: customer.displayName || recipientDetails.shipTo.name,
+      address: [customer.shippingAddress.street1, customer.shippingAddress.city, customer.shippingAddress.country].filter(Boolean).join('\n')
+    }
     
     // shipTo: { 
     //   name: customer.displayName || recipientDetails.billTo.name, 
