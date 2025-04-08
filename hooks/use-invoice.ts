@@ -414,7 +414,7 @@ export function useInvoice(initialData?: InvoiceData) {
         
         formik.setFieldValue(
           "senderDetails.logo",
-          user?.user?.logo || invoices?.senderDetails?.logo || "/default-logo.png"
+          user?.user?.logo || invoices?.senderDetails?.logo || "/default.avif"
         );
         
       }
