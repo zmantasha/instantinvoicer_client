@@ -103,6 +103,12 @@ export default function AddCustomer({ paramsId, customerInvoicePath,setModalOpen
       if (customerData.customerType === "individual") {
         delete (customerData as any).taxId;
       }
+
+      // Remove invoices array when updating a customer
+      if (paramsId) {
+        delete (customerData as any).invoices;
+      }
+
       try {
          setIsLoading(false)
           const accessToken = Cookies.get("accessToken");

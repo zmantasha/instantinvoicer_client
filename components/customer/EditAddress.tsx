@@ -74,6 +74,9 @@ export default function EditAddress({ modalOpen, setModalOpen, editSection,updat
             if(fullCustomerData.createdBy){
                 delete(fullCustomerData as any).createdBy
             }
+            if(fullCustomerData.invoices){
+                delete(fullCustomerData as any).invoices
+            }
             // Merge existing customer details with new address
             const updatedCustomerData = {
             ...fullCustomerData,  // Keep existing firstName, lastName, etc.
