@@ -58,9 +58,6 @@ export default function EditAddress({ modalOpen, setModalOpen, editSection,updat
     enableReinitialize: true, 
     onSubmit: async(values) => {
         try {
-            console.log("Updated Address:", values);
-            
-   
              const accessToken = Cookies.get("accessToken");
             const headers = {
                 headers: {
