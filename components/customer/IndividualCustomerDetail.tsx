@@ -378,11 +378,15 @@ export default function IndividualCustomerDetail({ customerId }: Props) {
           </>
         )}
         </div>
-        {activeTab === "Transaction" ? 
-        <div className={styles.invoiceContainer}>
-            <InvoiceLoader customerId={customer._id} />
-          </div>: <p className={styles.noData}>No Transection available.</p>}
-        {activeTab === "notes" && <p className={styles.noData}>No notes added yet.</p>}
+        {activeTab === "Transaction" ? (
+            <div className={styles.invoiceContainer}>
+              <InvoiceLoader customerId={customer._id} />
+            </div>
+          ) : activeTab === "notes" ? (
+            <p className={styles.noData}>No notes added yet.</p>
+          ) : (
+            <p className={styles.noData}>No Transaction available.</p>
+          )}
       </div>
 
       {EditAddressMemoize}
