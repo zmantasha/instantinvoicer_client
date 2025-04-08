@@ -239,8 +239,9 @@ export default function InvoiceLoader({customerId}:{customerId?:any}) {
           params: { page: currentPage, limit },
         }
       );
-      setInvoiceItem(response.data || []);
-      setTotalItems(response.data.length || 0);
+      console.log(response.data.data.length)
+      setInvoiceItem(response.data.data || []);
+      setTotalItems(response.data.total || 0);
     }
      
     } catch (error) {
@@ -248,7 +249,7 @@ export default function InvoiceLoader({customerId}:{customerId?:any}) {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.user?._id, setInvoiceItem,customerId]);
+  }, [user?.user?._id, setInvoiceItem,customerId,currentPage, limit]);
 
   useEffect(() => {
     fetchInvoice();
