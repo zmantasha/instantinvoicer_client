@@ -444,74 +444,68 @@ const AddCustomerMemoize=useMemo(()=>{
         onChange={(e) => {
           handleSearchChange(e); // For searching customers
           handleBillToNameChange(e);
-          // handleBillToManualInput(e) // For updating billTo.
         }}
         placeholder="Search customer..."
         onFocus={() => !!formik.values.recipientDetails.billTo.id? setShowDropdown(false):setShowDropdown(true)}
-       readOnly={!!formik.values.recipientDetails.billTo.id}
+        readOnly={!!formik.values.recipientDetails.billTo.id}
       />
-        <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
-      {/* {loading && (
-        <div className="absolute top-10 left-0 right-0 bg-white p-2 text-sm">
-          Searching...
+      {formik.values.recipientDetails.billTo.id && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-1/3 -translate-y-1/2 h-6 w-6"
+          onClick={() => {
+            onUpdateRecipient({
+              ...recipientDetails,
+              billTo: { id: "", name: "", address: "" },
+              shipTo: { name: "", address: "" }
+            });
+            setSearch("");
+            setShowDropdown(false);
+          }}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+      <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
+      {showDropdown && (
+        <div className="absolute top-12 left-0 right-0 border rounded-lg shadow-md p-4 w-100 bg-white z-50">
+          {loading && <div className="text-sm text-gray-500">Searching...</div>}
+
+          {customers.length > 0 ? (
+            <ul className="space-y-2">
+              {customers.map((customer: any) => (
+                <li
+                  key={customer._id}
+                  className="p-2 border rounded-md hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleSelectCustomer(customer)}
+                >
+                  <div className="font-medium">{customer.displayName}</div>
+                  <div className="text-gray-500 text-xs">{customer.email}</div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-gray-500 text-center py-4">No customer found</div>
+          )}
+
+          <button
+            className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+            onClick={() => {
+              setModalOpen(true);
+              setShowDropdown(false);
+            }}
+          >
+            Add Customer
+          </button>
         </div>
       )}
-      {showDropdown && customers.length > 0 && (
-        <ul className="absolute top-10 left-0 right-0 bg-white border rounded-md shadow-lg z-50">
-          {customers.map((customer: any) => (
-            <li
-              key={customer._id}
-              className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
-              onClick={() => handleSelectCustomer(customer)}
-            >
-              <div className="font-medium">{customer.displayName}</div>
-              <div className="text-gray-500 text-xs">
-                {customer.address1}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )} */}
-{showDropdown && (
-  <div className="absolute top-12 left-0 right-0 border rounded-lg shadow-md p-4 w-100 bg-white z-50">
-    {loading && <div className="text-sm text-gray-500">Searching...</div>}
-
-    {customers.length > 0 ? (
-      <ul className="space-y-2">
-        {customers.map((customer: any) => (
-          <li
-            key={customer._id}
-            className="p-2 border rounded-md hover:bg-gray-100 cursor-pointer"
-            onClick={() => handleSelectCustomer(customer)}
-          >
-            <div className="font-medium">{customer.displayName}</div>
-            <div className="text-gray-500 text-xs">{customer.email}</div>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <div className="text-gray-500 text-center py-4">No customer found</div>
-    )}
-
-    <button
-      className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-      onClick={() => {
-        setModalOpen(true);
-        setShowDropdown(false); // Close dropdown when opening modal
-      }}
-    >
-      Add Customer
-    </button>
-  </div>
-)}
-
     </div>
     <FormError
       message={formErrors.recipientDetails?.billTo?.name}
       className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
     />
-     {AddCustomerMemoize}
-    {/* <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen} handleSelectCustomer={handleSelectCustomer}/> */}
+    {AddCustomerMemoize}
   </div>
   
   <Textarea
