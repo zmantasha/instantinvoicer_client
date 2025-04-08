@@ -113,8 +113,8 @@ export default function ViewPage() {
  
 
   const handleEditInvoice=()=>{
-    
-     router.push(`/user/editInvoice/${id}`)
+    router.push(`/user/invoicetamplate/${id}/editInvoice`);
+    //  router.push(`/user/editInvoice/${id}`)
   }
 
  const handleStatusChange = async (id: string, currentStatus: string) => {

@@ -14,10 +14,14 @@ import axios from "axios";
 import { InvoiceData } from "../../types/invoice";
 import Spinner from "../Spinner";
 
-export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) {
+export default function InvoiceGenerator({ invoiceId,customerId,invoiceAction,invoiceActionCustomer }: { invoiceId?: string,customerId?: string,invoiceAction?:string,invoiceActionCustomer?:string }) {
   const [isLoading, setIsLoading] = useState(!!invoiceId);
   const [initialData, setInitialData] = useState<InvoiceData | undefined>(undefined);
-
+  const [clientReady, setClientReady] = useState(false);
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
+  // console.log("h",invoiceId)
   useEffect(() => {
     const fetchInvoiceData = async () => {
       if (invoiceId) {
@@ -30,7 +34,7 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
         } catch (error) {
           console.error("Failed to fetch invoice:", error);
         } finally {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
     };
@@ -57,7 +61,7 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
   } = useInvoice(initialData);
 
    if (isLoading) {
-    return <Spinner loading={true} color="teal" />;
+    return <Spinner loading={true} color="gray" />;
   }
 
   return (
@@ -91,15 +95,24 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
             </Select>
           </div>
           
-          <Button 
-          type="button" 
-          variant="outline" 
-          className="text-[#003366] w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
-          onClick={() => saveInvoice()}
-          disabled={formik.isSubmitting} // Disable when submitting
-        >
-        {formik.isSubmitting ? "Saving..." : invoiceId ? "Update Invoice" : "Save Invoice"}
-      </Button>
+       
+                    <Button 
+            type="button" 
+            variant="outline" 
+            className="text-[#003366] w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={() => saveInvoice()}
+            disabled={formik.isSubmitting} // Disable when submitting
+          >
+           {formik.isSubmitting 
+              ? "Saving..." 
+              : clientReady 
+                ? invoiceId 
+                  ? "Update Invoice" 
+                  : customerId 
+                    ? "Save Invoice" 
+                    : "Save Invoice"
+                : "Loading..."}
+          </Button>
         </div>
       </div>
 
@@ -115,6 +128,8 @@ export default function InvoiceGenerator({ invoiceId }: { invoiceId?: string }) 
           onUpdateRecipient={updateRecipientDetails}
           onUpdateInvoice={updateInvoiceDetails}
           formErrors={formErrors}
+          customerId={customerId}
+          invoiceAction={invoiceActionCustomer}
           formTouched={formTouched}
           formik={formik}
         />

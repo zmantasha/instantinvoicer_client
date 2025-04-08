@@ -28,5 +28,5 @@ export default function GoogleCallbackPage() {
     }
   }, [searchParams, router]);
 
-  return <Spinner loading={true} color="teal" />;
+  return <Spinner loading={true} color="gray" />;
 }

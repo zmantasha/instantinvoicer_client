@@ -8,6 +8,7 @@ export interface InvoiceItem {
 }
 export interface InvoiceData {
   _id: string,
+  customerId:string,
   userId:string,
   senderDetails: {
     logo: string;
@@ -17,6 +18,7 @@ export interface InvoiceData {
   };
   recipientDetails: {
     billTo: {
+      id: string;
       name: string;
       address: string;
       // email: string;

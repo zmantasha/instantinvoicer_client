@@ -139,6 +139,17 @@ const NavBar: FC = () => {
                     My Invoices
                   </Link>
                 </li>
+                <li className={styles.menuItem}>
+                  <Link
+                    href="/user/customer"
+                    className={`${styles.link} ${
+                      pathname === "/user/customer" ? styles.active : ""
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    Customer
+                  </Link>
+                </li>
                 {/* <li className={styles.menuItem}>
                   <Link
                     href="/user/setting"

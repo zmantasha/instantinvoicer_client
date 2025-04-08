@@ -5,10 +5,13 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Textarea } from "../../components/ui/textarea";
 import { FormError } from "../../components/ui/form-error";
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useUser } from "@/hooks/UserContext";
+import AddCustomerModal from "../customer/AddCustomerModal";
+import { useParams } from "next/navigation";
 
 interface InvoiceHeaderProps {
   senderDetails: {
@@ -18,6 +21,7 @@ interface InvoiceHeaderProps {
   };
   recipientDetails: {
     billTo: {
+      id:string;
       name: string;
       address: string;
     };
@@ -33,6 +37,8 @@ interface InvoiceHeaderProps {
     paymentTerms: string;
     poNumber: string;
   };
+  customerId?:string;
+  invoiceAction?:string;
   onUpdateSender: (details: any) => void;
   onUpdateRecipient: (details: any) => void;
   onUpdateInvoice: (details: any) => void;
@@ -45,6 +51,8 @@ const InvoiceHeader = memo(({
   senderDetails,
   recipientDetails,
   invoiceDetails,
+  customerId,
+  invoiceAction,
   onUpdateSender,
   onUpdateRecipient,
   onUpdateInvoice,
@@ -60,6 +68,16 @@ const InvoiceHeader = memo(({
   const [senderNameCharactersLeft, setNameSenderCharactersLeft] = useState(nameLength);
   const [billToCharactersLeft, setBillToCharactersLeft] = useState(nameLength);
   const [shipToCharactersLeft, setShipToCharactersLeft] = useState(nameLength);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); 
+  const { user } = useUser();
+  // const params= useParams()
+  // console.log(params.id)
+
+
 
   useEffect(() => {
     const address = formik.values.senderDetails.address || "";
@@ -85,6 +103,8 @@ const InvoiceHeader = memo(({
     const name = formik.values.recipientDetails.billTo.name || "";
     setBillToCharactersLeft(nameLength - name.length);
   }, [formik.values.recipientDetails.billTo.name]);
+
+  
 
   useEffect(() => {
     const name = formik.values.recipientDetails.shipTo.name || "";
@@ -134,6 +154,17 @@ const InvoiceHeader = memo(({
     });
   };
 
+  // const getAllSearch = async () => {
+  //   try {
+  //     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/search?displayName=${search}&&firstName=${search}`);
+  //     console.log(response)
+      
+  //     // setUser(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -176,6 +207,155 @@ const InvoiceHeader = memo(({
   const removeLogo = () => {
     onUpdateSender({ ...senderDetails, logo: "" });
   };
+
+  // const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const query = e.target.value;
+  //   setSearch(query);
+  
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/search?displayName=${query}&firstName=${query}`
+  //     );
+      // if(response.data){
+      //   setCustomers(response.data);
+      // }
+      
+      // if (Array.isArray(response.data) && response.data.length > 0) {
+      //   if (response.data[0].createdBy === user?.user?._id) {
+      //     setCustomers(response.data);
+      //   } else {
+      //     setCustomers([]);
+      //     setShowDropdown(true);
+      //   }
+      //  else {
+      //   setCustomers([]);
+      //   setShowDropdown(false);
+      // }
+  //   } catch (error) {
+  //     console.error("Error fetching customers:", error);
+  //     setCustomers([]);
+  //     setShowDropdown(false);
+  //   }
+  //   setLoading(false);
+    
+  // };
+  // const handleSelectCustomer = (customer: any) => {
+  //   onUpdateRecipient({
+  //     ...recipientDetails,
+  //     billTo: { name: customer.displayName, address: customer.address },
+  //     shipTo: { name: customer.displayName, address: customer.address }, // Optional
+  //   });
+  //   setSearch(customer.displayName);
+  //   setShowDropdown(false);
+  // };
+  // console.log(customers)
+  // Uncomment and modify the customer search handler
+ 
+  useEffect(() => {
+    if (customerId ){
+      setLoading(true);
+      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${customerId}`)
+        .then((response) => {
+          const customer = response.data;
+          if (customer) {
+            onUpdateRecipient({
+              ...recipientDetails,
+              billTo: {
+                id: customer._id,
+                name: customer.displayName || recipientDetails.billTo.name,
+                address: [customer.billingAddress.street1, customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
+              },
+              shipTo: {
+                name: customer.displayName || recipientDetails.shipTo.name,
+                address: [customer.shippingAddress.street1, customer.shippingAddress.city, customer.shippingAddress.country].filter(Boolean).join('\n')
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching customer data:', error);
+          toast.error('Failed to fetch customer data');
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [customerId]);
+  
+
+const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const query = e.target.value;
+  setSearch(query);
+  
+  if (query.length < 2) {
+    setCustomers([]);
+    setShowDropdown(false);
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/search?displayName=${query}&firstName=${query}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        }
+      }
+    );
+    setCustomers(response.data);
+    // setShowDropdown(response.data.length > 0);
+    setShowDropdown(true);
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    setCustomers([]);
+    setShowDropdown(true);
+  }
+  setLoading(false);
+};
+
+// Uncomment customer selection handler
+const handleSelectCustomer = (customer: any) => {
+  onUpdateRecipient({
+    ...recipientDetails,
+    billTo: { 
+      id: customer._id,
+      name: customer.displayName || recipientDetails.billTo.name, 
+      address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
+    },
+    shipTo: {
+      name: customer.displayName || recipientDetails.shipTo.name,
+      address: [customer.shippingAddress.street1, customer.shippingAddress.city, customer.shippingAddress.country].filter(Boolean).join('\n')
+    }
+    
+    // shipTo: { 
+    //   name: customer.displayName || recipientDetails.billTo.name, 
+    //   address: [customer.billingAddress.street1 , customer.billingAddress.city, customer.billingAddress.country].filter(Boolean).join('\n')
+    // },
+  });
+  setSearch(customer.displayName);
+  setShowDropdown(false);
+};
+
+const AddCustomerMemoize=useMemo(()=>{
+  return <AddCustomerModal modalOpen={modalOpen} setModalOpen={setModalOpen} handleSelectCustomer={handleSelectCustomer}/>
+},[modalOpen])
+
+// const handleBillToManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   const value = e.target.value;
+//   // Only clear ID if it's a new manual input
+//   const shouldClearId =recipientDetails.billTo.id !== "" && recipientDetails.billTo.name !== value;
+
+//   console.log(recipientDetails.billTo.id)
+//   onUpdateRecipient({
+//     ...recipientDetails,
+//     billTo: { 
+//       ...recipientDetails.billTo,
+//       name: value,
+//       id: shouldClearId ? "" : recipientDetails.billTo.id, // Clear ID when manually editing
+//     },
+//   });
+// };
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -254,35 +434,94 @@ const InvoiceHeader = memo(({
 
       {/* Middle Column - Bill To & Ship To */}
       <div className="space-y-6">
-        <div className="space-y-4">
-          <div>
-            <Label>Bill To</Label>
-            <Input
-              maxLength={nameLength}
-              value={formik.values.recipientDetails.billTo.name}
-              onChange={handleBillToNameChange}
-              placeholder="Who is this to?"
-            />
-            <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
-            <FormError 
-              message={formErrors.recipientDetails?.billTo?.name}
-              className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
-            />
-            <Textarea
-              maxLength={addressLength}
-              value={formik.values.recipientDetails.billTo.address}
-              onChange={handleBillToAddressChange}
-              placeholder="Billing address"
-              className="mt-2"
-              rows={3}
-            />
-            <p className="text-xs mt-1 text-gray-500">{billAddressCharactersLeft}</p>
-            <FormError 
-              message={formErrors.recipientDetails?.billTo?.address}
-              className={formTouched.recipientDetails?.billTo?.address ? "block" : "hidden"}
-            />
-          </div>
+      <div className="space-y-4">
+       <div>
+    <Label>Bill To</Label>
+    <div className="relative">
+      <Input
+        maxLength={nameLength}
+        value={search||formik.values.recipientDetails.billTo.name}
+        onChange={(e) => {
+          handleSearchChange(e); // For searching customers
+          handleBillToNameChange(e);
+        }}
+        placeholder="Search customer..."
+        onFocus={() => !!formik.values.recipientDetails.billTo.id? setShowDropdown(false):setShowDropdown(true)}
+        readOnly={!!formik.values.recipientDetails.billTo.id}
+      />
+      {formik.values.recipientDetails.billTo.id && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-1/3 -translate-y-1/2 h-6 w-6"
+          onClick={() => {
+            onUpdateRecipient({
+              ...recipientDetails,
+              billTo: { id: "", name: "", address: "" },
+              shipTo: { name: "", address: "" }
+            });
+            setSearch("");
+            setShowDropdown(false);
+          }}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+      <p className="text-xs mt-1 text-gray-500">{billToCharactersLeft}</p>
+      {showDropdown && (
+        <div className="absolute top-12 left-0 right-0 border rounded-lg shadow-md p-4 w-100 bg-white z-50">
+          {loading && <div className="text-sm text-gray-500">Searching...</div>}
+
+          {customers.length > 0 ? (
+            <ul className="space-y-2">
+              {customers.map((customer: any) => (
+                <li
+                  key={customer._id}
+                  className="p-2 border rounded-md hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleSelectCustomer(customer)}
+                >
+                  <div className="font-medium">{customer.displayName}</div>
+                  <div className="text-gray-500 text-xs">{customer.email}</div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-gray-500 text-center py-4">No customer found</div>
+          )}
+
+          <button
+            className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+            onClick={() => {
+              setModalOpen(true);
+              setShowDropdown(false);
+            }}
+          >
+            Add Customer
+          </button>
         </div>
+      )}
+    </div>
+    <FormError
+      message={formErrors.recipientDetails?.billTo?.name}
+      className={formTouched.recipientDetails?.billTo?.name ? "block" : "hidden"}
+    />
+    {AddCustomerMemoize}
+  </div>
+  
+  <Textarea
+    maxLength={addressLength}
+    value={formik.values.recipientDetails.billTo.address}
+    onChange={handleBillToAddressChange}
+    placeholder="Billing address"
+    rows={3}
+    className="mt-2"
+  />
+  <p className="text-xs mt-1 text-gray-500">{billAddressCharactersLeft}</p>
+  <FormError
+    message={formErrors.recipientDetails?.billTo?.address}
+    className={formTouched.recipientDetails?.billTo?.address ? "block" : "hidden"}
+  />
+</div>
 
         <div className="space-y-4">
           <div>

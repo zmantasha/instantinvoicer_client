@@ -7,6 +7,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { formatCurrency } from "../../lib/utils/format-currency";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import Spinner from "../Spinner";
 
 interface InvoiceItem {
   _id: string;
@@ -47,6 +48,7 @@ export default function InvoiceTable({
   const headers = ["Customer", "Reference", "Date", "Due Date", "Status", "Total", "Action"];
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,7 +68,9 @@ export default function InvoiceTable({
   };
 
   const handleEditInvoice = (id: string) => {
-    router.push(`/user/editInvoice/${id}`);
+    setIsLoading(true)
+    router.push(`/user/invoicetamplate/${id}/editInvoice`);
+    setIsLoading(false)
   };
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -114,6 +118,9 @@ export default function InvoiceTable({
       console.error("Error updating status:", error);
     }
   };
+  if (isLoading) {
+    return <Spinner loading={isLoading} color="gray" />;
+  }
 
   return (
     <div className={styles.tableContainer}>

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 
 const initialInvoiceData: Omit<InvoiceData, '_id'> = {
   userId: "",
+  customerId:"",
   senderDetails: {
     logo: "",
     name: "",
@@ -25,6 +26,7 @@ const initialInvoiceData: Omit<InvoiceData, '_id'> = {
   },
   recipientDetails: {
     billTo: {
+      id: "",
       name: "",
       address: "",
     },
@@ -143,6 +145,7 @@ export function useInvoice(initialData?: InvoiceData) {
       ...initialData,
       invoiceDetails: {
         ...initialData.invoiceDetails,
+        // customerId:initialData.recipientDetails.billTo.id,
         number: initialData.invoiceDetails.number,
         date: new Date(initialData.invoiceDetails.date).toISOString().split('T')[0],
         dueDate: initialData.invoiceDetails.dueDate
@@ -226,7 +229,7 @@ export function useInvoice(initialData?: InvoiceData) {
         if (Object.keys(errors).length > 0) {
           formik.setTouched({
             senderDetails: { name: true, address: true },
-            recipientDetails: { billTo: { name: true, address: true } },
+            recipientDetails: { billTo: {id:true, name: true, address: true } },
             invoiceDetails: { number: true, date: true, dueDate: true },
             items: formik.values.items.map(() => ({ data: {}, quantity: true, rate: true })),
           }, true);
@@ -277,8 +280,10 @@ export function useInvoice(initialData?: InvoiceData) {
         let finalValues = {
           ...values,
           userId: user?.user?._id,
+          customerId: values.recipientDetails.billTo.id, 
           totals: calculatedTotals,
         };
+       
 
         if (isEditing) {
           finalValues = {
@@ -324,6 +329,49 @@ export function useInvoice(initialData?: InvoiceData) {
     },
   });
 
+  // useEffect(() => {
+  //   if (user?.user._id && !initialData) {
+  //     generateInvoiceNumber();
+  //   }
+  // }, [user, initialData]);
+ 
+  
+
+  // const generateInvoiceNumber = useCallback(async () => {
+  //   if (!user?.user._id) return;
+
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
+  //     );
+  //     const invoices = response.data;
+      
+  //     let newInvoiceNumber = "INV-0001";
+      
+
+  //     if (invoices?.length > 0) {
+  //       const latestInvoice = invoices[invoices.length - 1];
+  //       if (latestInvoice.invoiceDetails?.number) {
+  //         const lastNumber = parseInt(
+  //           latestInvoice.invoiceDetails.number.replace("INV-", ""),
+  //           10
+  //         );
+  //         newInvoiceNumber = `INV-${String(lastNumber + 1).padStart(4, "0")}`;
+          
+  //       }
+  //     }
+  //     const invoicenumber= invoices.filter((item:any) => item.invoiceDetails.number == newInvoiceNumber)
+  //         console.log(invoicenumber);
+
+  //     formik.setFieldValue("invoiceDetails.number", newInvoiceNumber||invoices.invoiceDetails.number);
+  //     formik.setFieldValue("senderDetails.name", user.user.firstName || invoices.senderDetails.firstName);
+  //     formik.setFieldValue("senderDetails.address", user.user.address || invoices.senderDetails.address);
+  //     formik.setFieldValue("senderDetails.logo", user.user.logo || invoices.senderDetails.logo);
+  //   } catch (error) {
+  //     console.error("Error fetching invoices:", error);
+  //   }
+  // }, [user?.user._id, formik.setFieldValue]);
+
   const generateInvoiceNumber = useCallback(async () => {
     if (!user?.user._id) return;
   
@@ -362,7 +410,7 @@ export function useInvoice(initialData?: InvoiceData) {
         
         formik.setFieldValue(
           "senderDetails.logo",
-          user?.user?.logo || invoices?.senderDetails?.logo || ""
+          user?.user?.logo || invoices?.senderDetails?.logo || "/default-logo.png"
         );
         
       }
@@ -512,13 +560,13 @@ export function useInvoice(initialData?: InvoiceData) {
 
 
 
-      const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
-        const subtotal = calculateSubtotal(formik.values.items);
-        const tax = calculateTax(subtotal, totals.taxRate,totals.taxType);
-    const discount = calculateDiscount(subtotal, totals.discountType);
-    const shipping = calculateShipping(subtotal, totals.shipping, totals.shippingType);
-    const total = calculateTotal(subtotal, tax, discount, shipping);
-    const balanceDue = total - totals.amountPaid;
+const updateTotals = useCallback((totals: typeof initialInvoiceData.totals) => {
+  const subtotal = calculateSubtotal(formik.values.items);
+  const tax = calculateTax(subtotal, totals.taxRate,totals.taxType);
+  const discount = calculateDiscount(subtotal, totals.discountType);
+  const shipping = calculateShipping(subtotal, totals.shipping, totals.shippingType);
+  const total = calculateTotal(subtotal, tax, discount, shipping);
+  const balanceDue = total - totals.amountPaid;
 
     formik.setFieldValue("totals", {
       ...totals,
@@ -546,7 +594,7 @@ export function useInvoice(initialData?: InvoiceData) {
     formik.setTouched(
       {
         senderDetails: { name: true, address: true },
-        recipientDetails: { billTo: { name: true, address: true } },
+        recipientDetails: { billTo: {id:true, name: true, address: true } },
         invoiceDetails: { number: true, date: true, dueDate: true },
         items: formik.values.items.map((item) => ({
           data: Object.keys(item.data).reduce(

@@ -1,0 +1,87 @@
+.myCustomerPage{
+    background-color: #ffffff;   
+}
+.myCustomerContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 20vh;
+    padding: 20px;  
+}
+.customerCard{
+    border-radius: 12px; 
+    width: 100%;
+    max-width: 1334px;
+    box-sizing: border-box;
+}
+.customerHeader{
+    display:flex;
+    justify-content: space-between;
+    padding: 30px;  
+}
+.customerTitle{
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--primary-bg-color); 
+}
+.customerContainer{
+  padding: 20px 0px;  
+}
+.tableContainer {
+    margin-top: 20px;
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 20px;
+     
+  }
+.customerTable{
+width: 100%;
+border-collapse: collapse;
+table-layout: auto;
+}
+.customerTable th,
+.customerTable td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.customerTable th {
+  background-color: #f2f2f2;
+  color: #545353;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.customerTable tbody tr{
+  font-size: 14px;
+  text-transform: capitalize;
+}
+.customerTable tbody tr td:nth-child(1) {
+  font-size: 14px;
+  color:var(--primary-bg-color);
+  cursor: pointer;
+}
+.customerTable tbody tr td:nth-child(1):hover {
+  text-decoration: underline;
+}
+.customerTable tbody tr td:nth-child(3) {
+  font-size: 14px;
+  text-transform: lowercase;
+}
+
+.customerTable tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.customerTable tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.customerTable td {
+  white-space: normal;
+}
+.invoiceContainer {
+  padding: 20px 0px;
+
+}

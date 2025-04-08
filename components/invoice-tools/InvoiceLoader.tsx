@@ -208,9 +208,10 @@ import { useUser } from "@/hooks/UserContext";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import styles from "../../app/user/myinvoice/myinvoice.module.css";
+import Cookies from "js-cookie";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-export default function InvoiceLoader() {
+export default function InvoiceLoader({customerId}:{customerId?:any}) {
   const { user } = useUser();
   const router = useRouter();
   const [invoiceItem, setInvoiceItem] = useState<any[]>([]);
@@ -226,21 +227,38 @@ export default function InvoiceLoader() {
 
     try {
       setIsLoading(true);
+      if(customerId){
+        const response =await axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/${customerId}`)
+        setInvoiceItem(response.data.invoices||[]); // Extract invoices from the response
+        setTotalItems(response.data.invoices.length||0);
+      }
+      else{
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`,
         {
           params: { page: currentPage, limit },
         }
       );
+<<<<<<< HEAD
 
       setInvoiceItem(response.data.data || []);
       setTotalItems(response.data.total || 0);
+=======
+      setInvoiceItem(response.data || []);
+      setTotalItems(response.data.length || 0);
+    }
+     
+>>>>>>> feature/customer
     } catch (error) {
       console.error("Failed to fetch invoices:", error);
     } finally {
       setIsLoading(false);
     }
+<<<<<<< HEAD
   }, [user?.user?._id, currentPage, limit]);
+=======
+  }, [user?.user?._id, setInvoiceItem,customerId]);
+>>>>>>> feature/customer
 
   useEffect(() => {
     fetchInvoice();
@@ -252,8 +270,15 @@ export default function InvoiceLoader() {
 
   const handleDelete = async (id: string) => {
     try {
+      const accessToken = Cookies.get("accessToken");
+        const headers = {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        };
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/${id}`,headers
       );
       fetchInvoice();
     } catch (error) {
@@ -300,7 +325,7 @@ export default function InvoiceLoader() {
   };
 
   if (isLoading) {
-    return <Spinner loading={isLoading} color="teal" />;
+    return <Spinner loading={isLoading} color="gray" />;
   }
 
   return (
