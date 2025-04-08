@@ -328,6 +328,7 @@ export function useInvoice(initialData?: InvoiceData) {
       }
     },
   });
+  
 
   // useEffect(() => {
   //   if (user?.user._id && !initialData) {
@@ -410,7 +411,7 @@ export function useInvoice(initialData?: InvoiceData) {
         
         formik.setFieldValue(
           "senderDetails.logo",
-          user?.user?.logo || invoices?.senderDetails?.logo || "/default-logo.png"
+          user?.user?.logo || invoices?.senderDetails?.logo || "/default.avif"
         );
         
       }
