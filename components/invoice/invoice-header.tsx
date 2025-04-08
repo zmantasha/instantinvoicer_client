@@ -286,11 +286,11 @@ const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const query = e.target.value;
   setSearch(query);
   
-  if (query.length < 2) {
-    setCustomers([]);
-    setShowDropdown(false);
-    return;
-  }
+  // if (query.length < 1) {
+  //   setCustomers([]);
+  //   setShowDropdown(false);
+  //   return;
+  // }
 
   setLoading(true);
   try {
