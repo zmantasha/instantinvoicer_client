@@ -239,26 +239,16 @@ export default function InvoiceLoader({customerId}:{customerId?:any}) {
           params: { page: currentPage, limit },
         }
       );
-<<<<<<< HEAD
-
-      setInvoiceItem(response.data.data || []);
-      setTotalItems(response.data.total || 0);
-=======
       setInvoiceItem(response.data || []);
       setTotalItems(response.data.length || 0);
     }
      
->>>>>>> feature/customer
     } catch (error) {
       console.error("Failed to fetch invoices:", error);
     } finally {
       setIsLoading(false);
     }
-<<<<<<< HEAD
-  }, [user?.user?._id, currentPage, limit]);
-=======
   }, [user?.user?._id, setInvoiceItem,customerId]);
->>>>>>> feature/customer
 
   useEffect(() => {
     fetchInvoice();
