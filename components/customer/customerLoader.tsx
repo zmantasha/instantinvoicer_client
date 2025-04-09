@@ -13,11 +13,11 @@ export default function CustomerLoader(){
 
       const fetchCustomer=useCallback(async()=>{
 
-        if (!user?.user?._id) return;
+        if (!user?._id) return;
         try {
           setIsLoading(true)
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/userId/${user.user._id}`
+            `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/userId/${user?._id}`
           );
           setCustomers(response.data || []);
           
@@ -26,7 +26,7 @@ export default function CustomerLoader(){
         }finally{
           setIsLoading(false)
         }
-      },[user?.user?._id, setCustomers])
+      },[user?._id, setCustomers])
 
       useEffect(() => {
         fetchCustomer();

@@ -29,18 +29,18 @@ export default function CustomerList() {
 
   // Fetch customer list ONLY on first load
   const fetchCustomers = useCallback(async () => {
-    if (!user?.user?._id) return;
+    if (!user?._id) return;
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/userId/${user.user._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/customer/userId/${user?._id}`
       );
       setIsLoading(false);
       setCustomers(response.data || []);
     } catch (error) {
       console.error("Failed to fetch customers:", error);
     }
-  }, [user?.user?._id, setCustomers]);
+  }, [user?._id, setCustomers]);
 
   // Fetch customer list ONLY when the page loads
   useEffect(() => {
