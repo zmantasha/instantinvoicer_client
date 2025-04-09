@@ -243,30 +243,58 @@ interface InvoiceItem {
       <tr className="bg-gray-200">
         <th className="border border-gray-300 px-4 py-2 text-left">Sr.No</th>
         {/* Dynamically generate headers based on keys in the first item's data object */}
-        {invoiceItem.items.length > 0 &&
+        {/* {invoiceItem.items.length > 0 &&
           Object.keys(invoiceItem.items[0].data).map((key) => (
             <th key={key} className="border border-gray-300 px-4 py-2 text-left capitalize">
               {key}
             </th>
-          ))}
+          ))} */}
+                {invoiceItem.items.length > 0 &&
+                    typeof invoiceItem.items[0].data === "object" &&
+                    invoiceItem.items[0].data !== null ? (
+                      Object.keys(invoiceItem.items[0].data).map((key) => (
+                        <th key={key} className="border border-gray-300 px-4 py-2 text-left capitalize">
+                          {key}
+                        </th>
+                      ))
+                    ) : (
+                      <th className="border border-gray-300 px-4 py-2 text-left">Description</th>
+                    )}
                   <th className="border border-gray-300 px-4 py-2 text-right">Quantity</th>
                   <th className="border border-gray-300 px-4 py-2 text-right">Rate</th>
                   <th className="border border-gray-300 px-4 py-2 text-right">Amount</th>
                 </tr>
               </thead>
               <tbody>
-                {invoiceItem.items.map((item, index) => (
+                {/* {invoiceItem.items.map((item, index) => (
                   <tr
                     key={item.id}
                     className="odd:bg-white even:bg-gray-50"
                   >
-                    <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
+                    <td className="border border-gray-300 px-4 py-2">{index + 1}</td> */}
               {/* Dynamically render data based on keys */}
-              {Object.keys(item.data).map((key:any) => (
+              {/* {Object.keys(item.data).map((key:any) => (
                         <td key={key} className="border border-gray-300 px-4 py-2">
                           {item.data[key]}
                         </td>
-                      ))}
+                      ))} */}
+                      {invoiceItem.items.map((item, index) => (
+                        <tr key={item.id} className="border-t border-gray-300">
+                          <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
+
+                          {/* Render Description */}
+                          {typeof item.data === "object" && item.data !== null ? (
+                            Object.keys(item.data).map((key:any) => (
+                              <td key={key} className="border border-gray-300 px-4 py-2">
+                                {item.data[key]}
+                              </td>
+                            ))
+                          ) : (
+                            <td className="border border-gray-300 px-4 py-2">
+                              {/* fallback for old format */}
+                              {(item as any).description || item.data || "-"}
+                            </td>
+                          )}
                     <td className="border border-gray-300 px-4 py-2 text-right">{item.quantity}</td>
                     <td className="border border-gray-300 px-4 py-2 text-right">
                       {formatCurrency(item.rate, invoiceItem.invoiceDetails.currency)}
