@@ -421,7 +421,7 @@ export default function Home() {
                   src="/invoice-preview.png"
                   alt="Invoice Preview"
                   fill
-                  className="object-cover"
+                  className="object-fit"
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0c69cc]/20 to-transparent" />

@@ -114,13 +114,22 @@ const NavBar: FC = () => {
     <nav className={styles.nav}>
       <div className={styles.navContent}>
         <div className={styles.leftContainer}>
-        <h3
+        {/* <h3
           className={styles.logo}
           onClick={() => handleNavigation(isLoggedin ? "/" : "/")}
         >
           instantinvoicer.com
-        </h3>
-
+        </h3> */}
+        <div className={styles.logo}>
+        <Image
+              src="/invoice-logo.png"
+              alt="Invoice Logo"
+              width={160}  
+              height={160}
+              className="object-contain"
+              onClick={() => handleNavigation(isLoggedin ? "/" : "/")}
+            />
+          </div>
           <div
             className={`${styles.menuContainer} ${
               showMobileMenu ? styles.showMobileMenu : ""
