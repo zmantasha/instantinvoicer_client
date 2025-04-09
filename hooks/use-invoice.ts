@@ -362,7 +362,7 @@ export function useInvoice(initialData?: InvoiceData) {
         
         formik.setFieldValue(
           "senderDetails.logo",
-          user?.logo || invoices?.senderDetails?.logo || ""
+          user?.logo || invoices?.senderDetails?.logo || "/default.avif"
         );
         
       }
