@@ -7,7 +7,9 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import {toast} from "react-hot-toast"
 import Cookies from 'js-cookie';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Spinner from '@/components/Spinner';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 // Define the shape of form values
 interface FormValues {
