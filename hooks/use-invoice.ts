@@ -279,8 +279,7 @@ export function useInvoice(initialData?: InvoiceData) {
 
         let finalValues = {
           ...values,
-          userId: user?.user?._id,
-          customerId: values.recipientDetails.billTo.id, 
+          userId: user?._id,
           totals: calculatedTotals,
         };
        
@@ -374,11 +373,11 @@ export function useInvoice(initialData?: InvoiceData) {
   // }, [user?.user._id, formik.setFieldValue]);
 
   const generateInvoiceNumber = useCallback(async () => {
-    if (!user?.user._id) return;
+    if (!user?._id) return;
   
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user?._id}`
       );
       console.log(response.data.data)
       const invoices = response.data.data||[];
@@ -401,29 +400,29 @@ export function useInvoice(initialData?: InvoiceData) {
         formik.setFieldValue("invoiceDetails.number", newInvoiceNumber);
         formik.setFieldValue(
           "senderDetails.name",
-          user?.user?.firstName || invoices?.senderDetails?.firstName || ""
+          user?.firstName || invoices?.senderDetails?.firstName || ""
         );
         
         formik.setFieldValue(
           "senderDetails.address",
-          user?.user?.address || invoices?.senderDetails?.address || ""
+          user?.address || invoices?.senderDetails?.address || ""
         );
         
         formik.setFieldValue(
           "senderDetails.logo",
-          user?.user?.logo || invoices?.senderDetails?.logo || "/default.avif"
+          user?.logo || invoices?.senderDetails?.logo || "/default.avif"
         );
         
       }
     } catch (error) {
       console.error("Error fetching invoices:", error);
     }
-  }, [user?.user._id, initialData, formik]);
+  }, [user?._id, initialData, formik]);
   
   
   useEffect(() => {
     const fetchInvoiceData = async () => {
-      if (!user?.user._id) return;
+      if (!user?._id) return;
   
       if (initialData) {
         // If editing, use the existing invoice number
@@ -438,7 +437,7 @@ export function useInvoice(initialData?: InvoiceData) {
     };
   
     fetchInvoiceData();
-  }, [user?.user._id, initialData]); // ✅ Depend on user ID & initialData
+  }, [user?._id, initialData]); // ✅ Depend on user ID & initialData
   
   
   

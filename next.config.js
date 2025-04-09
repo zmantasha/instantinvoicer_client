@@ -16,7 +16,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { unoptimized: true },
+  images: {
+    unoptimized: true,
+    domains: ['example.com'], // Add any other domains you want to allow
+  },
   experimental: {
     // Disable the CSS optimization for now
     optimizeCss: false,

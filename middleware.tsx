@@ -3,17 +3,16 @@ import type { NextRequest } from 'next/server';
 import axios from 'axios';
 
 const authPaths = ['/account/login', '/account/signup'];
-const protectedPaths = ['/user/:path*'];
+const protectedPaths = ['/user', '/admin'];
 
 export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const path = request.nextUrl.pathname;
 
-  // Check if the current path is protected
-  const isProtectedPath = protectedPaths.some(pattern => {
-    const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
-    return regex.test(path);
-  });
+  // Always allow access to auth paths
+  if (authPaths.includes(path)) {
+    return NextResponse.next();
+  }
 
   try {
     if (token) {
@@ -24,18 +23,23 @@ export default async function middleware(request: NextRequest) {
         },
       });
 
-      // If user is authenticated and tries to access auth paths, redirect to dashboard
-      if (authPaths.includes(path)) {
+      const user = response.data.user;
+      const isAdmin = user?.roles?.includes('admin');
+
+      // Protect admin routes
+      if (path.startsWith('/admin') && !isAdmin) {
         return NextResponse.redirect(new URL('/user/myinvoice', request.url));
       }
 
-      // If user is authenticated and accessing protected path, allow access
-      if (isProtectedPath) {
-        return NextResponse.next();
+      // Protect user routes
+      if (path.startsWith('/user') && isAdmin) {
+        return NextResponse.redirect(new URL('/admin', request.url));
       }
+
+      return NextResponse.next();
     } else {
-      // No token available
-      if (isProtectedPath || !authPaths.includes(path)) {
+      // No token available, redirect to login if trying to access protected paths
+      if (protectedPaths.some(protectedPath => path.startsWith(protectedPath))) {
         return NextResponse.redirect(new URL('/account/login', request.url));
       }
     }
@@ -60,5 +64,10 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/user/:path*', '/account/login', '/account/signup'],
+  matcher: [
+    '/user/:path*',
+    '/admin/:path*',
+    '/account/login',
+    '/account/signup',
+  ],
 };

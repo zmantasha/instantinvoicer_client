@@ -223,7 +223,7 @@ export default function InvoiceLoader({customerId}:{customerId?:any}) {
   const totalPages = totalItems > 0 ? Math.ceil(totalItems / limit) : 1;
 
   const fetchInvoice = useCallback(async () => {
-    if (!user?.user?._id) return;
+    if (!user?._id) return;
 
     try {
       setIsLoading(true);
@@ -234,7 +234,7 @@ export default function InvoiceLoader({customerId}:{customerId?:any}) {
       }
       else{
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user.user._id}`,
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/invoice/invoices/userId/${user?._id}`,
         {
           params: { page: currentPage, limit },
         }
@@ -249,7 +249,7 @@ export default function InvoiceLoader({customerId}:{customerId?:any}) {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.user?._id, setInvoiceItem,customerId,currentPage, limit]);
+  }, [user?._id, currentPage, limit]);
 
   useEffect(() => {
     fetchInvoice();

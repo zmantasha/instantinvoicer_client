@@ -2,19 +2,17 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import styles from "./myaccount.module.css";
+import styles from "../../user/myaccount/myaccount.module.css";
 import { useFormik } from "formik";
 import { updateSchema } from "../../../validation/schemas";
 import { useRouter } from "next/navigation";
 import { useUser } from "../../../hooks/UserContext";
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import { Label } from "../../../components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FiUpload, FiTrash2, FiUser, FiHome, FiCamera } from "react-icons/fi";
 import Image from "next/image";
-import Spinner from "@/components/Spinner";
-import { AiOutlineLoading3Quarters } from "react-icons/ai"; 
 
 interface FormValues {
   firstName: string;
@@ -22,18 +20,14 @@ interface FormValues {
   address: string;
 }
 
-export default function MyAccount() {
+export default function AdminAccount() {
   const { user, setUser, fetchUserProfile } = useUser();
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
-  console.log("users",user)
   useEffect(() => {
     fetchUserProfile();
   }, []);
-  
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -45,7 +39,6 @@ export default function MyAccount() {
     validationSchema: updateSchema,
     onSubmit: async (values) => {
       try {
-       
         const accessToken = Cookies.get("accessToken");
         const headers = {
           headers: {
@@ -72,7 +65,7 @@ export default function MyAccount() {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: "avatar" | "logo") => {
     const file = event.target.files?.[0];
     if (!file) return;
-    setIsUploading(true);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -87,14 +80,12 @@ export default function MyAccount() {
         },
         withCredentials: true,
       });
-      //  setIsUploading(false)
+
       toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
       fetchUserProfile();
     } catch (error) {
       console.error(error);
       toast.error(`Failed to update ${type}. Please try again.`);
-    }finally{
-      setIsUploading(false);
     }
   };
 
@@ -120,49 +111,39 @@ export default function MyAccount() {
     setDeletePopupVisible(false);
   };
 
-   if (isLoading) {
-      return <Spinner loading={isLoading} color="gray" />;
-    }
-
   return (
     <div className={styles.container}>
       <div className={styles.profileHeader}>
-        <h1>Account Settings</h1>
-        <p className={styles.profileSubtitle}>Manage your profile and account preferences</p>
+        <h1>Admin Account Settings</h1>
+        <p className={styles.profileSubtitle}>Manage your admin profile and preferences</p>
       </div>
 
       <div className={styles.profileSection}>
         <div className={styles.profileMainSection}>
-        <div className={styles.avatarSection}>
-          <div className={styles.avatarWrapper}>
-            {/* <img 
-              src={user?.user?.avatar || "/default-avatar.png"} 
-              alt="Avatar" 
-              className={styles.avatar}
-            /> */}
-            <Image src={user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
-            <label className={styles.avatarUpload}>
-             {isUploading?   <AiOutlineLoading3Quarters size={20} className="animate-spin text-blue-500" />: <FiCamera size={20} />}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleFileUpload(e, "avatar")}
-                className={styles.hiddenInput}
-                disabled={isUploading}
-              />
-            </label>
-          </div>
-          <div className={styles.avatarInfo}>
-            <h2>{user?.firstName} {user?.lastName}</h2>
-            <p className={styles.userEmail}>{user?.email}</p>
-          </div>
+          <div className={styles.avatarSection}>
+            <div className={styles.avatarWrapper}>
+              <Image src={user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
+              <label className={styles.avatarUpload}>
+                <FiCamera size={20} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, "avatar")}
+                  className={styles.hiddenInput}
+                />
+              </label>
+            </div>
+            <div className={styles.avatarInfo}>
+              <h2>{user?.firstName} {user?.lastName}</h2>
+              <p className={styles.userEmail}>{user?.email}</p>
+            </div>
           </div>
           <div className={styles.logoWrapper}>
-            {user?.logo ?<Image src = {user?.logo  ||"/default.avif"} alt="Avatar" width={150} height={100} className={styles.logo}/> : ""}
+            {user?.logo ? <Image src={user?.logo || "/default.avif"} alt="Logo" width={150} height={100} className={styles.logo}/> : ""}
           </div>
         </div>
 
-        <form onSubmit={formik.handleSubmit} className={styles.formSection}>
+        <form onSubmit={formik.handleSubmit}>
           <div className={styles.formGrid}>
             <div className={styles.inputGroup}>
               <Label><FiUser className={styles.inputIcon} /> First Name</Label>
@@ -216,26 +197,17 @@ export default function MyAccount() {
           <div className={styles.fileUploadSection}>
             <Label>Company Logo</Label>
             <label className={styles.fileUploadLabel}>
-            {isUploading ?(
-            <>
-            <AiOutlineLoading3Quarters size={20} className="animate-spin text-blue-500" />
-            <span>Uploading...</span>
-            </>)
-              :(
-              <>
               <FiUpload className={styles.uploadIcon} />
               <span>Click to upload logo</span>
-              </>)}
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleFileUpload(e, "logo")}
                 className={styles.hiddenInput}
-                disabled={isUploading}
               />
             </label>
           </div>
-       {/* in future fix disable instead of isLoding ,change button color  */}
+
           <div className={styles.buttonGroup}>
             <Button type="submit" variant="default" isLoading={formik.isSubmitting}>
               Save Changes
@@ -250,7 +222,6 @@ export default function MyAccount() {
             <Button 
               variant="destructive" 
               onClick={() => setDeletePopupVisible(true)}
-              
             >
               <FiTrash2 />
               Delete Account

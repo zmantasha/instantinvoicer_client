@@ -1,39 +1,65 @@
-
-
 "use client"
 import Link from 'next/link';
 import styles from './login.module.css';
 import { useFormik } from 'formik';
-import {loginSchema} from "../../../validation/schemas"
+import * as Yup from 'yup';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import {toast} from "react-hot-toast"
+import Cookies from 'js-cookie';
+import { useEffect } from 'react';
 
-import { setCookie } from 'cookies-next';
-import { useState } from 'react';
-import Spinner from '@/components/Spinner';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
 // Define the shape of form values
 interface FormValues {
   email: string;
   password: string;
 }
 
+// Define validation schema
+const loginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters'),
+});
+
 export default function LoginPage() {
   const [isLoading,setIsLoading]=useState(false)
   const [showPassword,setShowPassword]=useState(false)
   const router = useRouter()
     
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = Cookies.get('accessToken');
+    if (token) {
+      // Verify token and redirect if valid
+      axios.get(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(response => {
+        const isAdmin = response.data.user?.roles?.includes('admin');
+        const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
+        router.replace(redirectPath);
+      })
+      .catch(() => {
+        // If token is invalid, clear it
+        Cookies.remove('accessToken');
+      });
+    }
+  }, [router]);
+
   const formik = useFormik<FormValues>({
     initialValues: {
       email: '',
       password: '',
     },
-    validationSchema:loginSchema,
+    validationSchema: loginSchema,
     onSubmit: async(values,{resetForm}) => {
       try {
-        // Handle form submission (e.g., API call)
-        setIsLoading(false)
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/login`,values,{withCredentials:true})
         if(response.data  && response.data.message=== "loginSuccessfull"){
           toast.success(response.data.message, {
@@ -41,21 +67,29 @@ export default function LoginPage() {
           })
           
           
-          // localStorage.setItem("accessToken",response.data.token)
-          setCookie('accessToken', response.data.token);
-          setIsLoading(true)
-          router.replace("/user/invoicetamplate")
+          // Set cookie with proper options
+          Cookies.set('accessToken', response.data.token, {
+            expires: new Date(new Date().getTime() + 60 * 60 * 1000), // 1 hour
+            path: '/',
+            secure: true,
+            sameSite: 'None'
+          });
+
+          // Check if user is admin and redirect accordingly
+          const isAdmin = response.data.user?.roles?.includes('admin');
+          const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
+          router.replace(redirectPath);
         }
       } catch (error) {
-       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || error.message|| 'login failed', {
-          position: "bottom-right",
-        });
-      } else {
-        toast.error('Something went wrong. Please try again.', {
-          position: "bottom-right",
-        });
-      }
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data?.message || error.message|| 'login failed', {
+            position: "bottom-right",
+          });
+        } else {
+          toast.error('Something went wrong. Please try again.', {
+            position: "bottom-right",
+          });
+        }
       }
     },
   });

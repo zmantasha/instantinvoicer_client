@@ -64,7 +64,7 @@ const NavBar: FC = () => {
       if (response.data && response.data.status === "success") {
         Cookies.remove("accessToken");
         toast.success("Successfully logged out.", { position: "bottom-right" });
-        router.replace("/account/login");
+        router.replace("/");
         setUser(null)
         setShowDropdown(null);
         setShowMobileMenu(false);
@@ -116,7 +116,7 @@ const NavBar: FC = () => {
         <div className={styles.leftContainer}>
         <h3
           className={styles.logo}
-          onClick={() => handleNavigation(isLoggedin ? "/user/myinvoice" : "/")}
+          onClick={() => handleNavigation(isLoggedin ? "/" : "/")}
         >
           instantinvoicer.com
         </h3>
@@ -141,13 +141,13 @@ const NavBar: FC = () => {
                 </li>
                 <li className={styles.menuItem}>
                   <Link
-                    href="/user/customer"
+                    href="/blogs"
                     className={`${styles.link} ${
-                      pathname === "/user/customer" ? styles.active : ""
+                      pathname === "/blogs" ? styles.active : ""
                     }`}
                     onClick={() => setShowMobileMenu(false)}
                   >
-                    Customer
+                    Blogs
                   </Link>
                 </li>
                 {/* <li className={styles.menuItem}>
@@ -203,19 +203,19 @@ const NavBar: FC = () => {
               {isLoggedin && (
                 <div className={styles.dropdownContainer}>
                   <div  className={styles.linkProfile} onClick={toggleDropdown}>
-                    {user?.user ? `${user?.user?.firstName} ${user?.user?.lastName}` : <></>}
+                    {user ? `${user?.firstName}  ${user?.lastName?user?.lastName:""}` : <></>}
                     <ChevronDown className="w-4 h-4 ml-2"/>
                   </div>
                   {showDropdown && (
                     <div ref={dropdownRef} className={styles.dropdownMenu}>
                       <div className={styles.dropdownProfile}>
-                        <div className={styles.avatar}>{user?.user?.avatar ?<Image src={user?.user?.avatar } alt="Profile" width={50} height={50} className={styles.profileImage} />:<Image src={"/default.avif" } alt="Profile" width={50} height={50} className={styles.profileImage} />}</div>
+                        <div className={styles.avatar}>{user?.avatar ?<Image src={user?.avatar } alt="Profile" width={50} height={50} className={styles.profileImage} />:<Image src={"/default.avif" } alt="Profile" width={50} height={50} className={styles.profileImage} />}</div>
                         <div>
                           <p className={styles.dropdownProfileName}>
-                            {user && user?.user?.firstName}
+                            {user && user?.firstName}
                           </p>
                           <p className={styles.dropdownProfileEmail}>
-                            {user && user?.user?.email}
+                            {user && user?.email}
                           </p>
                         </div>
                       </div>
