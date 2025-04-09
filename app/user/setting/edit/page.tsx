@@ -17,14 +17,14 @@ export default function Edit(){
   const { user } = useUser();
     const [latestInvoiceNumber, setLatestInvoiceNumber] = useState<string>("INV-0001");
     useEffect(()=>{
-      if (user?.user._id) {
+      if (user?._id) {
         generateInvoiceNumber();
       }
     },[user])
     const generateInvoiceNumber = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8002/api/v1/invoice/invoices/userId/${user?.user._id}`
+          `http://localhost:8002/api/v1/invoice/invoices/userId/${user?._id}`
         );
         const invoices = response.data; // Assuming this is an array
         console.log(invoices);
