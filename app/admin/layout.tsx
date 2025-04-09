@@ -47,7 +47,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       if (response.data && response.data.status === "success") {
         Cookies.remove("accessToken");
         toast.success("Successfully logged out.", { position: "bottom-right" });
-        router.replace("/account/login");
+        router.replace("/");
         setUser(null);
       }
     } catch (error) {
