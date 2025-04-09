@@ -21,8 +21,9 @@ export default function RootLayout({
   const pathname = usePathname(); // Get the current path
   const {id}= useParams()
   // Hide NavBar for all dynamic `share` routes like `/share/:id`
-  const shouldShowNavBar = !pathname.startsWith("/share/");
-  const shouldShowFooter = !pathname.startsWith("/account/");
+  const shouldShowNavBar = !pathname.startsWith("/share/")&& !pathname.startsWith("/admin");
+  // Hide footer for account pages and admin pages
+  const shouldShowFooter = !pathname.startsWith("/account/") && !pathname.startsWith("/admin");
   const customerListSidebar= pathname.includes(`/customer/${id}`) && !pathname.endsWith(`/customer/${id}/edit`);
   return (
     <html lang="en">
