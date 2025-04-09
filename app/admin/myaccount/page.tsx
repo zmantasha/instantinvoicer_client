@@ -2,12 +2,12 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import styles from "./myaccount.module.css";
+import styles from "../../user/myaccount/myaccount.module.css";
 import { useFormik } from "formik";
 import { updateSchema } from "../../../validation/schemas";
 import { useRouter } from "next/navigation";
 import { useUser } from "../../../hooks/UserContext";
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import { Label } from "../../../components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,12 +20,11 @@ interface FormValues {
   address: string;
 }
 
-export default function MyAccount() {
+export default function AdminAccount() {
   const { user, setUser, fetchUserProfile } = useUser();
   const [isDeletePopupVisible, setDeletePopupVisible] = useState(false);
   const router = useRouter();
 
-  console.log("users",user)
   useEffect(() => {
     fetchUserProfile();
   }, []);
@@ -115,41 +114,36 @@ export default function MyAccount() {
   return (
     <div className={styles.container}>
       <div className={styles.profileHeader}>
-        <h1>Account Settings</h1>
-        <p className={styles.profileSubtitle}>Manage your profile and account preferences</p>
+        <h1>Admin Account Settings</h1>
+        <p className={styles.profileSubtitle}>Manage your admin profile and preferences</p>
       </div>
 
       <div className={styles.profileSection}>
         <div className={styles.profileMainSection}>
-        <div className={styles.avatarSection}>
-          <div className={styles.avatarWrapper}>
-            {/* <img 
-              src={user?.user?.avatar || "/default-avatar.png"} 
-              alt="Avatar" 
-              className={styles.avatar}
-            /> */}
-            <Image src={user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
-            <label className={styles.avatarUpload}>
-              <FiCamera size={20} />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleFileUpload(e, "avatar")}
-                className={styles.hiddenInput}
-              />
-            </label>
-          </div>
-          <div className={styles.avatarInfo}>
-            <h2>{user?.firstName} {user?.lastName}</h2>
-            <p className={styles.userEmail}>{user?.email}</p>
-          </div>
+          <div className={styles.avatarSection}>
+            <div className={styles.avatarWrapper}>
+              <Image src={user?.avatar || "/default.avif"} alt="Avatar" width={50} height={50} className={styles.avatar} />
+              <label className={styles.avatarUpload}>
+                <FiCamera size={20} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, "avatar")}
+                  className={styles.hiddenInput}
+                />
+              </label>
+            </div>
+            <div className={styles.avatarInfo}>
+              <h2>{user?.firstName} {user?.lastName}</h2>
+              <p className={styles.userEmail}>{user?.email}</p>
+            </div>
           </div>
           <div className={styles.logoWrapper}>
-            {user?.logo ?<Image src = {user?.logo  ||"/default.avif"} alt="Avatar" width={150} height={100} className={styles.logo}/> : ""}
+            {user?.logo ? <Image src={user?.logo || "/default.avif"} alt="Logo" width={150} height={100} className={styles.logo}/> : ""}
           </div>
         </div>
 
-        <form onSubmit={formik.handleSubmit} className={styles.formSection}>
+        <form onSubmit={formik.handleSubmit}>
           <div className={styles.formGrid}>
             <div className={styles.inputGroup}>
               <Label><FiUser className={styles.inputIcon} /> First Name</Label>
@@ -228,7 +222,6 @@ export default function MyAccount() {
             <Button 
               variant="destructive" 
               onClick={() => setDeletePopupVisible(true)}
-              
             >
               <FiTrash2 />
               Delete Account
