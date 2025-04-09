@@ -280,6 +280,7 @@ export function useInvoice(initialData?: InvoiceData) {
         let finalValues = {
           ...values,
           userId: user?._id,
+          customerId: values.recipientDetails.billTo.id, 
           totals: calculatedTotals,
         };
        
