@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock, FileText, Share2, Zap, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, FileText, Share2, Zap, X, Eye, EyeOff } from "lucide-react";
 import BlogSection from "@/components/BlogSection";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -19,11 +19,15 @@ export default function Home() {
     lastName: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -44,7 +48,12 @@ export default function Home() {
         Cookies.remove('accessToken');
         setIsLoggedIn(false);
         setIsAdmin(false);
+      })
+      .finally(() => {
+        setAuthChecked(true);
       });
+    } else {
+      setAuthChecked(true);
     }
   }, []);
 
@@ -62,15 +71,30 @@ export default function Home() {
       // Redirect based on role
       const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
       router.push(redirectPath);
-    } else {
+    } else if (authChecked) {
+      // Only show auth modal if we've confirmed the user isn't logged in
       setShowAuthModal(true);
     }
+  };
+
+  const handleGoogleAuth = () => {
+    window.open(
+      `${process.env.NEXT_PUBLIC_SERVER}/auth/google`,
+      "_self"
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Validate confirm password for signup
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
 
     try {
       const endpoint = isLogin ? '/api/v1/user/login' : '/api/v1/user/registration';
@@ -125,7 +149,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Auth Modal */}
-      {showAuthModal && !isLoggedIn && (
+      {showAuthModal && !isLoggedIn && authChecked && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -202,16 +226,51 @@ export default function Home() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0c69cc] focus:border-transparent"
-                  required
-                  minLength={6}
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0c69cc] focus:border-transparent"
+                    required
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
+              
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0c69cc] focus:border-transparent"
+                      required
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+              )}
               
               <button
                 type="submit"
@@ -242,11 +301,36 @@ export default function Home() {
                     lastName: '',
                     email: '',
                     password: '',
+                    confirmPassword: '',
                   });
                 }}
                 className="text-[#0c69cc] hover:underline"
               >
                 {isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
+              </button>
+            </div>
+            
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleGoogleAuth}
+                className="mt-4 w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg py-2 px-4 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
+                  <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                  <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                  <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                  <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg>
+                <span>Continue with Google</span>
               </button>
             </div>
           </motion.div>
@@ -299,7 +383,7 @@ export default function Home() {
                     className="relative z-10 bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-all cursor-pointer w-full sm:w-auto"
                   >
                     Learn More
-        </button>
+                  </button>
                 </motion.div>
               </div>
               <div className="mt-8 flex items-center gap-4">
@@ -459,8 +543,8 @@ export default function Home() {
               </button>
             </motion.div>
           </motion.div>
-  </div>
-</section>
+        </div>
+      </section>
 
       {/* Blog Section */}
       <BlogSection />
