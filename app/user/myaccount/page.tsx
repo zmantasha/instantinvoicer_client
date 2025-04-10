@@ -30,8 +30,14 @@ export default function MyAccount() {
   const router = useRouter();
 
   console.log("users",user)
-  useEffect(() => {
-    fetchUserProfile();
+  useEffect(() => {   
+    const fetchData = async () => {
+      setIsLoading(true);  // Set loading before fetching data
+      await fetchUserProfile();
+      setIsLoading(false); // Set loading to false after fetching
+    };
+    
+    fetchData();
   }, []);
   
 
