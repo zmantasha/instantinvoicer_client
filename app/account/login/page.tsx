@@ -62,6 +62,7 @@ export default function LoginPage() {
     validationSchema: loginSchema,
     onSubmit: async(values,{resetForm}) => {
       try {
+        setIsLoading(true);
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/v1/user/login`,values,{withCredentials:true})
         if(response.data  && response.data.message=== "loginSuccessfull"){
           toast.success(response.data.message, {
@@ -80,7 +81,14 @@ export default function LoginPage() {
           // Check if user is admin and redirect accordingly
           const isAdmin = response.data.user?.roles?.includes('admin');
           const redirectPath = isAdmin ? '/admin' : '/user/myinvoice';
-          router.replace(redirectPath);
+          
+          // Use router.push instead of replace for better navigation
+          router.push(redirectPath);
+          
+          // Force a refresh to ensure the middleware picks up the new auth state
+          setTimeout(() => {
+            router.refresh();
+          }, 100);
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -92,6 +100,8 @@ export default function LoginPage() {
             position: "bottom-right",
           });
         }
+      } finally {
+        setIsLoading(false);
       }
     },
   });

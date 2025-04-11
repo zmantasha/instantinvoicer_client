@@ -9,9 +9,11 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useUser } from "@/hooks/UserContext";
 
 export default function Home() {
   const router = useRouter();
+  const { user, fetchUserProfile, loading: userContextLoading } = useUser();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -23,8 +25,6 @@ export default function Home() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -40,14 +40,12 @@ export default function Home() {
         },
       })
       .then(response => {
-        setIsLoggedIn(true);
-        setIsAdmin(response.data.user?.roles?.includes('admin'));
+        // Update the global user context
+        fetchUserProfile();
       })
       .catch(() => {
         // If token is invalid, clear it
         Cookies.remove('accessToken');
-        setIsLoggedIn(false);
-        setIsAdmin(false);
       })
       .finally(() => {
         setAuthChecked(true);
@@ -55,7 +53,24 @@ export default function Home() {
     } else {
       setAuthChecked(true);
     }
-  }, []);
+  }, [fetchUserProfile]);
+
+  // Determine if user is logged in based on UserContext
+  const isLoggedIn = Boolean(user);
+  const isAdmin = Boolean(user?.roles?.includes('admin'));
+
+  // Add a useEffect to check authentication status when the component mounts or when the pathname changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = Cookies.get('accessToken');
+      if (!token && user) {
+        // If there's no token but we have a user, fetch the profile to update the context
+        fetchUserProfile();
+      }
+    };
+    
+    checkAuth();
+  }, [fetchUserProfile, user]);
 
   const scrollToFeatures = (e: React.MouseEvent) => {
     e.preventDefault();

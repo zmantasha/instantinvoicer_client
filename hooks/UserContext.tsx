@@ -62,16 +62,52 @@ export const UserProvider = ({ children }:{children: React.ReactNode}) => {
     } catch (error) {
       console.error("Failed to fetch user:", error);
       setUser(null);
+      // Clear the cookie if the API returns an error
+      Cookies.remove("accessToken");
     } finally {
       setLoading(false);
       console.log("Loading state set to false");
     }
   };
 
+  // Set up an interval to check authentication status
   useEffect(() => {
     console.log("UserProvider mounted, fetching profile");
     fetchUserProfile();
-  }, []);
+    
+    // Set up an interval to periodically check authentication
+    const interval = setInterval(() => {
+      const token = Cookies.get("accessToken");
+      if (token && !user) {
+        // If we have a token but no user, fetch the profile
+        fetchUserProfile();
+      } else if (!token && user) {
+        // If we have a user but no token, clear the user
+        setUser(null);
+      }
+    }, 5000); // Check every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, []); // Remove user dependency to prevent re-running effect when user changes
+
+  // Add a listener for cookie changes
+  useEffect(() => {
+    const checkCookie = () => {
+      const token = Cookies.get("accessToken");
+      if (!token && user) {
+        // If the cookie is removed but we still have a user, clear the user
+        setUser(null);
+      }
+    };
+    
+    // Check immediately
+    checkCookie();
+    
+    // Set up an interval to check for cookie changes
+    const cookieInterval = setInterval(checkCookie, 1000);
+    
+    return () => clearInterval(cookieInterval);
+  }, [user]);
 
   // Check if user has admin role in the roles array
   const isAdmin = Boolean(user?.roles?.includes('admin'));
