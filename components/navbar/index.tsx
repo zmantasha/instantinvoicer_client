@@ -62,12 +62,26 @@ const NavBar: FC = () => {
       );
   
       if (response.data && response.data.status === "success") {
-        Cookies.remove("accessToken");
-        toast.success("Successfully logged out.", { position: "bottom-right" });
-        router.replace("/");
-        setUser(null)
+        // First set user to null and clear UI state
+        setUser(null);
         setShowDropdown(null);
         setShowMobileMenu(false);
+        
+        // Then remove the cookie
+        Cookies.remove("accessToken");
+        
+        // Show success message
+        toast.success("Successfully logged out.", { position: "bottom-right" });
+        
+        // Finally redirect to home page
+        router.push("/");
+        
+        // Force a refresh to ensure all components update properly
+        setTimeout(() => {
+          router.refresh();
+          // Force a re-fetch of the user profile to ensure UserContext is updated
+          fetchUserProfile();
+        }, 100);
       }
     } catch (error) {
       console.error("Logout error:", error);
